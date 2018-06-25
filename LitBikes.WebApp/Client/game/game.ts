@@ -136,6 +136,7 @@ module Game {
             });
 
             $(document).on('keydown', ev => {
+                console.log("N;arjasdc");
                 if ( $(ev.target).is('input') ) {
                     // Typing in chat, don't process as game keys
                     if ( ev.which === Keys.ENTER ) { // enter
@@ -231,8 +232,8 @@ module Game {
             this.secondaryFont = p.loadFont('fonts/visitor.ttf');
             this.debugFont = p.loadFont('fonts/larabie.ttf');
             
-            this.powerUpIconRocket = p.loadImage('img/game/powerups/rocket.png');
-            this.powerUpIconSlow = p.loadImage('img/game/powerups/slow.png');
+            this.powerUpIconRocket = p.loadImage('images/game/powerups/rocket.png');
+            this.powerUpIconSlow = p.loadImage('images/game/powerups/slow.png');
 
             p.createCanvas(this.arena.size, this.arena.size);
         }
