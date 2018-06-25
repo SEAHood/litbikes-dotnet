@@ -1,4 +1,4 @@
-﻿/// <binding AfterBuild='build+deploy' Clean='clean' />
+﻿/// <binding BeforeBuild='build:ts' Clean='clean' />
 var gulp = require('gulp');
 var typescript = require('gulp-tsc');
 var concat = require('gulp-concat');
@@ -6,6 +6,7 @@ var clean = require('gulp-clean');
 var runSequence = require('run-sequence');
 var order = require("gulp-order");
 var debug = require('gulp-debug');
+var minify = require('gulp-minify');
 
 var SRC_ROOT = './Client',
     TS_SRC = [
@@ -49,5 +50,11 @@ gulp.task('build:ts', function () {
         }))
         .pipe(order(JS_ORDER))
         .pipe(concat(DEPLOY_JS_NAME))
+        .pipe(minify({
+            ext: {
+                min: '.min.js'
+            },
+            noSource: true
+        }))
         .pipe(gulp.dest(COMPILED_DIR))
 });
