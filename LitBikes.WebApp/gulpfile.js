@@ -1,4 +1,5 @@
-﻿var gulp = require('gulp');
+﻿/// <binding AfterBuild='build+deploy' Clean='clean' />
+var gulp = require('gulp');
 var typescript = require('gulp-tsc');
 var concat = require('gulp-concat');
 var clean = require('gulp-clean');
@@ -6,7 +7,7 @@ var runSequence = require('run-sequence');
 var order = require("gulp-order");
 var debug = require('gulp-debug');
 
-var SRC_ROOT = './src',
+var SRC_ROOT = './Client',
     TS_SRC = [
         SRC_ROOT + '/references.ts',
         SRC_ROOT + '/game/game.ts',
@@ -16,13 +17,7 @@ var SRC_ROOT = './src',
         SRC_ROOT + '/model/bike.ts',
     ],
 
-    STATIC_ROOT = SRC_ROOT + '/static',
-    STATIC_FILES = [
-        STATIC_ROOT + '/**'
-    ],
-
-    COMPILED_DIR = 'compiled',
-    COMPILED_JS_DIR = COMPILED_DIR + '/js',
+    COMPILED_DIR = './wwwroot/lib/litbikes',
     COMPILED_FILES = COMPILED_DIR + '/**/*',
 
     JS_ORDER = [
@@ -31,42 +26,22 @@ var SRC_ROOT = './src',
         'game/game.js',
     ],
 
-    WEBSERVER_DIR = '../server/web',
-    WEBSERVER_FILES = WEBSERVER_DIR + '/**/*',
-
     DEPLOY_JS_NAME = 'litbikes.js'
     ;
 
 gulp.task('build+deploy', function (callback) {
     return runSequence(
         'clean',
-        function () {
-            runSequence(
-                'build:ts',
-                'move:static',
-                'deploy'
-            );
-        }
+        'build:ts'
     );
 });
 
 gulp.task('clean', function () {
-    return gulp.src([WEBSERVER_FILES, COMPILED_FILES], { read: false, allowEmpty: true })
+    return gulp.src([COMPILED_FILES], { read: false, allowEmpty: true })
         .pipe(clean({ force: true }))
 });
 
-gulp.task('deploy', function () {
-    return gulp.src(COMPILED_FILES)
-        .pipe(gulp.dest(WEBSERVER_DIR))
-});
-
-gulp.task('move:static', function () {
-    return gulp.src(STATIC_FILES, { base: './src/static' })
-        .pipe(gulp.dest(COMPILED_DIR))
-});
-
 gulp.task('build:ts', function () {
-
     return gulp.src(TS_SRC)
         .pipe(typescript({
             module: "commonjs",
@@ -74,5 +49,5 @@ gulp.task('build:ts', function () {
         }))
         .pipe(order(JS_ORDER))
         .pipe(concat(DEPLOY_JS_NAME))
-        .pipe(gulp.dest(COMPILED_JS_DIR))
+        .pipe(gulp.dest(COMPILED_DIR))
 });
