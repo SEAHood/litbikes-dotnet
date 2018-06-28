@@ -1,0 +1,3 @@
+﻿function sayHello() {
+    return "Hello!";
+}
