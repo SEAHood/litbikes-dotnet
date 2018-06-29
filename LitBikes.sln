@@ -5,13 +5,13 @@ VisualStudioVersion = 15.0.27130.2026
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "LitBikes.Model", "LitBikes.Model\LitBikes.Model.csproj", "{A5608E7A-45E7-44C0-B3AC-C47885B6E6D9}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "LitBikes.Engine", "LitBikes.Engine\LitBikes.Engine.csproj", "{EA44B805-8725-4868-A0B9-54ED882BA4D9}"
-EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "LitBikes.Game", "LitBikes.Game\LitBikes.Game.csproj", "{C6ED74AB-73EA-4D5D-B432-C79893A8D9B7}"
 EndProject
 Project("{9092AA53-FB77-4645-B42D-1CCCA6BD08BD}") = "LitBikes.Client", "LitBikes.Client\LitBikes.Client.njsproj", "{0DEBCB09-4329-4382-8AE7-3FDF5C1BAB1F}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "LitBikes.Server", "LitBikes.Server\LitBikes.Server.csproj", "{BDE7306A-69CB-42EA-89B0-0BDF82392B5D}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LitBikes.Util", "LitBikes.Util\LitBikes.Util.csproj", "{2D44F940-845F-49CD-86F9-AF0B5FC36C08}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -23,10 +23,6 @@ Global
 		{A5608E7A-45E7-44C0-B3AC-C47885B6E6D9}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{A5608E7A-45E7-44C0-B3AC-C47885B6E6D9}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{A5608E7A-45E7-44C0-B3AC-C47885B6E6D9}.Release|Any CPU.Build.0 = Release|Any CPU
-		{EA44B805-8725-4868-A0B9-54ED882BA4D9}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{EA44B805-8725-4868-A0B9-54ED882BA4D9}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{EA44B805-8725-4868-A0B9-54ED882BA4D9}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{EA44B805-8725-4868-A0B9-54ED882BA4D9}.Release|Any CPU.Build.0 = Release|Any CPU
 		{C6ED74AB-73EA-4D5D-B432-C79893A8D9B7}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{C6ED74AB-73EA-4D5D-B432-C79893A8D9B7}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{C6ED74AB-73EA-4D5D-B432-C79893A8D9B7}.Release|Any CPU.ActiveCfg = Release|Any CPU
@@ -39,6 +35,10 @@ Global
 		{BDE7306A-69CB-42EA-89B0-0BDF82392B5D}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{BDE7306A-69CB-42EA-89B0-0BDF82392B5D}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{BDE7306A-69CB-42EA-89B0-0BDF82392B5D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{2D44F940-845F-49CD-86F9-AF0B5FC36C08}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{2D44F940-845F-49CD-86F9-AF0B5FC36C08}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{2D44F940-845F-49CD-86F9-AF0B5FC36C08}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{2D44F940-845F-49CD-86F9-AF0B5FC36C08}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
