@@ -1,0 +1,78 @@
+﻿<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta charset="utf-8" />
+    <title></title>
+    <link href="css/main.css" rel="stylesheet" />
+    <link href="css/litbikes.css" rel="stylesheet" />
+</head>
+<body>
+    <div id="wrapper">
+        <div id="title">
+            <h1>🔥litbikes🔥</h1>
+        </div>
+        <div id="game">
+            <div id="round-container">
+                <div id="round-timer">00:00</div>
+            </div>
+            <div id="game-container"></div>
+            <div id="welcome-container">
+                <div id="welcome-message">welcome to litbikes</div>
+                <div id="player-name">
+                    Name:
+                    <input id="player-name-input" spellcheck="false" />
+                    <a id="player-name-submit" style="display: none">Join Game</a>
+                </div>
+            </div>
+            <div id="info-container" style="display: none">
+                <div id="chat-container">
+                    <div id="chat-log">
+                        <ul id="message-list"></ul>
+                    </div>
+                    <input id="chat-input" type="text" placeholder=">" maxlength="200">
+                </div>
+                <div id="score-container">
+                    <div id="score-header">🔥topbikes🔥</div>
+                    <div id="score">
+                        <ul></ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div id="beta-icon" title="eternal beta">β</div>
+
+
+    <div class="container" style="border:1px solid red">
+        <div class="row">&nbsp;</div>
+        <div class="row">
+            <div class="col-6">&nbsp;</div>
+            <div class="col-6">
+                <span style="color:white">User..........</span><input type="text" id="userInput" />
+                <br />
+                <span style="color:white">Message...</span><input type="text" id="messageInput" />
+                <input type="button" id="sendButton" value="Send Message" />
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-12">
+                <hr />
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-6">&nbsp;</div>
+            <div class="col-6">
+                <ul id="messagesList" style="color:white"></ul>
+            </div>
+        </div>
+    </div>
+
+
+
+
+
+    <script src="js/bundle.js"></script>
+</body>
+</html>
+

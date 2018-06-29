@@ -13,7 +13,7 @@
     <SchemaVersion>2.0</SchemaVersion>
     <ProjectGuid>0debcb09-4329-4382-8ae7-3fdf5c1bab1f</ProjectGuid>
     <ProjectHome>.</ProjectHome>
-    <StartupFile>app.js</StartupFile>
+    <StartupFile>app.ts</StartupFile>
     <SearchPath>
     </SearchPath>
     <WorkingDirectory>.</WorkingDirectory>
@@ -35,13 +35,27 @@
   </PropertyGroup>
   <ItemGroup>
     <TypeScriptCompile Include="app.ts" />
-    <Content Include="index.html">
+    <Content Include="public\index.html">
       <SubType>Code</SubType>
     </Content>
+    <Content Include="public\css\litbikes.css" />
     <Content Include="tsconfig.json" />
     <Content Include="package.json" />
     <Content Include="public\css\main.css" />
-    <TypeScriptCompile Include="src\game.ts">
+    <TypeScriptCompile Include="src\model\arena.ts" />
+    <TypeScriptCompile Include="src\model\bike.ts" />
+    <TypeScriptCompile Include="src\dto.ts" />
+    <TypeScriptCompile Include="src\dto.ts">
+      <SubType>Code</SubType>
+    </TypeScriptCompile>
+    <TypeScriptCompile Include="src\model\player.ts" />
+    <TypeScriptCompile Include="src\model\powerUp.ts" />
+    <TypeScriptCompile Include="src\test.ts" />
+    <TypeScriptCompile Include="src\game\game.ts">
+      <SubType>Code</SubType>
+    </TypeScriptCompile>
+    <TypeScriptCompile Include="src\model\trailSegment.ts" />
+    <TypeScriptCompile Include="src\util.ts">
       <SubType>Code</SubType>
     </TypeScriptCompile>
   </ItemGroup>
@@ -51,9 +65,13 @@
     <Folder Include="public\img\" />
     <Folder Include="public\js\" />
     <Folder Include="public\css\" />
+    <Folder Include="src\game\" />
+    <Folder Include="src\model\" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="gulpfile.js" />
+    <Compile Include="webpack.config.js">
+      <SubType>Code</SubType>
+    </Compile>
   </ItemGroup>
   <!-- Do not delete the following Import Project.  While this appears to do nothing it is a marker for setting TypeScript properties before our import that depends on them. -->
   <Import Project="$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)\TypeScript\Microsoft.TypeScript.targets" Condition="False" />
