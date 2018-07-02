@@ -80,6 +80,15 @@ namespace LitBikes.Model
             return line.Intersects(hitbox);
         }
 
+        public bool Equals(PowerUp other)
+        {
+            if (other == null) return false;
+            return id == other.GetId() &&
+                   pos == other.GetPos() &&
+                   type == other.GetPowerUpType() &&
+                   collected == other.collected;                   
+        }
+
         public PowerUpDto GetDto()
         {
             return new PowerUpDto

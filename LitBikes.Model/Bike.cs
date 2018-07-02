@@ -91,7 +91,7 @@ namespace LitBikes.Model
             LineSegment2D segLine;
             if (trail.Size() > 0)
             {
-                LineSegment2D lastSeg = trail.getHead().GetLine();
+                LineSegment2D lastSeg = trail.GetHead().GetLine();
                 segLine = new LineSegment2D();
                 segLine.Start.X = lastSeg.End.X;
                 segLine.Start.Y = lastSeg.End.Y;
@@ -109,8 +109,9 @@ namespace LitBikes.Model
             trail.Add(new TrailSegment(ownerPid, segLine));
         }
 
-        public bool Collides(List<TrailSegment> trail, int lookAhead)
+        public bool Collides(List<TrailSegment> trail, int lookAhead, out int? collidedWith)
         {
+            collidedWith = null;
             if (trail == null) return false;
 
             float aheadX = pos.X + (lookAhead * dir.X);
@@ -125,7 +126,10 @@ namespace LitBikes.Model
             foreach (TrailSegment segment in trail)
             {
                 if (line.Intersects(segment.GetLine()))
+                {
+                    collidedWith = segment.GetOwnerPid();
                     return true;
+                }
             }
 
             return false;
@@ -164,7 +168,7 @@ namespace LitBikes.Model
             return dir;
         }
 
-        public double GetSpd()
+        public float GetSpd()
         {
             return spd;
         }
@@ -193,12 +197,12 @@ namespace LitBikes.Model
             float headSegmentStartY = 0;
             if (trail.Size() > 0)
             {
-                var head = trail.getHead();
+                var head = trail.GetHead();
                 if (head == null)
                 {
                     return null;
                 }
-                var lastSeg = trail.getHead().GetLine();
+                var lastSeg = trail.GetHead().GetLine();
                 headSegmentStartX = lastSeg.End.X;
                 headSegmentStartY = lastSeg.End.Y;
             }

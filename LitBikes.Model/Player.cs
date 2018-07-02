@@ -113,7 +113,7 @@ namespace LitBikes.Model
             };
         }
 
-        public void Update()
+        public void UpdatePosition()
         {
             if (IsAlive())
             {
@@ -128,7 +128,7 @@ namespace LitBikes.Model
             bike.SetDir(_bike.GetDir());
         }
 
-        public bool CrashedIntoSelf()
+        public bool IsCrashedIntoSelf()
         {
             if (crashedInto == null)
                 return false;
