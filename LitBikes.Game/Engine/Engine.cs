@@ -14,7 +14,7 @@ namespace LitBikes.Game
     {
         public static readonly double BASE_BIKE_SPEED = 1.5;
 
-        private static Logger LOG = Log.getLogger(GameEngine.class);
+        //private static Logger LOG = Log.getLogger(GameEngine.class);
 	    private static readonly int GAME_TICK_MS = 25;
         private static readonly int PU_SPAWN_DELAY_MIN = 4;
         private static readonly int PU_SPAWN_DELAY_MAX = 7;
@@ -43,6 +43,7 @@ namespace LitBikes.Game
             score = new ScoreKeeper();
             debug = new Debug();
             roundKeeper = new RoundKeeper(300, 15);
+            powerUpKeeper = new PowerUpKeeper();
             this.gameSize = gameSize;
         }
 
@@ -58,7 +59,7 @@ namespace LitBikes.Game
 
             while (true)
             {
-                var tickRequired = _lastTick == null || DateTime.Now.Subtract(_lastTick).Milliseconds > 1;
+                var tickRequired = _lastTick == null || DateTime.Now.Subtract(_lastTick).Milliseconds > GAME_TICK_MS;
 
                 if (tickRequired)
                 {
@@ -80,7 +81,7 @@ namespace LitBikes.Game
             //LOG.info("Starting game at " + GAME_TICK_MS + "ms per game tick");
             //eventListener.gameStarted();
         }
-
+        
         private void GameTick()
         {
             gameTick++;
@@ -90,6 +91,11 @@ namespace LitBikes.Game
                 UpdatePlayerPositions(out var activePlayers, out var trails);
                 CheckForEvents(activePlayers, trails);
             }
+        }
+
+        public void StartRound()
+        {
+            roundKeeper.StartRound();
         }
 
         private void CheckForEvents(List<Player> activePlayers, List<TrailSegment> trails)
@@ -157,7 +163,7 @@ namespace LitBikes.Game
 
         public Player PlayerJoin(int pid, String name, bool isHuman)
         {
-            LOG.info("Creating new player with pid " + pid);
+            //LOG.info("Creating new player with pid " + pid);
 
             Player player = new Player(pid, isHuman);
             player.SetName(name);
@@ -180,7 +186,7 @@ namespace LitBikes.Game
 
             players.Remove(player);
             score.RemoveScore(pid);
-            LOG.info("Dropped player " + pid);
+            //LOG.info("Dropped player " + pid);
         }
 
         public bool HandleClientUpdate(ClientUpdateDto data)
@@ -248,7 +254,7 @@ namespace LitBikes.Game
 
         public void RequestUsePowerUp(Player player)
         {
-            powerUpKeeper.PlayerRequestsUse(player, GetTrails(), gameSize);
+            powerUpKeeper.PlayerRequestsUse(player, players, GetTrails(), gameSize);
         }
 
         public Spawn FindSpawn()
@@ -319,6 +325,16 @@ namespace LitBikes.Game
         public TimeSpan GetRoundTimeLeft()
         {
             return roundKeeper.GetTimeUntilRoundEnd();
+        }
+
+        public int GetGameSize()
+        {
+            throw new NotImplementedException();
+        }
+
+        public List<Player> GetPlayerList()
+        {
+            throw new NotImplementedException();
         }
     }	
 	

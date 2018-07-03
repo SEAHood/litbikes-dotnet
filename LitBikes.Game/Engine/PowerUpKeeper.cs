@@ -13,12 +13,6 @@ namespace LitBikes.Game
         private bool _isSpawning;
         private Dictionary<int, PowerUp> _playerPowerUps;
         private List<PowerUp> _availablePowerUps;
-        private IEngine _engine;
-
-        public PowerUpKeeper(IEngine engine)
-        {
-            _engine = engine;
-        }
 
         public void StartSpawner()
         {
@@ -46,7 +40,7 @@ namespace LitBikes.Game
             _availablePowerUps.Remove(availablePowerUp);
         }
 
-        public void PlayerRequestsUse(Player player, List<TrailSegment> trails, int gameSize)
+        public void PlayerRequestsUse(Player player, List<Player> playerList, List<TrailSegment> trails, int gameSize)
         {
             if (_playerPowerUps.TryGetValue(player.GetId(), out var powerUp))
             {
@@ -88,8 +82,7 @@ namespace LitBikes.Game
                             break;
                         }
 
-                        var trailOwner = _engine
-                            .GetPlayerList()
+                        var trailOwner = playerList
                             .FirstOrDefault(p => p.GetId() == impactPoint.GetTrailSegment()
                             .GetOwnerPid());
 
@@ -103,8 +96,7 @@ namespace LitBikes.Game
                         //debug.addImpact(impactPoint);
                         break;
                     case PowerUpType.SLOW:
-                        var players = _engine.GetPlayerList();
-                        foreach (var p in players)
+                        foreach (var p in playerList)
                         {
                             if (p.GetId() != player.GetId())
                             {
