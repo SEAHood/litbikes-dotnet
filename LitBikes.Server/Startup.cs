@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using LitBikes.Game.Controller;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
@@ -25,6 +26,9 @@ namespace LitBikes.Server
         {
             services.AddMvc();
             services.AddSignalR();
+
+            services.AddSingleton<ClientEventController, ClientEventController>();
+            services.AddSingleton<GameController, GameController>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

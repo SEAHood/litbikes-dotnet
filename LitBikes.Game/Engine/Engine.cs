@@ -1,21 +1,21 @@
-﻿using LitBikes.Model;
-using LitBikes.Model.Dtos;
-using Nine.Geometry;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Numerics;
-using System.Text;
 using System.Timers;
+using LitBikes.Game.Controller;
+using LitBikes.Model;
+using LitBikes.Model.Dtos;
+using Nine.Geometry;
 
-namespace LitBikes.Game
+namespace LitBikes.Game.Engine
 {
     public class GameEngine
     {
-        public static readonly double BASE_BIKE_SPEED = 1.5;
 
+        public static readonly float BaseBikeSpeed = 1.5f;
         //private static Logger LOG = Log.getLogger(GameEngine.class);
-	    private static readonly int GAME_TICK_MS = 25;
+        private static readonly int GAME_TICK_MS = 25;
         private static readonly int PU_SPAWN_DELAY_MIN = 4;
         private static readonly int PU_SPAWN_DELAY_MAX = 7;
         private static readonly int PU_DURATION_MIN = 10;
@@ -35,8 +35,11 @@ namespace LitBikes.Game
 
         private Timer powerUpSpawnTimer = new Timer();
 
-        public GameEngine(int gameSize)
+        private readonly GameEventController _gameEventController;
+
+        public GameEngine(GameEventController gameEventController, int gameSize)
         {
+            _gameEventController = gameEventController;
             arena = new Arena(gameSize);
             players = new List<Player>();
             powerUps = new List<PowerUp>();
@@ -100,7 +103,7 @@ namespace LitBikes.Game
 
         private void CheckForEvents(List<Player> activePlayers, List<TrailSegment> trails)
         {
-            foreach (Player player in activePlayers)
+            foreach (var player in activePlayers)
             {
                 var bike = player.GetBike();
                 var crashed = bike.Collides(trails, 1, out var collidedWith) || arena.CheckCollision(bike, 1);
@@ -117,7 +120,7 @@ namespace LitBikes.Game
                     var dir = bike.GetDir();
                     var aheadX = pos.X + (2 * dir.X);
                     var aheadY = pos.X + (2 * dir.Y);
-                    LineSegment2D line = new LineSegment2D(new Vector2(pos.X, pos.Y), new Vector2(aheadX, aheadY));
+                    var line = new LineSegment2D(new Vector2(pos.X, pos.Y), new Vector2(aheadX, aheadY));
                     if (powerUp.Collides(line))
                     {
                         // power-up keeper . PlayerCollectedPowerUp(powerUp)
@@ -146,7 +149,7 @@ namespace LitBikes.Game
                 // Decrement player score if they crashed into themselves or the wall
                 score.GrantScore(player.GetId(), player.GetName(), -1);
             }
-            eventListener.scoreUpdated(score.GetScores());
+            _gameEventController.ScoreUpdated(score.GetScores());
             return crashedInto;
         }
 
@@ -154,7 +157,7 @@ namespace LitBikes.Game
         {
             activePlayers = players.Where(p => p.IsAlive()).ToList();
             trails = new List<TrailSegment>();
-            foreach (Player player in activePlayers)
+            foreach (var player in activePlayers)
             {
                 player.UpdatePosition();
                 trails.AddRange(player.GetBike().GetTrailSegmentList(true));
@@ -248,7 +251,7 @@ namespace LitBikes.Game
             if (player != null && player.IsCrashed())
             {
                 player.Respawn(FindSpawn());
-                eventListener.playerSpawned(player.getId());
+                _gameEventController.PlayerSpawned(player.GetId());
             }
         }
 
@@ -259,11 +262,11 @@ namespace LitBikes.Game
 
         public Spawn FindSpawn()
         {
-            Spawn spawn = new Spawn(gameSize);
+            Spawn spawn = new Spawn(gameSize, BaseBikeSpeed);
             int i = 0;
             while (!SpawnIsAcceptable(spawn) && i++ < 10)
             {
-                spawn = new Spawn(gameSize);
+                spawn = new Spawn(gameSize, BaseBikeSpeed);
             }
             return spawn;
         }
@@ -271,7 +274,7 @@ namespace LitBikes.Game
         public bool SpawnIsAcceptable(Spawn spawn)
         {
             var limit = 100; // Distance to nearest trail
-            List<TrailSegment> trails = GetTrails();
+            var trails = GetTrails();
 
             var aheadX = spawn.GetPos().X + (limit * spawn.GetDir().X);
             var aheadY = spawn.GetPos().Y + (limit * spawn.GetDir().Y);

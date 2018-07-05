@@ -13,9 +13,7 @@ namespace LitBikes.Game
             {
                 var p = GetLineIntersection(ray, seg.GetLine());
                 if (p != null)
-                {
-                    impactPoints.Add(new ImpactPoint(seg, p));
-                }
+                    impactPoints.Add(new ImpactPoint(seg, p.Value));
             }
 
             ImpactPoint closestImpactPoint = null;
@@ -39,7 +37,7 @@ namespace LitBikes.Game
             var points = new List<Point>();
             foreach (var line in lines)
             {
-                Point? p = GetLineIntersection(ray, line);
+                var p = GetLineIntersection(ray, line);
                 if (p != null)
                     points.Add(p.Value);
             }

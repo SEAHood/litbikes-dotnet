@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Drawing;
 
 namespace LitBikes.Util
 {
@@ -7,11 +8,12 @@ namespace LitBikes.Util
         private static readonly float MIN_BRIGHTNESS = 0.8f;
         public static Color getBrightColor()
         {
-            Random random = new Random();
-            double h = random.NextDouble();
-            double s = random.NextDouble();
-            double b = MIN_BRIGHTNESS + ((1f - MIN_BRIGHTNESS) * random.NextDouble());
-            Color c = Color.getHSBColor(h, s, b);
+            var random = new Random();
+            var h = random.NextDouble();
+            var s = random.NextDouble();
+            var b = MIN_BRIGHTNESS + ((1f - MIN_BRIGHTNESS) * random.NextDouble());
+            //var c = Color.FromArgb(rnd.Next(256), rnd.Next(256), rnd.Next(256));
+            var c = Color.Aqua; // TODO
             return c;
         }
     }

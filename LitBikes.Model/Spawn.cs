@@ -5,41 +5,40 @@ namespace LitBikes.Model
 {
     public class Spawn
     {
+        private readonly Vector2 _pos;
+	    private readonly Vector2 _dir;
+	    private readonly float _spd;
 
-        private readonly Vector2 pos;
-	    private readonly Vector2 dir;
-	    private readonly float spd;
-
-        public Spawn(int gameSize)
+        public Spawn(int gameSize, float speed)
         {
-            pos = CreateSpawnPosition(gameSize);
-            dir = CreateSpawnDir();
-            spd = GameEngine.BASE_BIKE_SPEED;
+            _pos = CreateSpawnPosition(gameSize);
+            _dir = CreateSpawnDir();
+            _spd = speed;
         }
 
         public Vector2 GetPos()
         {
-            return pos;
+            return _pos;
         }
 
         public Vector2 GetDir()
         {
-            return dir;
+            return _dir;
         }
 
         public float GetSpd()
         {
-            return spd;
+            return _spd;
         }
 
-        private Vector2 CreateSpawnPosition(int gameSize)
+        private static Vector2 CreateSpawnPosition(int gameSize)
         {
-            return new Vector2(NumberUtil.randInt(20, gameSize - 20), NumberUtil.randInt(20, gameSize - 20));
+            return new Vector2(NumberUtil.RandInt(20, gameSize - 20), NumberUtil.RandInt(20, gameSize - 20));
         }
 
-        private Vector2 CreateSpawnDir()
+        private static Vector2 CreateSpawnDir()
         {
-            int dir = NumberUtil.randInt(1, 4);
+            var dir = NumberUtil.RandInt(1, 4);
             switch (dir)
             {
                 case 1:

@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Drawing;
 using System.Text;
 using System.Timers;
+using LitBikes.Game.Engine;
 using LitBikes.Model.Dtos;
 
 namespace LitBikes.Game.Controller
@@ -28,10 +29,62 @@ namespace LitBikes.Game.Controller
 
         private Timer broadcastWorldTimer;
         private int broadcastWorldInterval = 100; // MS
+
+        private ClientEventHandler _clientEventHandler;
         
         public GameController(int _minPlayers, int gameSize, ClientEventController clientEventController)
         {
             var gameEventController = new GameEventController();
+            _clientEventHandler = new ClientEventHandler();
+            SetupGameEventHandlers(gameEventController);
+            SetupClientEventHandlers(clientEventController);
+
+            minPlayers = _minPlayers;
+            game = new GameEngine(gameEventController, gameSize);
+            sessionPlayers = new Dictionary<Guid, int>();
+            // botController = new BotController(this);
+
+            broadcastWorldTimer.Interval = broadcastWorldInterval;
+            broadcastWorldTimer.Elapsed += (sender, e) => BroadcastWorldUpdate();
+            broadcastWorldTimer.Start();
+
+        }
+
+        private void SetupClientEventHandlers(ClientEventController clientEventController)
+        {
+            clientEventController.Event += (sender, args) =>
+            {
+                switch (args.Event)
+                {
+                    case ClientEvent.Hello:
+                        _clientEventHandler.ClientHello();
+                        break;
+                    case ClientEvent.ChatMessage:
+                        _clientEventHandler.ClientChatMessageEvent("something");
+                        break;
+                    case ClientEvent.KeepAlive:
+                        _clientEventHandler.ClientKeepAliveEvent();
+                        break;
+                    case ClientEvent.RequestJoinGame:
+                        _clientEventHandler.ClientRequestGameJoinEvent(null);
+                        break;
+                    case ClientEvent.RequestRespawn:
+                        _clientEventHandler.ClientRequestRespawnEvent();
+                        break;
+                    case ClientEvent.Update:
+                        _clientEventHandler.ClientUpdateEvent(null);
+                        break;
+                    case ClientEvent.UsePowerup:
+                        _clientEventHandler.ClientRequestUsePowerUpEvent();
+                        break;
+                    default:
+                        throw new ArgumentOutOfRangeException();
+                }
+            };
+        }
+
+        private void SetupGameEventHandlers(GameEventController gameEventController)
+        {
             gameEventController.Event += (sender, args) =>
             {
                 switch (args.Event)
@@ -57,16 +110,6 @@ namespace LitBikes.Game.Controller
                         throw new ArgumentOutOfRangeException();
                 }
             };
-
-            minPlayers = _minPlayers;
-            game = new GameEngine(gameSize);
-            sessionPlayers = new Dictionary<Guid, int>();
-            // botController = new BotController(this);
-
-            broadcastWorldTimer.Interval = broadcastWorldInterval;
-            broadcastWorldTimer.Elapsed += new ElapsedEventHandler(BroadcastWorldUpdate);
-            broadcastWorldTimer.Start();
-
         }
 
         public void Start()
@@ -146,7 +189,7 @@ namespace LitBikes.Game.Controller
             //ioServer.getBroadcastOperations().sendEvent(key, obj);
         }
 
-        public Bot BotCreated()
+        /*public Bot BotCreated()
         {
             /*String botName = "BOT#" + String.format("%04d", random.nextInt(10000));
             int pid = pidGen++;
@@ -155,14 +198,14 @@ namespace LitBikes.Game.Controller
             bot.setName(botName);
             bot.setBike(player.getBike());
             sessionPlayers.put(bot.getSessionId(), pid);
-            return bot;*/
+            return bot;#1#
         }
 
         public void BotDestroyed(Bot bot)
         {
             /*game.dropPlayer(bot.getId());
-            sessionPlayers.remove(bot.getSessionId());*/
-        }
+            sessionPlayers.remove(bot.getSessionId());#1#
+        }*/
 
         private void BalanceBots()
         {
@@ -174,149 +217,6 @@ namespace LitBikes.Game.Controller
             botController.setBotCount(requiredBots);*/
         }
 
-        // CLIENT EVENTS
-        public void ClientJoiningGame(ClientGameJoinDto gameJoinDto)
-        {
-            /*if (!gameJoinDto.isValid())
-            {
-                // TODO Implement some error handling
-                client.sendEvent(C_ERROR, "invalid name");
-                return;
-            }
-
-            int pid = sessionPlayers.get(client.getSessionId());
-            String name = gameJoinDto.name;
-            Player player = game.playerJoin(pid, name, true);
-
-            GameSettingsDto gameSettings = new GameSettingsDto();
-            gameSettings.gameTickMs = game.getGameTickMs();
-
-            GameJoinDto dto = new GameJoinDto();
-            dto.player = player.getDto();
-            dto.scores = game.getScores();
-
-            balanceBots();
-
-            client.sendEvent(C_JOINED_GAME, dto);*/
-        }
-
-        public void ClientHello()
-        {
-            /*int pid = pidGen++;
-            sessionPlayers.put(client.getSessionId(), pid);
-
-            GameSettingsDto gameSettings = new GameSettingsDto();
-            gameSettings.gameTickMs = game.getGameTickMs();
-
-            HelloDto dto = new HelloDto();
-            dto.gameSettings = gameSettings;
-            dto.world = game.getWorldDto();
-
-            client.sendEvent(C_HELLO, dto);*/
-        }
-
-        public void ClientDisconnectEvent()
-        {
-            /*try
-            {
-                Integer pid = sessionPlayers.get(client.getSessionId());
-                if (pid == null)
-                    return;//throw new Exception("sessionPlayers value was null.. this really shouldn't have happened");
-                game.dropPlayer(pid);
-            }
-            catch (Exception e)
-            {
-
-            }
-            balanceBots();*/
-        }
-
-        public void ClientChatMessageEvent(String message)
-        {
-            //var pid = sessionPlayers.get(client.getSessionId());
-            //if (pid == null)
-                //return;//throw new Exception("sessionPlayers value was null.. this really shouldn't have happened");
-            var pid = 1; // TODO TEMPORARY
-            var player = game.GetPlayer(pid);
-            var colour = player.GetBike().GetColour();
-            var sourceColour = $"rgba({colour.getRed()},{colour.getGreen()},{colour.getBlue()},%A%)";
-            var dto = new ChatMessageDto(player.GetName(), sourceColour, message, false);
-
-            BroadcastData("chat-message", dto);
-        }
-
-
-        public void ClientUpdateEvent(ClientUpdateDto updateDto)
-        {
-            /*Integer pid = sessionPlayers.get(client.getSessionId());
-            if (pid == null)
-                return;//throw new Exception("sessionPlayers value was null.. this really shouldn't have happened");
-
-            if (game.HandleClientUpdate(updateDto))
-            {
-                broadcastWorldUpdate();
-            }*/
-        }
-
-
-        public void ClientRequestRespawnEvent()
-        {
-            /*Integer pid = sessionPlayers.get(client.getSessionId());
-            if (pid == null)
-                throw new Exception("sessionPlayers value was null.. this really shouldn't have happened");
-
-            Player player = game.getPlayer(pid);
-            LOG.info("Respawn request from " + player.getName());
-            game.requestRespawn(player);*/
-        }
-
-
-        public void ClientRequestUsePowerUpEvent()
-        {
-            /*Integer pid = sessionPlayers.get(client.getSessionId());
-            if (pid == null)
-                throw new Exception("sessionPlayers value was null.. this really shouldn't have happened");
-
-            Player player = game.getPlayer(pid);
-            if (player.getCurrentPowerUpType() == null)
-                return; // player doesn't have a powerup
-
-            LOG.info("PowerUp used by " + player.getName());
-            game.requestUsePowerUp(player);
-            broadcastWorldUpdate();*/
-        }
-
-
-        public void ClientHelloEvent()
-        {
-            /*LOG.info("Received hello");
-            clientHello(client);*/
-        }
-
-        public void ClientRequestWorldEvent()
-        {
-            //SendWorldUpdate(client);
-        }
-
-        public void ClientKeepAliveEvent()
-        {
-            // todo time out client after 2 missed keep alives or something?
-            //client.sendEvent("keep-alive-ack");
-        }
-
-        public void ClientRequestGameJoinEvent(ClientGameJoinDto gameJoinDto)
-        {
-            /*LOG.info("Received game join request event");
-            clientJoiningGame(client, gameJoinDto);
-
-            // TODO Make sure client isn't trying to rejoin - i.e. if they already have a name
-
-            String newPlayerMessage = gameJoinDto.name + " joined!";
-            ChatMessageDto dto = new ChatMessageDto(null, null, newPlayerMessage, true);
-            broadcastData("chat-message", dto);*/
-        }
-
-	    // END CLIENT EVENTS
-
+        
     }
 }

@@ -2,9 +2,11 @@
 using Nine.Geometry;
 using System;
 using System.Collections.Generic;
+using System.Drawing;
 using System.Linq;
 using System.Numerics;
 using System.Text;
+using Point = Nine.Geometry.Point;
 
 namespace LitBikes.Model
 {
@@ -51,32 +53,35 @@ namespace LitBikes.Model
             AddTrailPoint();
 
             if (newPlayer)
-                colour = generateBikeColour();
+                colour = GenerateBikeColour();
         }
 
-        private Color generateBikeColour()
+        private Color GenerateBikeColour()
         {
-            String[] colours = {
-            "#ff0099",
-            "#b4ff69",
-            "#69b4ff",
-            "#ffb469",
-            "#69ffb4",
-            "#f3f315",
-            "#f1c40f",
-            "#e74c3c",
-            "#8e44ad",
-            "#3498db",
-            "#2ecc71",
-            "#9b59b6",
-            "#27ae60",
-            "#1abc9c",
-            "#2980b9",
-            "#d35400",
-            "#f39c12"
-        };
-            String colour = colours[random.Next(colours.Length)];
-            return Color.decode(colour);
+            string[] colours = {
+                "#ff0099",
+                "#b4ff69",
+                "#69b4ff",
+                "#ffb469",
+                "#69ffb4",
+                "#f3f315",
+                "#f1c40f",
+                "#e74c3c",
+                "#8e44ad",
+                "#3498db",
+                "#2ecc71",
+                "#9b59b6",
+                "#27ae60",
+                "#1abc9c",
+                "#2980b9",
+                "#d35400",
+                "#f39c12"
+            };
+            var colourHex = colours[random.Next(colours.Length)];
+            var colourConverter = new ColorConverter();
+            var newColour = (Color?)colourConverter.ConvertFromString(colourHex);
+
+            return newColour ?? Color.Red;
         }
 
         public void UpdatePosition()
@@ -137,15 +142,14 @@ namespace LitBikes.Model
 
         public BikeDto GetDto()
         {
-            BikeDto dto = new BikeDto
+            return new BikeDto
             {
                 pos = new Vector2(pos.X, pos.Y),
                 dir = new Vector2(dir.X, dir.Y),
                 spd = spd,
                 trail = trail.GetList().Select(t => t.GetDto()).ToList(),
-                colour = $"rgba({colour.getRed()},{colour.getGreen()},{colour.getBlue()},%A%)"
+                colour = $"rgba({colour.R:X2},{colour.G:X2},{colour.B:X2},%A%)"
             };
-            return dto;
         }
 
         public Vector2 GetPos()
@@ -208,8 +212,8 @@ namespace LitBikes.Model
             }
             else
             {
-                headSegmentStartX = startPos.x;
-                headSegmentStartY = startPos.y;
+                headSegmentStartX = startPos.X;
+                headSegmentStartY = startPos.Y;
             }
 
             foreach (var t in trailWithHead)
@@ -234,7 +238,7 @@ namespace LitBikes.Model
             AddTrailPoint();
         }
 
-        public override String ToString()
+        public override string ToString()
         {
             return "bike s(" + pos.X + ", " + pos.Y + "), s(" + dir.X + ", " + dir.Y + ")";
         }

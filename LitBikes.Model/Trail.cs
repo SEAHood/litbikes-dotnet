@@ -64,7 +64,7 @@ namespace LitBikes.Model
             var orientation = requestedSegment.GetOrientation();
             TrailSegment newSegment1 = null;
             TrailSegment newSegment2 = null;
-            if (orientation.x == 1)
+            if (orientation.X == 1)
             {
                 // segment is horizontal
                 var y = requestedSegment.GetLine().Start.Y;
@@ -101,7 +101,7 @@ namespace LitBikes.Model
                 newSegment1 = new TrailSegment(requestedSegment.GetOwnerPid(), newSegment1Line);
                 newSegment2 = new TrailSegment(requestedSegment.GetOwnerPid(), newSegment2Line);
             }
-            else if (orientation.y == 1)
+            else if (orientation.Y == 1)
             {
                 // segment is vertical
                 var x = requestedSegment.GetLine().Start.X;
