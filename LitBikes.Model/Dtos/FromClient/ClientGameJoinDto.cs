@@ -2,9 +2,9 @@
 
 namespace LitBikes.Model.Dtos
 {
-    public class ClientGameJoinDto
+    public class ClientGameJoinDto : IDto
     {
-        public String name;
+        public string name;
 
         public bool IsValid()
         {

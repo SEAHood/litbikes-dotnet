@@ -4,11 +4,11 @@ namespace LitBikes.Model
 {
     public class Wall : ICollidable
     {
-        public int GetId()
+        public Guid GetId()
         {
-            return -1;
+            return Guid.Empty;
         }
-        public String GetName()
+        public string GetName()
         {
             return "The Wall";
         }

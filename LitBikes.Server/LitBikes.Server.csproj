@@ -18,6 +18,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\LitBikes.Events\LitBikes.Events.csproj" />
     <ProjectReference Include="..\LitBikes.Game\LitBikes.Game.csproj" />
   </ItemGroup>
 

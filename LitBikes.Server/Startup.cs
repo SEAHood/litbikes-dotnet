@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using LitBikes.Events;
 using LitBikes.Game.Controller;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -27,7 +28,8 @@ namespace LitBikes.Server
             services.AddMvc();
             services.AddSignalR();
 
-            services.AddSingleton<ClientEventController, ClientEventController>();
+            services.AddSingleton<ServerEventSender, ServerEventSender>();
+            services.AddSingleton<ClientEventReceiver, ClientEventReceiver>();
             services.AddSingleton<GameController, GameController>();
         }
 

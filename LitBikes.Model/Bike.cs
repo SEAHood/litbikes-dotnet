@@ -23,37 +23,37 @@ namespace LitBikes.Model
         public Vector2 dir;
         public float spd;
         public List<TrailSegmentDto> trail;
-        public String colour; // in rgba(0,0,0,%A%) format
+        public string colour; // in rgba(0,0,0,%A%) format
     }
 
     public class Bike
     {
         //private static Logger LOG = Log.getLogger(Bike.class);	
-        private readonly int ownerPid;
-        private Vector2 pos;
-        private Vector2 dir;
-        private float spd;
-        private Trail trail;
-        private Vector2 startPos;
-        private Color colour;
-        private Random random = new Random();
+        private readonly Guid _ownerPid;
+        private Vector2 _pos;
+        private Vector2 _dir;
+        private float _spd;
+        private Trail _trail;
+        private Vector2 _startPos;
+        private Color _colour;
+        private readonly Random _random = new Random();
 
-        public Bike(int ownerPid)
+        public Bike(Guid ownerPid)
         {
-            this.ownerPid = ownerPid;
+            _ownerPid = ownerPid;
         }
 
         public void Init(Spawn spawn, bool newPlayer)
         {
-            pos = spawn.GetPos();
-            dir = spawn.GetDir();
-            spd = spawn.GetSpd();
-            trail = new Trail();
-            startPos = pos;
+            _pos = spawn.GetPos();
+            _dir = spawn.GetDir();
+            _spd = spawn.GetSpd();
+            _trail = new Trail();
+            _startPos = _pos;
             AddTrailPoint();
 
             if (newPlayer)
-                colour = GenerateBikeColour();
+                _colour = GenerateBikeColour();
         }
 
         private Color GenerateBikeColour()
@@ -77,7 +77,7 @@ namespace LitBikes.Model
                 "#d35400",
                 "#f39c12"
             };
-            var colourHex = colours[random.Next(colours.Length)];
+            var colourHex = colours[_random.Next(colours.Length)];
             var colourConverter = new ColorConverter();
             var newColour = (Color?)colourConverter.ConvertFromString(colourHex);
 
@@ -86,55 +86,71 @@ namespace LitBikes.Model
 
         public void UpdatePosition()
         {
-            float xDiff = dir.X * spd;
-            float yDiff = dir.Y * spd;
-            pos = Vector2.Add(pos, new Vector2(xDiff, yDiff));
+            var xDiff = _dir.X * _spd;
+            var yDiff = _dir.Y * _spd;
+            _pos = Vector2.Add(_pos, new Vector2(xDiff, yDiff));
         }
 
         private void AddTrailPoint()
         {
             LineSegment2D segLine;
-            if (trail.Size() > 0)
+            if (_trail.Size() > 0)
             {
-                LineSegment2D lastSeg = trail.GetHead().GetLine();
-                segLine = new LineSegment2D();
-                segLine.Start.X = lastSeg.End.X;
-                segLine.Start.Y = lastSeg.End.Y;
-                segLine.End.X = pos.X;
-                segLine.End.Y = pos.Y;
+                var lastSeg = _trail.GetHead().GetLine();
+                segLine = new LineSegment2D
+                {
+                    Start = {
+                        X = lastSeg.End.X,
+                        Y = lastSeg.End.Y
+                    },
+                    End = {
+                        X = _pos.X,
+                        Y = _pos.Y
+                    }
+                };
             }
             else
             {
-                segLine = new LineSegment2D();
-                segLine.Start.X = pos.X;
-                segLine.Start.Y = pos.Y;
-                segLine.End.X = pos.X;
-                segLine.End.Y = pos.Y;
+                segLine = new LineSegment2D
+                {
+                    Start = {
+                        X = _pos.X,
+                        Y = _pos.Y
+                    },
+                    End = {
+                        X = _pos.X,
+                        Y = _pos.Y
+                    }
+                };
             }
-            trail.Add(new TrailSegment(ownerPid, segLine));
+            _trail.Add(new TrailSegment(_ownerPid, segLine));
         }
 
-        public bool Collides(List<TrailSegment> trail, int lookAhead, out int? collidedWith)
+        public bool Collides(List<TrailSegment> trail, int lookAhead, out Guid? collidedWith)
         {
             collidedWith = null;
             if (trail == null) return false;
 
-            float aheadX = pos.X + (lookAhead * dir.X);
-            float aheadY = pos.Y + (lookAhead * dir.Y);
+            var aheadX = _pos.X + (lookAhead * _dir.X);
+            var aheadY = _pos.Y + (lookAhead * _dir.Y);
 
-            LineSegment2D line = new LineSegment2D();
-            line.Start.X = pos.X;
-            line.Start.Y = pos.Y;
-            line.End.X = aheadX;
-            line.End.Y = aheadY;
-
-            foreach (TrailSegment segment in trail)
+            var line = new LineSegment2D
             {
-                if (line.Intersects(segment.GetLine()))
-                {
-                    collidedWith = segment.GetOwnerPid();
-                    return true;
+                Start = {
+                    X = _pos.X,
+                    Y = _pos.Y
+                },
+                End = {
+                    X = aheadX,
+                    Y = aheadY
                 }
+            };
+
+            foreach (var segment in trail)
+            {
+                if (!line.Intersects(segment.GetLine())) continue;
+                collidedWith = segment.GetOwnerPid();
+                return true;
             }
 
             return false;
@@ -144,83 +160,84 @@ namespace LitBikes.Model
         {
             return new BikeDto
             {
-                pos = new Vector2(pos.X, pos.Y),
-                dir = new Vector2(dir.X, dir.Y),
-                spd = spd,
-                trail = trail.GetList().Select(t => t.GetDto()).ToList(),
-                colour = $"rgba({colour.R:X2},{colour.G:X2},{colour.B:X2},%A%)"
+                pos = new Vector2(_pos.X, _pos.Y),
+                dir = new Vector2(_dir.X, _dir.Y),
+                spd = _spd,
+                trail = _trail.GetList().Select(t => t.GetDto()).ToList(),
+                colour = $"rgba({_colour.R:X2},{_colour.G:X2},{_colour.B:X2},%A%)"
             };
         }
 
         public Vector2 GetPos()
         {
-            return pos;
+            return _pos;
         }
 
         public void SetPos(Vector2 pos)
         {
-            this.pos = pos;
+            this._pos = pos;
         }
 
         public Point GetPosAsPoint()
         {
-            return new Point((int)pos.X, (int)pos.Y);
+            return new Point((int)_pos.X, (int)_pos.Y);
         }
 
         public Vector2 GetDir()
         {
-            return dir;
+            return _dir;
         }
 
         public float GetSpd()
         {
-            return spd;
+            return _spd;
         }
 
         public void SetSpd(float spd)
         {
-            this.spd = spd;
+            _spd = spd;
         }
 
         public void SetDir(Vector2 dir)
         {
-            if ((this.dir.X == 0 && dir.X == 0) || (this.dir.Y == 0 && dir.Y == 0))
+            if (_dir.X == 0 && dir.X == 0 || _dir.Y == 0 && dir.Y == 0)
                 return;
 
-            this.dir = dir;
+            _dir = dir;
             AddTrailPoint();
         }
 
         public List<TrailSegment> GetTrailSegmentList(bool withHead)
         {
             if (!withHead)
-                return trail.GetList();
+                return _trail.GetList();
 
-            var trailWithHead = new List<TrailSegment>(trail.GetList());
-            float headSegmentStartX = 0;
-            float headSegmentStartY = 0;
-            if (trail.Size() > 0)
+            var trailWithHead = new List<TrailSegment>(_trail.GetList());
+            float headSegmentStartX;
+            float headSegmentStartY;
+
+            if (_trail.Size() > 0)
             {
-                var head = trail.GetHead();
+                var head = _trail.GetHead();
                 if (head == null)
                 {
                     return null;
                 }
-                var lastSeg = trail.GetHead().GetLine();
+                var lastSeg = _trail.GetHead().GetLine();
                 headSegmentStartX = lastSeg.End.X;
                 headSegmentStartY = lastSeg.End.Y;
             }
             else
             {
-                headSegmentStartX = startPos.X;
-                headSegmentStartY = startPos.Y;
+                headSegmentStartX = _startPos.X;
+                headSegmentStartY = _startPos.Y;
             }
 
             foreach (var t in trailWithHead)
             {
                 t.SetHead(false);
             }
-            var headSegment = new TrailSegment(ownerPid, new LineSegment2D(new Vector2(headSegmentStartX, headSegmentStartY), new Vector2(pos.X, pos.Y)));
+            var headSegment = new TrailSegment(_ownerPid, new LineSegment2D(new Vector2(headSegmentStartX, headSegmentStartY), new Vector2(_pos.X, _pos.Y)));
             headSegment.SetHead(true);
             trailWithHead.Add(headSegment);
 
@@ -229,7 +246,7 @@ namespace LitBikes.Model
 
         public Color GetColour()
         {
-            return colour;
+            return _colour;
         }
 
         public void Crash()
@@ -240,12 +257,12 @@ namespace LitBikes.Model
 
         public override string ToString()
         {
-            return "bike s(" + pos.X + ", " + pos.Y + "), s(" + dir.X + ", " + dir.Y + ")";
+            return "bike s(" + _pos.X + ", " + _pos.Y + "), s(" + _dir.X + ", " + _dir.Y + ")";
         }
 
         public void BreakTrailSegment(ImpactPoint impactPoint, double radius)
         {
-            trail.BreakSegment(impactPoint, radius);
+            _trail.BreakSegment(impactPoint, radius);
         }
     }
 }

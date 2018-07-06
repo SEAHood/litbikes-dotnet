@@ -7,67 +7,67 @@ namespace LitBikes.Model
 {
     public class TrailSegment
     {
-        private readonly String id;
-	    private readonly int ownerPid;
-        private readonly LineSegment2D line;
-	    private readonly Vector2 orientation;
-	    private bool isHead;
+        private readonly string _id;
+	    private readonly Guid _ownerPid;
+        private readonly LineSegment2D _line;
+	    private readonly Vector2 _orientation;
+	    private bool _isHead;
 
-        public TrailSegment(int ownerPid, LineSegment2D line) :
+        public TrailSegment(Guid ownerPid, LineSegment2D line) :
             this(Guid.NewGuid().ToString(), ownerPid, line, GeometryUtil.GetLineOrientation(line), false) { }
 
-        private TrailSegment(String id, int ownerPid, LineSegment2D line, Vector2 orientation, bool isHead)
+        private TrailSegment(string id, Guid ownerPid, LineSegment2D line, Vector2 orientation, bool isHead)
         {
-            this.id = id;
-            this.ownerPid = ownerPid;
-            this.line = line;
-            this.orientation = orientation;
-            this.isHead = isHead;
+            _id = id;
+            _ownerPid = ownerPid;
+            _line = line;
+            _orientation = orientation;
+            _isHead = isHead;
         }
 
-        public String GetId()
+        public string GetId()
         {
-            return id;
+            return _id;
         }
 
-        public int GetOwnerPid()
+        public Guid GetOwnerPid()
         {
-            return ownerPid;
+            return _ownerPid;
         }
 
         public LineSegment2D GetLine()
         {
-            return line;
+            return _line;
         }
 
         public Vector2 GetOrientation()
         {
-            return orientation;
+            return _orientation;
         }
 
         public bool IsHead()
         {
-            return isHead;
+            return _isHead;
         }
 
         public void SetHead(bool isHead)
         {
-            this.isHead = isHead;
+            _isHead = isHead;
         }
 
         public TrailSegmentDto GetDto()
         {
             return new TrailSegmentDto
             {
-                isHead = isHead,
-                start = new Vector2(line.Start.X, line.Start.Y),
-                end = new Vector2(line.End.X, line.End.Y)
+                isHead = _isHead,
+                start = new Vector2(_line.Start.X, _line.Start.Y),
+                end = new Vector2(_line.End.X, _line.End.Y)
             };
         }
 
         public TrailSegment Clone()
         {
-            return new TrailSegment(id, ownerPid, line, orientation, isHead);
+            return new TrailSegment(_id, _ownerPid, _line, _orientation, _isHead);
         }
     }
 }

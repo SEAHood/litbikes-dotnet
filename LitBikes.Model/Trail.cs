@@ -7,11 +7,11 @@ namespace LitBikes.Model
 {
     public class Trail
     {
-        private readonly ConcurrentDictionary<String, TrailSegment> segments;
+        private readonly ConcurrentDictionary<string, TrailSegment> segments;
 
         public Trail()
         {
-            segments = new ConcurrentDictionary<String, TrailSegment>();
+            segments = new ConcurrentDictionary<string, TrailSegment>();
         }
 
         public List<TrailSegment> GetList()

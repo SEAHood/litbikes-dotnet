@@ -1,14 +1,15 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 
 namespace LitBikes.Model.Dtos
 {
-    public class ServerWorldDto
+    public class ServerWorldDto : IDto
     {
         public long timestamp;
         public long gameTick;
         public bool roundInProgress;
         public int timeUntilNextRound;
-        public int currentWinner;
+        public Guid currentWinner;
         public int roundTimeLeft;
         public List<PlayerDto> players;
         public List<PowerUpDto> powerUps;

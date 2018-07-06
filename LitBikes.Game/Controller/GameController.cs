@@ -6,6 +6,8 @@ using System.Text;
 using System.Timers;
 using LitBikes.Game.Engine;
 using LitBikes.Model.Dtos;
+using LitBikes.Events;
+using LitBikes.Model.Enums;
 
 namespace LitBikes.Game.Controller
 {
@@ -30,15 +32,17 @@ namespace LitBikes.Game.Controller
         private Timer broadcastWorldTimer;
         private int broadcastWorldInterval = 100; // MS
 
-        private ClientEventHandler _clientEventHandler;
+        private readonly ClientEventHandler _clientEventHandler;
+        private ServerEventSender _eventSender;
         
-        public GameController(int _minPlayers, int gameSize, ClientEventController clientEventController)
+        public GameController(int _minPlayers, int gameSize, ClientEventReceiver clientEventReceiver, ServerEventSender serverEventSender)
         {
             var gameEventController = new GameEventController();
             _clientEventHandler = new ClientEventHandler();
             SetupGameEventHandlers(gameEventController);
-            SetupClientEventHandlers(clientEventController);
+            SetupClientEventHandlers(clientEventReceiver);
 
+            _eventSender = serverEventSender;
             minPlayers = _minPlayers;
             game = new GameEngine(gameEventController, gameSize);
             sessionPlayers = new Dictionary<Guid, int>();
@@ -48,11 +52,13 @@ namespace LitBikes.Game.Controller
             broadcastWorldTimer.Elapsed += (sender, e) => BroadcastWorldUpdate();
             broadcastWorldTimer.Start();
 
+            Start();
+
         }
 
-        private void SetupClientEventHandlers(ClientEventController clientEventController)
+        private void SetupClientEventHandlers(ClientEventReceiver clientEventReceiver)
         {
-            clientEventController.Event += (sender, args) =>
+            clientEventReceiver.Event += (sender, args) =>
             {
                 switch (args.Event)
                 {
@@ -60,7 +66,8 @@ namespace LitBikes.Game.Controller
                         _clientEventHandler.ClientHello();
                         break;
                     case ClientEvent.ChatMessage:
-                        _clientEventHandler.ClientChatMessageEvent("something");
+                        var player = game.GetPlayer(args.PlayerId);
+                        _clientEventHandler.ClientChatMessageEvent(player, "something");
                         break;
                     case ClientEvent.KeepAlive:
                         _clientEventHandler.ClientKeepAliveEvent();
@@ -96,7 +103,7 @@ namespace LitBikes.Game.Controller
                         PlayerSpawned(1);
                         break;
                     case GameEvent.ScoreUpdated:
-                        ScoreUpdated(null);
+                        ScoreUpdated();
                         break;
                     case GameEvent.GameStarted:
                         break;
@@ -130,12 +137,16 @@ namespace LitBikes.Game.Controller
 
         public void PlayerCrashed(Player player)
         {
-            String crashedInto = player.IsCrashedIntoSelf() ? "their own trail!" : player.GetCrashedInto().GetName();
-            String playerCrashedMessage = player.GetName() + " crashed into " + crashedInto;
-            //LOG.info(playerCrashedMessage);
-            ChatMessageDto dto = new ChatMessageDto(null, null, playerCrashedMessage, true);
-            BroadcastData("chat-message", dto);
+            var crashedInto = player.IsCrashedIntoSelf() ? "their own trail!" : player.GetCrashedInto().GetName();
+            var playerCrashedMessage = player.GetName() + " crashed into " + crashedInto;
+            SendServerMessage(playerCrashedMessage);
             BroadcastWorldUpdate();
+        }
+
+        private void SendServerMessage(string message)
+        {
+            var dto = new ChatMessageDto(null, null, message, true);
+            _eventSender.SendEvent(ServerEvent.ChatMessage, dto);
         }
 
         public void PlayerSpawned(int pid)
@@ -143,26 +154,23 @@ namespace LitBikes.Game.Controller
             BroadcastWorldUpdate();
         }
 
-        public void ScoreUpdated(List<ScoreDto> scores)
+        public void ScoreUpdated()
         {
-            BroadcastData("score-update", scores);
+            _eventSender.SendEvent(ServerEvent.ScoreUpdate, game.GetScores());
         }
 
         public void RoundStarted()
         {
-            String msg = "Round started!";
-            ChatMessageDto dto = new ChatMessageDto(null, null, msg, true);
-            BroadcastData("chat-message", dto);
-            BroadcastData("score-update", game.GetScores());
+            const string msg = "Round started!";
+            SendServerMessage(msg);
+            ScoreUpdated();
         }
 
         public void RoundEnded()
         {
+            const string msg = "Round ended!";
+            SendServerMessage(msg);
             game.StartRound();
-
-            String msg = "Round ended!";
-            ChatMessageDto dto = new ChatMessageDto(null, null, msg, true);
-            BroadcastData("chat-message", dto);
         }
         // END GAME EVENTS
 
@@ -184,10 +192,6 @@ namespace LitBikes.Game.Controller
             //botController.doUpdate(game.getPlayers(), game.getArena());
         }
 
-        public void BroadcastData(String key, Object obj)
-        {
-            //ioServer.getBroadcastOperations().sendEvent(key, obj);
-        }
 
         /*public Bot BotCreated()
         {

@@ -7,8 +7,8 @@ namespace LitBikes.Model
 {
     public class PowerUpDto
     {
-        public String id;
-        public String name;
+        public string id;
+        public string name;
         public Vector2 pos;
         public PowerUpType type;
         public bool collected;
@@ -23,7 +23,7 @@ namespace LitBikes.Model
 
     public class PowerUp
     {
-        private readonly String id;
+        private readonly string id;
         private Vector2 pos;
         private PowerUpType type;
         private bool collected;
@@ -36,7 +36,7 @@ namespace LitBikes.Model
             collected = false;
         }
 
-        public String GetId()
+        public string GetId()
         {
             return id;
         }

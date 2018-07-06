@@ -6,13 +6,13 @@ namespace LitBikes.Model
 {
     public class PlayerDto
     {
-        public int pid;
-        public String name;
+        public Guid pid;
+        public string name;
         public BikeDto bike;
         public bool spectating;
         public bool crashed;
-        public int? crashedInto;
-        public String crashedIntoName;
+        public Guid? crashedInto;
+        public string crashedIntoName;
         public int score;
         public PowerUpType currentPowerUp;
         public PlayerEffect effect;
@@ -20,96 +20,96 @@ namespace LitBikes.Model
 
     public enum PlayerEffect
     {
-        NONE,
-        SLOWED
+        None,
+        Slowed
     }
 
     public class Player : ICollidable
     {
-        protected int pid;
-        protected Bike bike;
-        private String name;
-        private bool crashed = false;
-        private bool spectating = false;
-        private ICollidable crashedInto = null;
-        private readonly bool isHuman;
-        private PowerUpType currentPowerUpType = PowerUpType.NOTHING;
-        private PlayerEffect effect = PlayerEffect.NONE;
+        private Guid _pid;
+        private Bike _bike;
+        private string name;
+        private bool _crashed = false;
+        private bool _spectating = false;
+        private ICollidable _crashedInto = null;
+        private readonly bool _isHuman;
+        private PowerUpType _currentPowerUpType = PowerUpType.NOTHING;
+        private PlayerEffect _effect = PlayerEffect.None;
 
-        public Player(int _pid, bool _isHuman)
+        public Player(Guid pid, bool isHuman)
         {
-            pid = _pid;
-            isHuman = _isHuman;
+            _pid = pid;
+            _isHuman = isHuman;
         }
 
-        public int GetId()
+        public Guid GetId()
         {
-            return pid;
+            return _pid;
         }
 
-        public String GetName()
+        public string GetName()
         {
             return name;
         }
 
         public Bike GetBike()
         {
-            return bike;
+            return _bike;
         }
 
         public void SetBike(Bike bike)
         {
-            this.bike = bike;
+            _bike = bike;
         }
 
-        public void SetName(String name)
+        public void SetName(string name)
         {
             this.name = name;
         }
 
         public bool IsAlive()
         {
-            return !crashed && !spectating;
+            return !_crashed && !_spectating;
         }
 
         public bool IsHuman()
         {
-            return isHuman;
+            return _isHuman;
         }
 
         public PowerUpType GetCurrentPowerUpType()
         {
-            return currentPowerUpType;
+            return _currentPowerUpType;
         }
 
         public void SetCurrentPowerUpType(PowerUpType type)
         {
-            currentPowerUpType = type;
+            _currentPowerUpType = type;
         }
 
         public PlayerEffect GetEffect()
         {
-            return effect;
+            return _effect;
         }
 
         public void SetEffect(PlayerEffect effect)
         {
-            this.effect = effect;
+            _effect = effect;
         }
 
         public PlayerDto GetDto()
         {
             return new PlayerDto
             {
-                pid = pid,
+                pid = _pid,
                 name = name,
-                bike = bike.GetDto(),
-                crashed = crashed,
-                crashedInto = crashedInto?.GetId(),
-                crashedIntoName = crashedInto?.GetName(),
-                spectating = spectating,
-                currentPowerUp = currentPowerUpType,
-                effect = effect
+                bike = _bike.GetDto(),
+                crashed = _crashed,
+                crashedInto = _crashedInto?.GetId(),
+                crashedIntoName = _crashedInto?.GetName(),
+                spectating = _spectating,
+                currentPowerUp = _currentPowerUpType,
+                effect = _effect
             };
         }
 
@@ -117,57 +117,57 @@ namespace LitBikes.Model
         {
             if (IsAlive())
             {
-                bike.UpdatePosition();
+                _bike.UpdatePosition();
             }
         }
 
         public void UpdateBike(Bike _bike)
         {
             // this is terrible
-            bike.SetPos(_bike.GetPos());
-            bike.SetDir(_bike.GetDir());
+            _bike.SetPos(_bike.GetPos());
+            _bike.SetDir(_bike.GetDir());
         }
 
         public bool IsCrashedIntoSelf()
         {
-            if (crashedInto == null)
+            if (_crashedInto == null)
                 return false;
-            return crashedInto.GetId() == pid;
+            return _crashedInto.GetId() == _pid;
         }
 
         public bool IsSpectating()
         {
-            return spectating;
+            return _spectating;
         }
 
         public void SetSpectating(bool spectating)
         {
-            this.spectating = spectating;
+            _spectating = spectating;
         }
 
         public ICollidable GetCrashedInto()
         {
-            return crashedInto;
+            return _crashedInto;
         }
 
         public void SetCrashedInto(ICollidable crashedInto)
         {
-            this.crashedInto = crashedInto;
+            _crashedInto = crashedInto;
         }
 
         public bool IsCrashed()
         {
-            return crashed;
+            return _crashed;
         }
 
         public void SetCrashed(bool crashed)
         {
-            this.crashed = crashed;
+            _crashed = crashed;
         }
 
         public void Crashed(ICollidable collidedWith)
         {
-            bike.Crash();
+            _bike.Crash();
             SetCrashed(true);
             SetCrashedInto(collidedWith);
             SetSpectating(true);
@@ -175,17 +175,17 @@ namespace LitBikes.Model
 
         public void Respawn(Spawn spawn)
         {
-            bike.Init(spawn, false);
+            _bike.Init(spawn, false);
             SetCrashed(false);
             SetCrashedInto(null);
             SetSpectating(false);
-            currentPowerUpType = PowerUpType.NOTHING;
-            effect = PlayerEffect.NONE;
+            _currentPowerUpType = PowerUpType.NOTHING;
+            _effect = PlayerEffect.None;
         }
 
         public void BreakTrailSegment(ImpactPoint impactPoint, double radius)
         {
-            bike.BreakTrailSegment(impactPoint, radius);
+            _bike.BreakTrailSegment(impactPoint, radius);
         }
     }
 }

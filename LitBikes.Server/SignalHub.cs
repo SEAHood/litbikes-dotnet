@@ -1,68 +1,86 @@
 ﻿using System;
+using System.Collections.Generic;
 using LitBikes.Game.Controller;
 using Microsoft.AspNetCore.SignalR;
 using System.Threading.Tasks;
+using LitBikes.Events;
+using LitBikes.Model.Dtos;
+using LitBikes.Model.Enums;
+using LitBikes.Server;
 
-namespace LitBikes.Server
+namespace LitBikes.Game.Controller
 {
     public class SignalHub : Hub
     {
-        private readonly ClientEventController _clientEventController;
+        private readonly ClientEventReceiver _clientEventReceiver;
+        private readonly ServerEventSender _serverEventSender;
+        private readonly Dictionary<string, Guid> _playerConnections;
 
-        public SignalHub(ClientEventController clientEventController)
+        public SignalHub(ClientEventReceiver clientEventReceiver, ServerEventSender serverEventSender)
         {
-            _clientEventController = clientEventController;
+            _clientEventReceiver = clientEventReceiver;
+            _serverEventSender = serverEventSender;
+            _serverEventSender.Event += async (sender, args) => await SendEvent(args);
+            _playerConnections = new Dictionary<string, Guid>();
         }
 
         public override Task OnConnectedAsync()
         {
+            var newPlayerId = Guid.NewGuid();
+            _playerConnections.Add(Context.ConnectionId, newPlayerId);
             return base.OnConnectedAsync();
+        }
+
+        private async Task SendEvent(ServerEventSenderArgs args)
+        {
+            await Clients.All.SendAsync(args.Event.ToString(), args.Payload);
         }
 
         #region ClientEvents
 
         public void Hello()
         {
-            _clientEventController.Hello();
+            if (_playerConnections.TryGetValue(Context.ConnectionId, out var playerId))
+                _clientEventReceiver.Hello(playerId);
         }
 
-        public void RequestJoinGame()
+        public void RequestJoinGame(ClientGameJoinDto dto)
         {
-            _clientEventController.RequestJoinGame();
+            if (_playerConnections.TryGetValue(Context.ConnectionId, out var playerId))
+                _clientEventReceiver.RequestJoinGame(playerId, dto);
         }
 
         public void KeepAlive()
         {
-            _clientEventController.KeepAlive();
+            if (_playerConnections.TryGetValue(Context.ConnectionId, out var playerId))
+                _clientEventReceiver.KeepAlive(playerId);
         }
 
         public void RequestRespawn()
         {
-            _clientEventController.RequestRespawn();
+            if (_playerConnections.TryGetValue(Context.ConnectionId, out var playerId))
+                _clientEventReceiver.RequestRespawn(playerId);
         }
 
-        public void Update()
+        public void Update(ClientUpdateDto dto)
         {
-            _clientEventController.Update();
+            if (_playerConnections.TryGetValue(Context.ConnectionId, out var playerId))
+                _clientEventReceiver.Update(playerId, dto);
         }
 
-        public void ChatMessage()
+        public void ChatMessage(ClientChatMessageDto dto)
         {
-            _clientEventController.ChatMessage();
+            if (_playerConnections.TryGetValue(Context.ConnectionId, out var playerId))
+                _clientEventReceiver.ChatMessage(playerId, dto);
         }
 
         public void UsePowerup()
         {
-            _clientEventController.UsePowerup();
+            if (_playerConnections.TryGetValue(Context.ConnectionId, out var playerId))
+                _clientEventReceiver.UsePowerup(playerId);
         }
 
         #endregion
 
-
-
-        public async Task SendMessage(string user, string message)
-        {
-            await Clients.All.SendAsync("ReceiveMessage", user, message);
-        }
     }
 }

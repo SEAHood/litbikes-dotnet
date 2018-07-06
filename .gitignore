@@ -3,6 +3,10 @@
 ##
 ## Get latest from https://github.com/github/gitignore/blob/master/VisualStudio.gitignore
 
+# Source .js and .map files
+LitBikes.Client/src/**/*.js
+LitBikes.Client/src/**/*.map
+
 # User-specific files
 *.suo
 *.user

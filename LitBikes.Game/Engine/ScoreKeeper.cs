@@ -6,11 +6,11 @@ namespace LitBikes.Game
 {
     public class ScoreDto
     {
-        public int pid;
+        public Guid pid;
         public String name;
         public int score;
 
-        public ScoreDto(int _pid, String _name, int _score)
+        public ScoreDto(Guid _pid, string _name, int _score)
         {
             pid = _pid;
             name = _name;
@@ -27,7 +27,7 @@ namespace LitBikes.Game
             scores = new List<ScoreDto>();
         }
 
-        public void GrantScore(int pid, String name, int score)
+        public void GrantScore(Guid pid, string name, int score)
         {
             var currentScore = scores.FirstOrDefault(s => s.pid == pid);
             if (currentScore == null)
@@ -38,12 +38,12 @@ namespace LitBikes.Game
             currentScore.score = currentScore.score + score;
         }
 
-        public int GetScore(int pid)
+        public int GetScore(Guid pid)
         {
             return scores.FirstOrDefault(s => s.pid == pid)?.score ?? 0;
         }
 
-        public void RemoveScore(int pid)
+        public void RemoveScore(Guid pid)
         {
             var currentScore = scores.FirstOrDefault(s => s.pid == pid);
             scores.Remove(currentScore);
@@ -59,9 +59,9 @@ namespace LitBikes.Game
             scores.Clear();
         }
 
-        public int GetCurrentWinner()
+        public Guid GetCurrentWinner()
         {
-            if (!scores.Any()) return -1;
+            if (!scores.Any()) return Guid.Empty;
             return scores.OrderBy(s => s.score).First().pid;
         }
 

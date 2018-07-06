@@ -4,7 +4,7 @@ using System.Text;
 
 namespace LitBikes.Model.Dtos
 {
-    public class ChatMessageDto
+    public class ChatMessageDto : IDto
     {
         public long Timestamp;
         public string Source;

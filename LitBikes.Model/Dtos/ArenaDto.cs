@@ -4,7 +4,7 @@ using System.Text;
 
 namespace LitBikes.Model.Dtos
 {
-    public class ArenaDto
+    public class ArenaDto : IDto
     {
         public int size;
     }

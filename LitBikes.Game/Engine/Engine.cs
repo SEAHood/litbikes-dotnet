@@ -164,7 +164,7 @@ namespace LitBikes.Game.Engine
             }
         }
 
-        public Player PlayerJoin(int pid, String name, bool isHuman)
+        public Player PlayerJoin(Guid pid, String name, bool isHuman)
         {
             //LOG.info("Creating new player with pid " + pid);
 
@@ -180,7 +180,7 @@ namespace LitBikes.Game.Engine
             return player;
         }
 
-        public void DropPlayer(int pid)
+        public void DropPlayer(Guid pid)
         {
             var player = players.SingleOrDefault(p => p.GetId() == pid);
 
@@ -320,7 +320,7 @@ namespace LitBikes.Game.Engine
             return players;
         }
 
-        public Player GetPlayer(int pid)
+        public Player GetPlayer(Guid pid)
         {
             return players.FirstOrDefault(p => p.GetId() == pid);
         }

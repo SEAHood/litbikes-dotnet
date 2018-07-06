@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 
 namespace LitBikes.Game.Controller
 {
@@ -12,7 +13,7 @@ namespace LitBikes.Game.Controller
             Event?.Invoke(this, new GameEventArgs(GameEvent.PlayerCrashed));
         }
 
-        public void PlayerSpawned(int playerId)
+        public void PlayerSpawned(Guid playerId)
         {
             Event?.Invoke(this, new GameEventArgs(GameEvent.PlayerSpawned));
         }

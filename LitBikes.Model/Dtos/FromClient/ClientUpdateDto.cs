@@ -1,10 +1,11 @@
-﻿using System.Numerics;
+﻿using System;
+using System.Numerics;
 
 namespace LitBikes.Model.Dtos
 {
-    public class ClientUpdateDto
+    public class ClientUpdateDto : IDto
     {
-        public int? pid;
+        public Guid pid; //TODO probably shouldn't rely on this!!!!!!!
         public int? xDir;
         public int? yDir;
         public int? xPos;
