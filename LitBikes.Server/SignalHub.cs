@@ -82,5 +82,9 @@ namespace LitBikes.Game.Controller
 
         #endregion
 
+        public async Task SendMessage(string user, string message)
+        {
+            await Clients.All.SendAsync("ReceiveMessage", user, message);
+        }
     }
 }

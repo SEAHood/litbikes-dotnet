@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Numerics;
+using System.Threading;
 using System.Timers;
 using LitBikes.Game.Controller;
 using LitBikes.Model;
@@ -32,8 +33,9 @@ namespace LitBikes.Game.Engine
         private RoundKeeper roundKeeper;
         private int gameSize;
         private Debug debug;
+        private Thread _tickThread;
 
-        private Timer powerUpSpawnTimer = new Timer();
+        private System.Timers.Timer powerUpSpawnTimer = new System.Timers.Timer();
 
         private readonly GameEventController _gameEventController;
 
@@ -60,19 +62,23 @@ namespace LitBikes.Game.Engine
 
             _startedAt = DateTime.Now;
 
-            while (true)
+            _tickThread = new Thread(delegate()
             {
-                var tickRequired = _lastTick == null || DateTime.Now.Subtract(_lastTick).Milliseconds > GAME_TICK_MS;
-
-                if (tickRequired)
+                while (true)
                 {
-                    // Last tick from start or end? not sure yet
-                    _lastTick = DateTime.Now;
-                    GameTick();
-                    //
+                    if (players.Count == 0)
+                        Thread.Sleep(1000);
+                    var tickRequired = _lastTick == null || DateTime.Now.Subtract(_lastTick).Milliseconds > GAME_TICK_MS;
+                    if (tickRequired)
+                    {
+                        // Last tick from start or end? not sure yet
+                        _lastTick = DateTime.Now;
+                        GameTick();
+                        //
+                    }
                 }
-
-            }
+            });
+            _tickThread.Start();
 
             //Runnable gameLoop = new GameTick();
             //ScheduledExecutorService executor = Executors.newScheduledThreadPool(1);

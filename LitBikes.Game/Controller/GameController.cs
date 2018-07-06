@@ -35,7 +35,7 @@ namespace LitBikes.Game.Controller
         private readonly ClientEventHandler _clientEventHandler;
         private ServerEventSender _eventSender;
         
-        public GameController(int _minPlayers, int gameSize, ClientEventReceiver clientEventReceiver, ServerEventSender serverEventSender)
+        public GameController( int _minPlayers, int gameSize, ClientEventReceiver clientEventReceiver, ServerEventSender serverEventSender)
         {
             var gameEventController = new GameEventController();
             _clientEventHandler = new ClientEventHandler();
@@ -48,7 +48,7 @@ namespace LitBikes.Game.Controller
             sessionPlayers = new Dictionary<Guid, int>();
             // botController = new BotController(this);
 
-            broadcastWorldTimer.Interval = broadcastWorldInterval;
+            broadcastWorldTimer = new Timer { Interval = broadcastWorldInterval };
             broadcastWorldTimer.Elapsed += (sender, e) => BroadcastWorldUpdate();
             broadcastWorldTimer.Start();
 

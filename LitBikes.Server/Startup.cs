@@ -28,9 +28,11 @@ namespace LitBikes.Server
             services.AddMvc();
             services.AddSignalR();
 
-            services.AddSingleton<ServerEventSender, ServerEventSender>();
-            services.AddSingleton<ClientEventReceiver, ClientEventReceiver>();
-            services.AddSingleton<GameController, GameController>();
+            var clientEventReceiver = new ClientEventReceiver();
+            var serverEventSender = new ServerEventSender();
+            services.AddSingleton(serverEventSender);
+            services.AddSingleton(clientEventReceiver);
+            services.AddSingleton(new GameController(1, 1, clientEventReceiver, serverEventSender));
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
