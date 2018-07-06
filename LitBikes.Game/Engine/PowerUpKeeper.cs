@@ -11,8 +11,14 @@ namespace LitBikes.Game
     class PowerUpKeeper
     {
         private bool _isSpawning;
-        private Dictionary<int, PowerUp> _playerPowerUps;
-        private List<PowerUp> _availablePowerUps;
+        private readonly Dictionary<Guid, PowerUp> _playerPowerUps;
+        private readonly List<PowerUp> _availablePowerUps;
+
+        public PowerUpKeeper()
+        {
+            _availablePowerUps = new List<PowerUp>();
+            _playerPowerUps = new Dictionary<Guid, PowerUp>();
+        }
 
         public void StartSpawner()
         {
@@ -104,14 +110,14 @@ namespace LitBikes.Game
                                 var oldSpd = b.GetSpd();
                                 b.SetSpd(0.5f);
                                 p.UpdateBike(b);
-                                p.SetEffect(PlayerEffect.SLOWED);
+                                p.SetEffect(PlayerEffect.Slowed);
 
                                 var timer = new Timer(3000);
                                 timer.Elapsed += (sender, e) =>
                                 {
                                     b.SetSpd(oldSpd);
                                     p.UpdateBike(b);
-                                    p.SetEffect(PlayerEffect.NONE);
+                                    p.SetEffect(PlayerEffect.None);
                                 };
                                 timer.Start();
                             }

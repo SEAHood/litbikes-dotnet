@@ -6,6 +6,8 @@
 # Source .js and .map files
 LitBikes.Client/src/**/*.js
 LitBikes.Client/src/**/*.map
+LitBikes.Client/app.js
+LitBikes.Client/app.js.map
 
 # User-specific files
 *.suo

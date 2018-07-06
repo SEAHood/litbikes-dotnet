@@ -50,7 +50,6 @@
     </TypeScriptCompile>
     <TypeScriptCompile Include="src\model\player.ts" />
     <TypeScriptCompile Include="src\model\powerUp.ts" />
-    <TypeScriptCompile Include="src\test.ts" />
     <TypeScriptCompile Include="src\game\game.ts">
       <SubType>Code</SubType>
     </TypeScriptCompile>
