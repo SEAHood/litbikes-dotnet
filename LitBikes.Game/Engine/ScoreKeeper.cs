@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 
-namespace LitBikes.Game
+namespace LitBikes.Game.Engine
 {
     public class ScoreDto
     {

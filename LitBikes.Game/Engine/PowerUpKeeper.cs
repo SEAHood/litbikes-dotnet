@@ -1,12 +1,11 @@
-﻿using LitBikes.Model;
-using Nine.Geometry;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Timers;
+using LitBikes.Model;
+using Nine.Geometry;
 
-namespace LitBikes.Game
+namespace LitBikes.Game.Engine
 {
     class PowerUpKeeper
     {

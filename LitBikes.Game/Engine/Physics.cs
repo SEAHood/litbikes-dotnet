@@ -1,8 +1,8 @@
-﻿using LitBikes.Model;
+﻿using System.Collections.Generic;
+using LitBikes.Model;
 using Nine.Geometry;
-using System.Collections.Generic;
 
-namespace LitBikes.Game
+namespace LitBikes.Game.Engine
 {
     public class Physics
     {

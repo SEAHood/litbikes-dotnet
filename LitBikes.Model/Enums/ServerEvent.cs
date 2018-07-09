@@ -4,6 +4,7 @@
     {
         WorldUpdate,
         ScoreUpdate,
-        ChatMessage
+        ChatMessage,
+        Hello
     }
 }

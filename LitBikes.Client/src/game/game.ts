@@ -6,7 +6,8 @@ import { Vector, NumberUtil } from '../util'
 import {
     WorldUpdateDto, BikeDto, PlayerDto, PowerUpDto,
     ClientUpdateDto, GameJoinDto, ClientGameJoinDto,
-    HelloDto, ChatMessageDto, ScoreDto
+    HelloDto, ChatMessageDto, ScoreDto,
+    SendChatMessageDto
 } from '../dto'
 
 import 'p5'
@@ -625,11 +626,23 @@ hubConnection.on("ReceiveMessage", (user, message) => {
     document.getElementById("messagesList").appendChild(li);
 });
 
-hubConnection.start().catch(err => console.error(err.toString()));
+hubConnection.on("Hello", (dto) => {
+    console.log(dto);
+});
+
+hubConnection.start().then(() => {
+    console.log("invoking");
+    hubConnection.invoke("Hello").catch(err => console.error(err.toString()));
+}).catch(err => console.error(err.toString()));
 
 document.getElementById("sendButton").addEventListener("click", event => {
     const user = $("#userInput").val();
-    const message = $("#messageInput").val();
-    hubConnection.invoke("SendMessage", user, message).catch(err => console.error(err.toString()));
+    const message = $("#messageInput").val().toString();
+
+    const payload: SendChatMessageDto = {
+        message: message
+    };
+
+    hubConnection.invoke("ChatMessage", payload).catch(err => console.error(err.toString()));
     event.preventDefault();
 });

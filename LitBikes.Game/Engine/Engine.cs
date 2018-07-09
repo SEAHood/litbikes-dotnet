@@ -7,6 +7,7 @@ using System.Timers;
 using LitBikes.Game.Controller;
 using LitBikes.Model;
 using LitBikes.Model.Dtos;
+using LitBikes.Model.Dtos.FromClient;
 using Nine.Geometry;
 
 namespace LitBikes.Game.Engine

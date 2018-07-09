@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 using LitBikes.Model;
+using LitBikes.Model.Dtos.FromClient;
 
 namespace LitBikes.Game.Controller
 {

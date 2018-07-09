@@ -35,13 +35,19 @@
   </PropertyGroup>
   <ItemGroup>
     <TypeScriptCompile Include="app.ts" />
+    <Content Include="public\fonts\3Dventure.ttf" />
+    <Content Include="public\fonts\larabie.ttf" />
+    <Content Include="public\fonts\visitor.ttf" />
+    <Content Include="public\img\escheresque_ste.png" />
+    <Content Include="public\img\fav.ico" />
+    <Content Include="public\img\game\powerups\rocket.png" />
+    <Content Include="public\img\game\powerups\slow.png" />
     <Content Include="public\index.html">
       <SubType>Code</SubType>
     </Content>
     <Content Include="public\css\litbikes.css" />
     <Content Include="tsconfig.json" />
     <Content Include="package.json" />
-    <Content Include="public\css\main.css" />
     <TypeScriptCompile Include="src\model\arena.ts" />
     <TypeScriptCompile Include="src\model\bike.ts" />
     <TypeScriptCompile Include="src\dto.ts" />
@@ -59,6 +65,9 @@
     </TypeScriptCompile>
   </ItemGroup>
   <ItemGroup>
+    <Folder Include="public\fonts\" />
+    <Folder Include="public\img\game\" />
+    <Folder Include="public\img\game\powerups\" />
     <Folder Include="src\" />
     <Folder Include="public\" />
     <Folder Include="public\img\" />

@@ -33,9 +33,9 @@ namespace LitBikes.Game.Controller
         private int broadcastWorldInterval = 100; // MS
 
         private readonly ClientEventHandler _clientEventHandler;
-        private ServerEventSender _eventSender;
+        private IServerEventSender _eventSender;
         
-        public GameController( int _minPlayers, int gameSize, ClientEventReceiver clientEventReceiver, ServerEventSender serverEventSender)
+        public GameController(IClientEventReceiver clientEventReceiver, IServerEventSender serverEventSender)
         {
             var gameEventController = new GameEventController();
             _clientEventHandler = new ClientEventHandler();
@@ -43,7 +43,8 @@ namespace LitBikes.Game.Controller
             SetupClientEventHandlers(clientEventReceiver);
 
             _eventSender = serverEventSender;
-            minPlayers = _minPlayers;
+            minPlayers = 5;
+            var gameSize = 600;
             game = new GameEngine(gameEventController, gameSize);
             sessionPlayers = new Dictionary<Guid, int>();
             // botController = new BotController(this);
@@ -51,19 +52,31 @@ namespace LitBikes.Game.Controller
             broadcastWorldTimer = new Timer { Interval = broadcastWorldInterval };
             broadcastWorldTimer.Elapsed += (sender, e) => BroadcastWorldUpdate();
             broadcastWorldTimer.Start();
-
-            Start();
-
+            
         }
 
-        private void SetupClientEventHandlers(ClientEventReceiver clientEventReceiver)
+        private void SetupClientEventHandlers(IClientEventReceiver clientEventReceiver)
         {
             clientEventReceiver.Event += (sender, args) =>
             {
                 switch (args.Event)
                 {
                     case ClientEvent.Hello:
-                        _clientEventHandler.ClientHello();
+                        //int pid = pidGen++;
+                        //sessionPlayers.put(client.getSessionId(), pid);
+                        game.PlayerJoin(args.PlayerId, "Test Player", true);
+
+                        var dto = new HelloDto
+                        {
+                            GameSettings = new GameSettingsDto
+                            {
+                                GameTickMs = game.GetGameTickMs()
+                            },
+                            World = game.GetWorldDto()
+                        };
+
+                        _eventSender.SendEvent(ServerEvent.Hello, dto);
+                        //client.sendEvent(C_HELLO, dto);
                         break;
                     case ClientEvent.ChatMessage:
                         var player = game.GetPlayer(args.PlayerId);
@@ -188,6 +201,7 @@ namespace LitBikes.Game.Controller
 
         public void BroadcastWorldUpdate()
         {
+            _eventSender.SendEvent(ServerEvent.WorldUpdate, game.GetWorldDto());
             //ioServer.getBroadcastOperations().sendEvent("world-update", game.getWorldDto());
             //botController.doUpdate(game.getPlayers(), game.getArena());
         }

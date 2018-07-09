@@ -1,82 +1,76 @@
-﻿using System;
-using System.Collections.Generic;
-using LitBikes.Game.Controller;
-using Microsoft.AspNetCore.SignalR;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
 using LitBikes.Events;
-using LitBikes.Model.Dtos;
-using LitBikes.Model.Enums;
-using LitBikes.Server;
+using LitBikes.Model.Dtos.FromClient;
+using Microsoft.AspNetCore.SignalR;
 
-namespace LitBikes.Game.Controller
+namespace LitBikes.Server
 {
+    public static class SendHub
+    {
+        public static async Task SendEvent(IHubClients clients, ServerEventSenderArgs args)
+        {
+            await clients.All.SendAsync(args.Event.ToString(), args.Payload);
+        }
+    }
+
     public class SignalHub : Hub
     {
-        private readonly ClientEventReceiver _clientEventReceiver;
-        private readonly ServerEventSender _serverEventSender;
-        private readonly Dictionary<string, Guid> _playerConnections;
+        private readonly IClientEventReceiver _clientEventReceiver;
+        private readonly ConnectionManager _connectionManager;
 
-        public SignalHub(ClientEventReceiver clientEventReceiver, ServerEventSender serverEventSender)
+        public SignalHub(ConnectionManager connectionManager, IClientEventReceiver clientEventReceiver)
         {
             _clientEventReceiver = clientEventReceiver;
-            _serverEventSender = serverEventSender;
-            _serverEventSender.Event += async (sender, args) => await SendEvent(args);
-            _playerConnections = new Dictionary<string, Guid>();
+            _connectionManager = connectionManager;
         }
 
         public override Task OnConnectedAsync()
         {
-            var newPlayerId = Guid.NewGuid();
-            _playerConnections.Add(Context.ConnectionId, newPlayerId);
+            _connectionManager.OnConnected(Context.ConnectionId);
             return base.OnConnectedAsync();
-        }
-
-        private async Task SendEvent(ServerEventSenderArgs args)
-        {
-            await Clients.All.SendAsync(args.Event.ToString(), args.Payload);
         }
 
         #region ClientEvents
 
         public void Hello()
         {
-            if (_playerConnections.TryGetValue(Context.ConnectionId, out var playerId))
+            if (_connectionManager.PlayerExists(Context.ConnectionId, out var playerId))
                 _clientEventReceiver.Hello(playerId);
         }
 
         public void RequestJoinGame(ClientGameJoinDto dto)
         {
-            if (_playerConnections.TryGetValue(Context.ConnectionId, out var playerId))
+            if (_connectionManager.PlayerExists(Context.ConnectionId, out var playerId))
                 _clientEventReceiver.RequestJoinGame(playerId, dto);
         }
 
         public void KeepAlive()
         {
-            if (_playerConnections.TryGetValue(Context.ConnectionId, out var playerId))
+            if (_connectionManager.PlayerExists(Context.ConnectionId, out var playerId))
                 _clientEventReceiver.KeepAlive(playerId);
         }
 
         public void RequestRespawn()
         {
-            if (_playerConnections.TryGetValue(Context.ConnectionId, out var playerId))
+            if (_connectionManager.PlayerExists(Context.ConnectionId, out var playerId))
                 _clientEventReceiver.RequestRespawn(playerId);
         }
 
         public void Update(ClientUpdateDto dto)
         {
-            if (_playerConnections.TryGetValue(Context.ConnectionId, out var playerId))
+            if (_connectionManager.PlayerExists(Context.ConnectionId, out var playerId))
                 _clientEventReceiver.Update(playerId, dto);
         }
 
         public void ChatMessage(ClientChatMessageDto dto)
         {
-            if (_playerConnections.TryGetValue(Context.ConnectionId, out var playerId))
+            if (_connectionManager.PlayerExists(Context.ConnectionId, out var playerId))
                 _clientEventReceiver.ChatMessage(playerId, dto);
         }
 
         public void UsePowerup()
         {
-            if (_playerConnections.TryGetValue(Context.ConnectionId, out var playerId))
+            if (_connectionManager.PlayerExists(Context.ConnectionId, out var playerId))
                 _clientEventReceiver.UsePowerup(playerId);
         }
 

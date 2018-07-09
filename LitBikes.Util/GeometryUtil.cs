@@ -11,8 +11,9 @@ namespace LitBikes.Util
             bool noXChange = line.Start.X == line.End.X;
             bool noYChange = line.Start.Y == line.End.Y;
 
-            if (noXChange == noYChange)
-                throw new Exception("There cannot be the same change in X and Y or something");
+            // TODO
+            //if (noXChange == noYChange)
+            //    throw new Exception("There cannot be the same change in X and Y or something");
 
             return new Vector2(noXChange ? 0 : 1, noYChange ? 0 : 1);
         }

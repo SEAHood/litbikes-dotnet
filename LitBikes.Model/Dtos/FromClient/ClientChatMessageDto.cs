@@ -1,4 +1,4 @@
-﻿namespace LitBikes.Model.Dtos
+﻿namespace LitBikes.Model.Dtos.FromClient
 {
     public class ClientChatMessageDto : IDto
     {

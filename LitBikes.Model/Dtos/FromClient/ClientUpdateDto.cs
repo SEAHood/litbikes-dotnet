@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Numerics;
 
-namespace LitBikes.Model.Dtos
+namespace LitBikes.Model.Dtos.FromClient
 {
     public class ClientUpdateDto : IDto
     {

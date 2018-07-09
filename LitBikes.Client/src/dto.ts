@@ -66,11 +66,15 @@ export interface WorldUpdateDto {
 }
 
 export interface ChatMessageDto {
+    message: string;
     timestamp: number;
     source: string;
     sourceColour: string; // includes %A% alpha
-    message: string;
     isSystemMessage: boolean;
+}
+
+export interface SendChatMessageDto {
+    message: string
 }
 
 export interface ScoreDto {

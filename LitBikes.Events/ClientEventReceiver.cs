@@ -1,17 +1,27 @@
 ﻿using System;
 using LitBikes.Model.Dtos;
+using LitBikes.Model.Dtos.FromClient;
 using LitBikes.Model.Enums;
 
 namespace LitBikes.Events
 {
+    public delegate void ClientEventReceiverHandler(object sender, ClientEventReceiverArgs e);
+
     public interface IClientEventReceiver
     {
+        event ClientEventReceiverHandler Event;
+        void Hello(Guid playerId);
+        void RequestJoinGame(Guid playerId, ClientGameJoinDto dto);
+        void KeepAlive(Guid playerId);
+        void RequestRespawn(Guid playerId);
+        void Update(Guid playerId, ClientUpdateDto dto);
+        void ChatMessage(Guid playerId, ClientChatMessageDto dto);
+        void UsePowerup(Guid playerId);
     }
 
     public class ClientEventReceiver : IClientEventReceiver
     {
         public Guid id = Guid.NewGuid();
-        public delegate void ClientEventReceiverHandler(object sender, ClientEventReceiverArgs e);
         public event ClientEventReceiverHandler Event;
 
         public void Hello(Guid playerId)
