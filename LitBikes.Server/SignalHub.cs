@@ -1,4 +1,5 @@
-﻿using System.Threading.Tasks;
+﻿using System;
+using System.Threading.Tasks;
 using LitBikes.Events;
 using LitBikes.Model.Dtos.FromClient;
 using Microsoft.AspNetCore.SignalR;
@@ -28,6 +29,12 @@ namespace LitBikes.Server
         {
             _connectionManager.OnConnected(Context.ConnectionId);
             return base.OnConnectedAsync();
+        }
+
+        public override Task OnDisconnectedAsync(Exception exception)
+        {
+            _connectionManager.OnDisconnected(Context.ConnectionId);
+            return base.OnDisconnectedAsync(exception);
         }
 
         #region ClientEvents

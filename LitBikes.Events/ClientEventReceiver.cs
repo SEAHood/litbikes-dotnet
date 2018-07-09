@@ -1,5 +1,4 @@
 ﻿using System;
-using LitBikes.Model.Dtos;
 using LitBikes.Model.Dtos.FromClient;
 using LitBikes.Model.Enums;
 
@@ -21,7 +20,6 @@ namespace LitBikes.Events
 
     public class ClientEventReceiver : IClientEventReceiver
     {
-        public Guid id = Guid.NewGuid();
         public event ClientEventReceiverHandler Event;
 
         public void Hello(Guid playerId)
@@ -58,7 +56,5 @@ namespace LitBikes.Events
         {
             Event?.Invoke(this, new ClientEventReceiverArgs(playerId, ClientEvent.UsePowerup));
         }
-
-
     }
 }

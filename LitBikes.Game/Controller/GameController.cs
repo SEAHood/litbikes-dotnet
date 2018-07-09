@@ -15,7 +15,7 @@ namespace LitBikes.Game.Controller
     {
         //private static Logger LOG = Log.getLogger(GameController.class);
 	    private Dictionary<Guid, int> sessionPlayers; //session ID -> engine player ID
-        private GameEngine game;
+        private readonly GameEngine _game;
 	    //private BotController botController;
 	    private int pidGen = 0;
 
@@ -45,7 +45,7 @@ namespace LitBikes.Game.Controller
             _eventSender = serverEventSender;
             minPlayers = 5;
             var gameSize = 600;
-            game = new GameEngine(gameEventController, gameSize);
+            _game = new GameEngine(gameEventController, gameSize);
             sessionPlayers = new Dictionary<Guid, int>();
             // botController = new BotController(this);
 
@@ -53,6 +53,7 @@ namespace LitBikes.Game.Controller
             broadcastWorldTimer.Elapsed += (sender, e) => BroadcastWorldUpdate();
             broadcastWorldTimer.Start();
             
+            Start();
         }
 
         private void SetupClientEventHandlers(IClientEventReceiver clientEventReceiver)
@@ -64,22 +65,22 @@ namespace LitBikes.Game.Controller
                     case ClientEvent.Hello:
                         //int pid = pidGen++;
                         //sessionPlayers.put(client.getSessionId(), pid);
-                        game.PlayerJoin(args.PlayerId, "Test Player", true);
+                        _game.PlayerJoin(args.PlayerId, "Test Player", true);
 
                         var dto = new HelloDto
                         {
                             GameSettings = new GameSettingsDto
                             {
-                                GameTickMs = game.GetGameTickMs()
+                                GameTickMs = _game.GetGameTickMs()
                             },
-                            World = game.GetWorldDto()
+                            World = _game.GetWorldDto()
                         };
 
                         _eventSender.SendEvent(ServerEvent.Hello, dto);
                         //client.sendEvent(C_HELLO, dto);
                         break;
                     case ClientEvent.ChatMessage:
-                        var player = game.GetPlayer(args.PlayerId);
+                        var player = _game.GetPlayer(args.PlayerId);
                         _clientEventHandler.ClientChatMessageEvent(player, "something");
                         break;
                     case ClientEvent.KeepAlive:
@@ -135,18 +136,13 @@ namespace LitBikes.Game.Controller
         public void Start()
         {
             //SetupGameListeners();
-            game.Start();
+            _game.Start();
             //BalanceBots();
-            game.StartRound();
+            _game.StartRound();
             broadcastWorldTimer.Start();
         }
 
         //// START GAME EVENTS
-        //private void setupGameListeners()
-        //{
-        //    game.attachListener(this);
-        //}
-
 
         public void PlayerCrashed(Player player)
         {
@@ -169,7 +165,7 @@ namespace LitBikes.Game.Controller
 
         public void ScoreUpdated()
         {
-            _eventSender.SendEvent(ServerEvent.ScoreUpdate, game.GetScores());
+            _eventSender.SendEvent(ServerEvent.ScoreUpdate, _game.GetScores());
         }
 
         public void RoundStarted()
@@ -183,25 +179,14 @@ namespace LitBikes.Game.Controller
         {
             const string msg = "Round ended!";
             SendServerMessage(msg);
-            game.StartRound();
+            _game.StartRound();
         }
         // END GAME EVENTS
 
 
-        public void SendWorldUpdate()//SocketIOClient client)
-        {
-            /*if (client != null)
-            {
-                if (client instanceof BotIOClient ) 
-				        ((BotIOClient)client).updateBot(game.getPlayers(), game.getArena());
-			        else
-				        client.sendEvent("world-update", game.getWorldDto());
-            }*/
-        }
-
         public void BroadcastWorldUpdate()
         {
-            _eventSender.SendEvent(ServerEvent.WorldUpdate, game.GetWorldDto());
+            _eventSender.SendEvent(ServerEvent.WorldUpdate, _game.GetWorldDto());
             //ioServer.getBroadcastOperations().sendEvent("world-update", game.getWorldDto());
             //botController.doUpdate(game.getPlayers(), game.getArena());
         }

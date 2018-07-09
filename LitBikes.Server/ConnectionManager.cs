@@ -16,11 +16,14 @@ namespace LitBikes.Server
 
         public void OnConnected(string connectionId)
         {
-            if (!PlayerExists(connectionId, out _))
-            {
-                var newPlayerId = Guid.NewGuid();
-                _playerConnections.Add(connectionId, newPlayerId);
-            }
+            if (PlayerExists(connectionId, out _)) return;
+            var newPlayerId = Guid.NewGuid();
+            _playerConnections.Add(connectionId, newPlayerId);
+        }
+
+        public void OnDisconnected(string connectionId)
+        {
+            _playerConnections.Remove(connectionId);
         }
 
         public bool PlayerExists(string connectionId, out Guid playerId)
