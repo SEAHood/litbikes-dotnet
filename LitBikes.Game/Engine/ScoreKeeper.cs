@@ -1,74 +1,59 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using LitBikes.Model.Dtos;
 
 namespace LitBikes.Game.Engine
 {
-    public class ScoreDto
-    {
-        public Guid pid;
-        public String name;
-        public int score;
-
-        public ScoreDto(Guid _pid, string _name, int _score)
-        {
-            pid = _pid;
-            name = _name;
-            score = _score;
-        }
-    }
-
     public class ScoreKeeper
     {
-        private readonly List<ScoreDto> scores;
+        private readonly List<ScoreDto> _scores;
 
         public ScoreKeeper()
         {
-            scores = new List<ScoreDto>();
+            _scores = new List<ScoreDto>();
         }
 
         public void GrantScore(Guid pid, string name, int score)
         {
-            var currentScore = scores.FirstOrDefault(s => s.pid == pid);
+            var currentScore = _scores.FirstOrDefault(s => s.PlayerId == pid);
             if (currentScore == null)
             {
                 currentScore = new ScoreDto(pid, name, 0);
-                scores.Add(currentScore);
+                _scores.Add(currentScore);
             }
-            currentScore.score = currentScore.score + score;
+            currentScore.Score = currentScore.Score + score;
         }
 
-        public int GetScore(Guid pid)
+        public int GetScore(Guid playerId)
         {
-            return scores.FirstOrDefault(s => s.pid == pid)?.score ?? 0;
+            return _scores.FirstOrDefault(s => s.PlayerId == playerId)?.Score ?? 0;
         }
 
-        public void RemoveScore(Guid pid)
+        public void RemoveScore(Guid playerId)
         {
-            var currentScore = scores.FirstOrDefault(s => s.pid == pid);
-            scores.Remove(currentScore);
+            var currentScore = _scores.FirstOrDefault(s => s.PlayerId == playerId);
+            _scores.Remove(currentScore);
         }
 
         public List<ScoreDto> GetScores()
         {
-            return scores;
+            return _scores;
         }
 
         public void Reset()
         {
-            scores.Clear();
+            _scores.Clear();
         }
 
         public Guid GetCurrentWinner()
         {
-            if (!scores.Any()) return Guid.Empty;
-            return scores.OrderBy(s => s.score).First().pid;
+            return !_scores.Any() ? Guid.Empty : _scores.OrderBy(s => s.Score).First().PlayerId;
         }
 
-        public String GetCurrentWinnerName()
+        public string GetCurrentWinnerName()
         {
-            if (!scores.Any()) return "Unknown";
-            return scores.OrderBy(s => s.score).First().name;
+            return !_scores.Any() ? "Unknown" : _scores.OrderBy(s => s.Score).First().Name;
         }
 
     }

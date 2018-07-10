@@ -33,7 +33,7 @@ namespace LitBikes.Model
         private bool _spectating = false;
         private ICollidable _crashedInto = null;
         private readonly bool _isHuman;
-        private PowerUpType _currentPowerUpType = PowerUpType.NOTHING;
+        private PowerUpType _currentPowerUpType = PowerUpType.Nothing;
         private PlayerEffect _effect = PlayerEffect.None;
 
         public Player(Guid pid, bool isHuman)
@@ -179,7 +179,7 @@ namespace LitBikes.Model
             SetCrashed(false);
             SetCrashedInto(null);
             SetSpectating(false);
-            _currentPowerUpType = PowerUpType.NOTHING;
+            _currentPowerUpType = PowerUpType.Nothing;
             _effect = PlayerEffect.None;
         }
 

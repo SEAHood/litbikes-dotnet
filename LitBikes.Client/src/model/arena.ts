@@ -1,5 +1,5 @@
-import { ArenaDto } from '../dto'
-import { NumberUtil, Vector } from '../util'
+import { ArenaDto } from "../dto"
+import { NumberUtil, Vector } from "../util"
 
 export class Arena {
     public size : number;

@@ -15,7 +15,7 @@ namespace LitBikes.Model
         {
             return new ArenaDto
             {
-                size = Size
+                Size = Size
             };
         }
 

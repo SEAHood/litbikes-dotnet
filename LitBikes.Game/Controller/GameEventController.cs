@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using LitBikes.Game.Engine;
+using LitBikes.Model;
+using LitBikes.Model.Dtos;
 
 namespace LitBikes.Game.Controller
 {
@@ -9,12 +11,12 @@ namespace LitBikes.Game.Controller
         public delegate void GameEventHandler(object sender, GameEventArgs e);
         public event GameEventHandler Event;
 
-        public void PlayerCrashed()
+        public void PlayerCrashed(Player player)
         {
-            Event?.Invoke(this, new GameEventArgs(GameEvent.PlayerCrashed));
+            Event?.Invoke(this, new GameEventArgs(GameEvent.PlayerCrashed, player));
         }
 
-        public void PlayerSpawned(Guid playerId)
+        public void PlayerSpawned()
         {
             Event?.Invoke(this, new GameEventArgs(GameEvent.PlayerSpawned));
         }

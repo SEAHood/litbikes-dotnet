@@ -1,4 +1,5 @@
 ﻿using System;
+using LitBikes.Model;
 
 namespace LitBikes.Game.Controller
 {
@@ -21,10 +22,17 @@ namespace LitBikes.Game.Controller
     public class GameEventArgs : EventArgs
     {
         public GameEvent Event { get; }
+        public Player Player;
 
         public GameEventArgs(GameEvent e)
         {
             Event = e;
+        }
+
+        public GameEventArgs(GameEvent e, Player player)
+        {
+            Event = e;
+            Player = player;
         }
     }
 }

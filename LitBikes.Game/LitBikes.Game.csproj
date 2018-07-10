@@ -10,6 +10,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\LitBikes.Events\LitBikes.Events.csproj" />
+    <ProjectReference Include="..\LitBikes.Exceptions\LitBikes.Exceptions.csproj" />
     <ProjectReference Include="..\LitBikes.Model\LitBikes.Model.csproj" />
   </ItemGroup>
 

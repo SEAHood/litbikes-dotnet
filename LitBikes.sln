@@ -13,7 +13,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "LitBikes.Server", "LitBikes
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "LitBikes.Util", "LitBikes.Util\LitBikes.Util.csproj", "{2D44F940-845F-49CD-86F9-AF0B5FC36C08}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LitBikes.Events", "LitBikes.Events\LitBikes.Events.csproj", "{F2E3D258-BB26-40CD-BCAC-5EF61BFEAE6A}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "LitBikes.Events", "LitBikes.Events\LitBikes.Events.csproj", "{F2E3D258-BB26-40CD-BCAC-5EF61BFEAE6A}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LitBikes.Exceptions", "LitBikes.Exceptions\LitBikes.Exceptions.csproj", "{F98F4DBC-9FD3-4A33-A601-6F823DB3C641}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -45,6 +47,10 @@ Global
 		{F2E3D258-BB26-40CD-BCAC-5EF61BFEAE6A}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{F2E3D258-BB26-40CD-BCAC-5EF61BFEAE6A}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{F2E3D258-BB26-40CD-BCAC-5EF61BFEAE6A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F98F4DBC-9FD3-4A33-A601-6F823DB3C641}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F98F4DBC-9FD3-4A33-A601-6F823DB3C641}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F98F4DBC-9FD3-4A33-A601-6F823DB3C641}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F98F4DBC-9FD3-4A33-A601-6F823DB3C641}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

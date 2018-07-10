@@ -2,11 +2,11 @@
 {
     public class ClientGameJoinDto : IDto
     {
-        public string name;
+        public string Name;
 
         public bool IsValid()
         {
-            return name.Length > 1 || name.Length <= 15;
+            return Name.Length > 1 || Name.Length <= 15;
         }
     }
 }

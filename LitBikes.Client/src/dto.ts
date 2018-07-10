@@ -1,7 +1,7 @@
-﻿import { Vector } from './util';
+﻿import { Vector } from "./util";
 
 export interface BikeDto {
-    pid: number;
+    playerId: number;
     name: string;
     pos: Vector;
     dir: Vector;
@@ -11,7 +11,7 @@ export interface BikeDto {
 }
 
 export interface PlayerDto {
-    pid: number;
+    playerId: number;
     name: string;
     bike: BikeDto;
     crashed: boolean;
@@ -78,7 +78,7 @@ export interface SendChatMessageDto {
 }
 
 export interface ScoreDto {
-    pid: number;
+    playerId: number;
     name: string;
     score: number;
 }
@@ -96,7 +96,7 @@ export interface ImpactDto {
 }
 
 export interface ClientUpdateDto {
-    pid: number;
+    playerId: number;
     xDir: number;
     yDir: number;
     xPos: number;

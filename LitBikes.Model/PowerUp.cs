@@ -7,96 +7,96 @@ namespace LitBikes.Model
 {
     public class PowerUpDto
     {
-        public string id;
-        public string name;
-        public Vector2 pos;
-        public PowerUpType type;
-        public bool collected;
+        public string Id;
+        public string Name;
+        public Vector2 Pos;
+        public PowerUpType Type;
+        public bool Collected;
     }
 
     public enum PowerUpType
     {
-        NOTHING,
-        ROCKET,
-        SLOW
+        Nothing,
+        Rocket,
+        Slow
     }
 
     public class PowerUp
     {
-        private readonly string id;
-        private Vector2 pos;
-        private PowerUpType type;
-        private bool collected;
+        private readonly string _id;
+        private Vector2 _pos;
+        private PowerUpType _type;
+        private bool _collected;
 
-        public PowerUp(Vector2 _pos, PowerUpType _type)
+        public PowerUp(Vector2 pos, PowerUpType type)
         {
-            id = Guid.NewGuid().ToString();
-            pos = _pos;
-            type = _type;
-            collected = false;
+            _id = Guid.NewGuid().ToString();
+            _pos = pos;
+            _type = type;
+            _collected = false;
         }
 
         public string GetId()
         {
-            return id;
+            return _id;
         }
 
         public Vector2 GetPos()
         {
-            return pos;
+            return _pos;
         }
 
         public void SetPos(Vector2 pos)
         {
-            this.pos = pos;
+            this._pos = pos;
         }
 
         public PowerUpType GetPowerUpType()
         {
-            return type;
+            return _type;
         }
 
         public void SetType(PowerUpType type)
         {
-            this.type = type;
+            _type = type;
         }
 
         public bool IsCollected()
         {
-            return collected;
+            return _collected;
         }
 
         public void SetCollected(bool collected)
         {
-            this.collected = collected;
+            _collected = collected;
         }
 
         public bool Collides(LineSegment2D line)
         {
-            int boxSize = 6;
-            int originX = (int)pos.X - (boxSize / 2);
-            int originY = (int)pos.Y - (boxSize / 2);
-            Rectangle hitbox = new Rectangle(originX, originY, boxSize, boxSize);
+            const int boxSize = 6;
+            var originX = (int)_pos.X - (boxSize / 2);
+            var originY = (int)_pos.Y - (boxSize / 2);
+            var hitbox = new Rectangle(originX, originY, boxSize, boxSize);
             return line.Intersects(hitbox);
         }
 
         public bool Equals(PowerUp other)
         {
             if (other == null) return false;
-            return id == other.GetId() &&
-                   pos == other.GetPos() &&
-                   type == other.GetPowerUpType() &&
-                   collected == other.collected;                   
+            return _id == other.GetId() &&
+                   _pos == other.GetPos() &&
+                   _type == other.GetPowerUpType() &&
+                   _collected == other._collected;                   
         }
 
         public PowerUpDto GetDto()
         {
             return new PowerUpDto
             {
-                id = id,
-                pos = pos,
-                type = type,
-                collected = collected
+                Id = _id,
+                Pos = _pos,
+                Type = _type,
+                Collected = _collected
             };
         }
     }

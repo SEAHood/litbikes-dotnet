@@ -5,25 +5,24 @@ namespace LitBikes.Model.Dtos.FromClient
 {
     public class ClientUpdateDto : IDto
     {
-        public Guid pid; //TODO probably shouldn't rely on this!!!!!!!
-        public int? xDir;
-        public int? yDir;
-        public int? xPos;
-        public int? yPos;
+        public Guid PlayerId; //TODO probably shouldn't rely on this!!!!!!!
+        public int? XDir;
+        public int? YDir;
+        public int? XPos;
+        public int? YPos;
 
         public Vector2? GetDir()
         {
-            if (xDir != null && yDir != null)
-                return new Vector2(xDir.Value, yDir.Value);
-            else
-                return null;
+            if (XDir != null && YDir != null)
+                return new Vector2(XDir.Value, YDir.Value);
+            return null;
         }
 
         public bool IsValid()
         {
-            return pid != null &&
-                   xDir != null && xDir <= 1 && xDir >= -1 &&
-                   yDir != null && yDir <= 1 && yDir >= -1;
+            return PlayerId != Guid.Empty &&
+                   XDir != null && XDir <= 1 && XDir >= -1 &&
+                   YDir != null && YDir <= 1 && YDir >= -1;
         }
     }
 }

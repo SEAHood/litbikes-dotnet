@@ -1,8 +1,8 @@
-import { BikeDto, TrailSegmentDto } from '../dto'
-import { Vector, NumberUtil, ColourUtil } from '../util'
-import { TrailSegment } from './trailSegment'
-import * as _ from 'underscore'
-import 'p5'
+import { BikeDto, TrailSegmentDto } from "../dto"
+import { Vector, NumberUtil, ColourUtil } from "../util"
+import { TrailSegment } from "./trailSegment"
+import * as _ from "underscore"
+import "p5"
 
 export class Bike {
     private pos : Vector;
@@ -99,11 +99,11 @@ export class Bike {
         // Respawning effect
         if (this.respawning && showRespawnRing) {
             let innerRingSize = Math.max(0, this.idRingSize - 10);
-            p.fill('rgba(0,0,0,0)');
+            p.fill("rgba(0,0,0,0)");
             p.stroke(255);
             p.strokeWeight(2);
             p.ellipse(this.pos.x, this.pos.y, this.idRingSize, this.idRingSize);
-            p.stroke(this.colour.replace('%A%', '1'));
+            p.stroke(this.colour.replace("%A%", "1"));
             p.strokeWeight(1);
             p.ellipse(this.pos.x, this.pos.y, innerRingSize, innerRingSize);
             this.idRingSize = this.idRingSize + 1.5;
@@ -119,7 +119,7 @@ export class Bike {
             
         // Draw trail
         p.strokeWeight(2);
-        p.stroke(this.colour.replace('%A%', this.trailOpacity.toString()));
+        p.stroke(this.colour.replace("%A%", this.trailOpacity.toString()));
 
         // Create trail segment between bike and last trail end
         let headEnd : Vector = _.find(this.trail, t => t.isHead).end;
@@ -144,7 +144,7 @@ export class Bike {
         // Draw bike
         let bikeColour = isControlledPlayer
             ? "rgb(255, 255, 255)"
-            :  this.colour.replace('%A%', '1');
+            :  this.colour.replace("%A%", "1");
         p.noStroke();
         p.fill(bikeColour);
         p.ellipse(this.pos.x, this.pos.y, 5, 5);
@@ -153,14 +153,14 @@ export class Bike {
         if ( this.crashing ) {
             // Explosion
             var randColour = NumberUtil.rand255();
-            p.stroke('rgba(' + randColour + ', 0, 0, 0.80)');
-            p.fill('rgba(' + randColour + ', ' + randColour + ' , 0, 0.75)');
+            p.stroke("rgba(" + randColour + ", 0, 0, 0.80)");
+            p.fill("rgba(" + randColour + ", " + randColour + " , 0, 0.75)");
             p.ellipse(this.pos.x, this.pos.y, 20, 20);
 
             var randSize = Math.floor(Math.random() * 35);
             randColour = NumberUtil.rand255();
-            p.stroke('rgba(' + randColour + ', ' + randColour + ' , 0, 0.55)');
-            p.fill('rgba(' + NumberUtil.rand255() + ', 0, 0, 0.65)');
+            p.stroke("rgba(" + randColour + ", " + randColour + " , 0, 0.55)");
+            p.fill("rgba(" + NumberUtil.rand255() + ", 0, 0, 0.65)");
             p.ellipse(this.pos.x, this.pos.y, randSize, randSize);
         }
     }

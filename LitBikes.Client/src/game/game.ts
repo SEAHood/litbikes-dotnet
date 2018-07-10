@@ -1,25 +1,26 @@
-import { Bike } from '../model/bike'
-import { Player } from '../model/player'
-import { PowerUp } from '../model/powerUp'
-import { Arena } from '../model/arena'
-import { Vector, NumberUtil } from '../util'
+import { Bike } from "../model/bike"
+import { Player } from "../model/player"
+import { PowerUp } from "../model/powerUp"
+import { Arena } from "../model/arena"
+import { Vector, NumberUtil } from "../util"
 import {
     WorldUpdateDto, BikeDto, PlayerDto, PowerUpDto,
     ClientUpdateDto, GameJoinDto, ClientGameJoinDto,
     HelloDto, ChatMessageDto, ScoreDto,
     SendChatMessageDto
-} from '../dto'
+} from "../dto"
 
-import 'p5'
-import * as signalR from '@aspnet/signalr'
-import * as _ from 'underscore'
-import * as $ from 'jquery'
+import "p5"
+import * as signalR from "@aspnet/signalr"
+import * as _ from "underscore"
+import * as $ from "jquery"
 
 export class Game {
     private player : Player;
-    private host = 'http://' + window.location.hostname + ':9092';
+    private host = `http://${window.location.hostname}:9092`;
     //private socket = null;//io.connect(this.host);
-    private hubConnection = new signalR.HubConnectionBuilder().withUrl("/hub").build();
+    private hubConnection = new signalR.HubConnectionBuilder().withUrl(`http://${window.location.hostname}:59833/hub`).build();
+    //private hubConnection = new signalR.HubConnectionBuilder().withUrl("/hub").build();
     private arena : Arena;
     private players : Player[] = [];
     private powerUps : PowerUp[] = [];
@@ -55,55 +56,50 @@ export class Game {
     private impacts: Vector[];
 
     constructor() {
-        this.hubConnection.on('hello', ( data : HelloDto ) => {
+        this.hubConnection.on("Hello", ( data : HelloDto ) => {
             this.initGame(data);
         });
 
-        this.hubConnection.on('joined-game', (data : GameJoinDto ) => {
+        this.hubConnection.on("JoinedGame", (data : GameJoinDto ) => {
             this.joinGame(data);
         });
-
-        setInterval(() => {
-            this.timeKeepAliveSent = new Date().getTime();
-            this.hubConnection.invoke('keep-alive');
-        }, 1000);
-
-        this.hubConnection.on('keep-alive-ack', data => {
+        
+        this.hubConnection.on("KeepAliveAck", data => {
             let timeNow = new Date().getTime();
             this.latency = timeNow - this.timeKeepAliveSent;
             this.refreshServerTimeout();
         });
 
-        this.hubConnection.on('world-update', ( data : WorldUpdateDto ) => {
+        this.hubConnection.on("WorldUpdate", ( data : WorldUpdateDto ) => {
             if ( this.gameStarted ) {
                 this.processWorldUpdate(data);
             }
         });
 
-        this.hubConnection.on('score-update', (data: ScoreDto[]) => {
+        this.hubConnection.on("ScoreUpdate", (data: ScoreDto[]) => {
             this.updateScores(data);
         });
 
-        this.hubConnection.on('chat-message', ( data : ChatMessageDto ) => {
+        this.hubConnection.on("ChatMessage", ( data : ChatMessageDto ) => {
             // TODO: Use moment or something?
-            let messageTime = new Date(data.timestamp).toTimeString().split(' ')[0];
+            let messageTime = new Date(data.timestamp).toTimeString().split(" ")[0];
             let chatElement = "<li>";
 
-            chatElement += "[" + messageTime + "]";
+            chatElement += `[${messageTime}]`;
             if ( data.isSystemMessage ) {
-                chatElement += "&nbsp;<span style='color:#AFEEEE'>" + _.escape(data.message) + "</span>";
+                chatElement += `&nbsp;<span style='color:#AFEEEE'>${_.escape(data.message)}</span>`;
             } else {
                 let colour = data.sourceColour.replace("%A%", "100");
-                chatElement += "&nbsp;<span style='color:" + colour + "'><strong>" + data.source + "</strong></span>:";
-                chatElement += "&nbsp;" + _.escape(data.message);
+                chatElement += `&nbsp;<span style='color:${colour}'><strong>${data.source}</strong></span>:`;
+                chatElement += `&nbsp;${_.escape(data.message)}`;
             }
             chatElement += "</li>";
 
-            $('#chat-log ul').append(chatElement);
-            $('#chat-log').scrollTop($('#chat-log')[0].scrollHeight);
+            $("#chat-log ul").append(chatElement);
+            $("#chat-log").scrollTop($("#chat-log")[0].scrollHeight);
 
-            if ( $('#message-list li').length > 250 ) {
-                $('#message-list li').first().remove();
+            if ( $("#message-list li").length > 250 ) {
+                $("#message-list li").first().remove();
             }
 
             this.messageCount = $("#message-list li").length;
@@ -126,7 +122,8 @@ export class Game {
             ENTER = 13
         };
 
-        $(document).on('keyup', ev => {
+        $(document).on("keyup", ev => {
+            console.log("OKAJWDNKAJWND");
             let keyCode = ev.which;
             if ( this.player ) {
                 if (keyCode === Keys.TAB) {
@@ -135,20 +132,21 @@ export class Game {
             }
         });
 
-        $(document).on('keydown', ev => {
-            if ( $(ev.target).is('input') ) {
+        $(document).on("keydown", ev => {
+            console.log("OKAJWDNKAJWND");
+            if ( $(ev.target).is("input") ) {
                 // Typing in chat, don't process as game keys
                 if ( ev.which === Keys.ENTER ) { // enter
-                    if ($(ev.target).is('#player-name-input')) { // enter when inside player name box
-                        let name = $('#player-name-input').val();
+                    if ($(ev.target).is("#player-name-input")) { // enter when inside player name box
+                        let name = $("#player-name-input").val();
                         if (this.nameIsValid(name.toString())) {
                             this.requestJoinGame(name.toString());
                         }                            
-                    } else if ($(ev.target).is('#chat-input')) { // enter when inside chat box
-                        let message = $('#chat-input').val();
+                    } else if ($(ev.target).is("#chat-input")) { // enter when inside chat box
+                        let message = $("#chat-input").val();
                         if (message.toString().trim() != "") {
-                            this.hubConnection.invoke('chat-message', message);
-                            $('#chat-input').val('');
+                            this.hubConnection.invoke("ChatMessage", message);
+                            $("#chat-input").val("");
                         }
                     }
                     $(ev.target).blur();
@@ -173,15 +171,15 @@ export class Game {
                 } else if (keyCode === Keys.F3) {
                     this.showDebug = !this.showDebug;
                 } else if (keyCode === Keys.R) {
-                    this.hubConnection.invoke('request-respawn');
+                    this.hubConnection.invoke("RequestRespawn");
                 } else if (keyCode === Keys.H) {
                     this.showRespawn = !this.showRespawn;
                 } else if (keyCode === Keys.TAB) {
                     this.tabPressed = true;
                 } else if (keyCode === Keys.SPACE) {
-                    this.hubConnection.invoke('use-powerup');
+                    this.hubConnection.invoke("UsePowerup");
                 } else if (keyCode === Keys.ENTER) {
-                    $('#chat-input').focus();
+                    $("#chat-input").focus();
                 } else {
                     eventMatched = false;
                 }
@@ -196,43 +194,56 @@ export class Game {
                     //this.sendClientUpdate();
                     // TODO MOVE THIS SOMEWHERE ELSE
                     let updateDto : ClientUpdateDto = {
-                        pid : this.player.getPid(),
+                        playerId : this.player.getPlayerId(),
                         xDir : newVector.x,
                         yDir : newVector.y,
                         xPos : this.player.getBike().getPos().x,
                         yPos : this.player.getBike().getPos().y
                     };
-                    this.hubConnection.invoke('update', updateDto);
+                    this.hubConnection.invoke("Update", updateDto);
                 }
             }
         });
             
-        $(document).ready(() => {                
-            $('#player-name-input').on('input', () => {
-                let name = $('#player-name-input').val();
+        $(document).ready(() => {        
+            $("#player-name-input").on("input", () => {
+                console.log("OKAJWDNKAJWND");
+                let name = $("#player-name-input").val();
                 if (this.nameIsValid(name.toString())) {
-                    $('#player-name-submit').show();
+                    $("#player-name-submit").show();
                 } else {
-                    $('#player-name-submit').hide();
+                    $("#player-name-submit").hide();
                 }
             });
                 
-            $('#player-name-submit').on('click', () => {
-                let name = $('#player-name-input').val();
+            $("#player-name-submit").on("click", () => {
+                let name = $("#player-name-input").val();
                 this.requestJoinGame(name.toString());
             });
         });
+    }
 
-        this.hubConnection.invoke('hello');
+    go() {
+        $(document).on("keyup", ev => {
+            console.log("OKAJWDNKAJWND");
+        });
+
+        this.hubConnection.start().then(() => {
+            this.hubConnection.invoke("Hello");
+            setInterval(() => {
+                this.timeKeepAliveSent = new Date().getTime();
+                this.hubConnection.invoke("KeepAlive");
+            }, 1000);
+        }).catch(err => console.error(err.toString()));
     }
         
     private setup( p : p5 ) {
-        this.mainFont = p.loadFont('fonts/3Dventure.ttf');
-        this.secondaryFont = p.loadFont('fonts/visitor.ttf');
-        this.debugFont = p.loadFont('fonts/larabie.ttf');
+        this.mainFont = p.loadFont("fonts/3Dventure.ttf");
+        this.secondaryFont = p.loadFont("fonts/visitor.ttf");
+        this.debugFont = p.loadFont("fonts/larabie.ttf");
             
-        this.powerUpIconRocket = p.loadImage('images/game/powerups/rocket.png');
-        this.powerUpIconSlow = p.loadImage('images/game/powerups/slow.png');
+        this.powerUpIconRocket = p.loadImage("images/game/powerups/rocket.png");
+        this.powerUpIconSlow = p.loadImage("images/game/powerups/slow.png");
 
         p.createCanvas(this.arena.size, this.arena.size);
     }
@@ -251,18 +262,18 @@ export class Game {
     }
 
     private requestJoinGame(name: string) {
-        let joinObj : ClientGameJoinDto = {
+        const joinObj: ClientGameJoinDto = {
             name: name
         };
-        this.hubConnection.invoke('request-join-game', joinObj);
+        this.hubConnection.invoke("RequestJoinGame", joinObj);
     }
 
     private joinGame( data : GameJoinDto ) {
-        $('#welcome-container').hide();
-        $('#info-container').slideDown();
+        $("#welcome-container").hide();
+        $("#info-container").slideDown();
         this.gameJoined = true;
         this.player = new Player(
-            data.player.pid, 
+            data.player.playerId, 
             data.player.name, 
             new Bike(data.player.bike), 
             data.player.crashed,
@@ -285,11 +296,11 @@ export class Game {
             
         this.processWorldUpdate(data.world);
 
-        this.p5Instance = new p5(this.sketch(), $('#game-container')[0]);
+        this.p5Instance = new p5(this.sketch(), $("#game-container")[0]);
         this.gameStarted = true;
             
-        $('#game').width(this.arena.size);
-        $('#game').height(this.arena.size);
+        $("#game").width(this.arena.size);
+        $("#game").height(this.arena.size);
 
         // MAIN UPDATE LOOP
         setInterval(() => {
@@ -334,28 +345,28 @@ export class Game {
             var t = new Date(data.roundTimeLeft * 1000);
             var minutes = NumberUtil.pad(t.getMinutes(), 2);
             var seconds = NumberUtil.pad(t.getSeconds(), 2);
-            $('#round-timer').text(minutes + ":" + seconds);
+            $("#round-timer").text(minutes + ":" + seconds);
         }
         this.roundTimeLeft = data.roundTimeLeft;
 
-        let updatedPlayers = _.pluck(data.players, 'pid');
-        let existingPlayers = _.pluck(this.players, 'pid');
-        _.each( existingPlayers, ( pid : number ) => {
-            if ( !_.contains(updatedPlayers, pid ) ) {
-                this.players = _.reject(this.players, (p : Player) => p.getPid() === pid );
+        let updatedPlayers = _.pluck(data.players, "playerId");
+        let existingPlayers = _.pluck(this.players, "playerId");
+        _.each( existingPlayers, ( playerId : number ) => {
+            if ( !_.contains(updatedPlayers, playerId ) ) {
+                this.players = _.reject(this.players, (p : Player) => p.getPlayerId() === playerId );
             }
         });
 
         _.each( data.players, ( p : PlayerDto ) => {
-            if ( this.gameJoined && p.pid === this.player.getPid() && this.player ) {
+            if ( this.gameJoined && p.playerId === this.player.getPlayerId() && this.player ) {
                 this.player.updateFromDto(p);
             } else {
-                let existingPlayer = _.find(this.players, (ep: Player) => ep.getPid() === p.pid);
+                let existingPlayer = _.find(this.players, (ep: Player) => ep.getPlayerId() === p.playerId);
                 if ( existingPlayer ) {
                     existingPlayer.updateFromDto(p);
                 } else {
                     let player = new Player(
-                        p.pid, 
+                        p.playerId, 
                         p.name, 
                         new Bike(p.bike), 
                         p.crashed,
@@ -390,30 +401,30 @@ export class Game {
     private updateScores(scores: ScoreDto[]) {            
         scores = _.sortBy(scores, x => x.score).reverse();
         let topFive = _.first(scores, 5);
-        $('#score ul').empty();
+        $("#score ul").empty();
         let playerInTopFive = false;
         topFive.forEach((score: ScoreDto, i: number) => {                
-            let isPlayer = this.gameJoined && score.pid == this.player.getPid();
-            let player: Player = _.first(this.players.filter((p: Player) => p.getPid() == score.pid));
+            let isPlayer = this.gameJoined && score.playerId == this.player.getPlayerId();
+            let player: Player = _.first(this.players.filter((p: Player) => p.getPlayerId() == score.playerId));
             playerInTopFive = isPlayer || playerInTopFive;
             let li = isPlayer ? "<li style='color:yellow'>" : "<li>";
-            let position = "#" + (i + 1);
+            let position = `#${i + 1}`;
             let bikeColour = !player || isPlayer 
                 ? "inherit"
-                :  player.getBike().getColour().replace('%A%', '1');
+                :  player.getBike().getColour().replace("%A%", "1");
             let scoreElement = li + position + " <span style='color:" + bikeColour + "'>" + score.name + "</span>: " + score.score + "</li>";
-            $('#score ul').append(scoreElement);
+            $("#score ul").append(scoreElement);
         });
 
         if (this.gameJoined && !playerInTopFive) {
-            let playerScore = scores.filter(x => x.pid == this.player.getPid())[0];
+            let playerScore = scores.filter(x => x.playerId == this.player.getPlayerId())[0];
             if (!playerScore) {
                 return;
             }
             let li = "<li style='color:yellow'>";
-            let position = "#" + (scores.indexOf(playerScore) + 1);
+            let position = `#${scores.indexOf(playerScore) + 1}`;
             let scoreElement = li + position + " " + playerScore.name + ": " + playerScore.score + "</li>";
-            $('#score ul').append(scoreElement);
+            $("#score ul").append(scoreElement);
         }
     }
 
@@ -454,22 +465,22 @@ export class Game {
 
         if ( this.serverTimedOut ) {
             p.noStroke();
-            p.fill('rgba(0,0,0,0.4)');
+            p.fill("rgba(0,0,0,0.4)");
             p.rect(0, halfHeight - 35, this.arena.size, 55);
 
             p.textFont(this.mainFont);
-            p.textAlign('center', 'top');
+            p.textAlign("center", "top");
 
-            p.fill('rgba(125,249,255,0.50)');
+            p.fill("rgba(125,249,255,0.50)");
             p.textSize(29);
             p.text("He's dead, Jim",
                 halfWidth + NumberUtil.randInt(0, 2), halfHeight - 30 + NumberUtil.randInt(0, 2));
-            p.fill('rgba(255,255,255,0.80)');
+            p.fill("rgba(255,255,255,0.80)");
             p.textSize(28);
             p.text("He's dead, Jim",
                 halfWidth, halfHeight - 30);
 
-            p.fill('rgba(0,0,0,0.40)');
+            p.fill("rgba(0,0,0,0.40)");
             p.fill(255);
             p.textFont(this.secondaryFont);
             p.textSize(15);
@@ -495,40 +506,40 @@ export class Game {
 
             if ( this.player.isCrashed() && this.player.isSpectating() && this.showRespawn && this.roundInProgress ) {
                 p.noStroke();
-                p.fill('rgba(0,0,0,0.4)');
+                p.fill("rgba(0,0,0,0.4)");
                 p.rect(0, halfHeight - 35, this.arena.size, 100);
 
                 p.textFont(this.mainFont);
-                p.textAlign('center', 'top');
+                p.textAlign("center", "top");
 
                 if ( this.player.isCrashed() ) {
-                    let suicide = this.player.getCrashedInto() == this.player.getPid();
+                    let suicide = this.player.getCrashedInto() == this.player.getPlayerId();
                     let crashText = "";
                     if (suicide) {
                         crashText = "You killed yourself, idiot";
                     } else {
-                        crashText = "Killed by " + this.player.getCrashedIntoName();
+                        crashText = `Killed by ${this.player.getCrashedIntoName()}`;
                     }
-                    p.fill('rgba(125,249,255,0.50)');
+                    p.fill("rgba(125,249,255,0.50)");
                     p.textSize(29);
                     p.text(crashText,
                         halfWidth + NumberUtil.randInt(0, 2), halfHeight - 30 + NumberUtil.randInt(0, 2));
-                    p.fill('rgba(255,255,255,0.80)');
+                    p.fill("rgba(255,255,255,0.80)");
                     p.textSize(28);
                     p.text(crashText,
                         halfWidth, halfHeight - 30);
                 }
 
-                p.fill('rgba(125,249,255,0.50)');
+                p.fill("rgba(125,249,255,0.50)");
                 p.textSize(33);
                 p.text("Press 'R' to respawn",
                     halfWidth + NumberUtil.randInt(0, 2), halfHeight + NumberUtil.randInt(0, 2));
 
-                p.fill('rgba(255,255,255,0.80)');
+                p.fill("rgba(255,255,255,0.80)");
                 p.textSize(32);
                 p.text("Press 'R' to respawn", halfWidth, halfHeight);
 
-                p.fill('rgba(0,0,0,0.40)');
+                p.fill("rgba(0,0,0,0.40)");
                 p.fill(255);
                 p.textFont(this.secondaryFont);
                 p.textSize(15);
@@ -537,35 +548,35 @@ export class Game {
         } 
 
         if (!this.roundInProgress) {
-            let winner = this.gameJoined && this.currentWinner === this.player.getPid()
+            let winner = this.gameJoined && this.currentWinner === this.player.getPlayerId()
                 ? this.player
-                : _.find(this.players, (player: Player) => player.getPid() === this.currentWinner);
+                : _.find(this.players, (player: Player) => player.getPlayerId() === this.currentWinner);
                 
             let winnerName = "The Wall";
             if (winner)
                 winnerName = winner.getName();
 
             p.noStroke();
-            p.fill('rgba(0,0,0,0.4)');
+            p.fill("rgba(0,0,0,0.4)");
             p.rect(0, halfHeight - 35, this.arena.size, 55);
 
             p.textFont(this.mainFont);
-            p.textAlign('center', 'top');
+            p.textAlign("center", "top");
 
-            p.fill('rgba(125,249,255,0.50)');
+            p.fill("rgba(125,249,255,0.50)");
             p.textSize(29);
             p.text(winnerName + " won!",
                 halfWidth + NumberUtil.randInt(0, 2), halfHeight - 30 + NumberUtil.randInt(0, 2));
-            p.fill('rgba(255,255,255,0.80)');
+            p.fill("rgba(255,255,255,0.80)");
             p.textSize(28);
             p.text(winnerName + " won!",
                 halfWidth, halfHeight - 30);
 
-            p.fill('rgba(0,0,0,0.40)');
+            p.fill("rgba(0,0,0,0.40)");
             p.fill(255);
             p.textFont(this.secondaryFont);
             p.textSize(15);
-            p.text("Next round starting in " + this.timeUntilNextRound + " second" + (this.timeUntilNextRound === 1 ? "" : "s"), halfWidth, halfHeight);
+            p.text(`Next round starting in ${this.timeUntilNextRound} second${this.timeUntilNextRound === 1 ? "" : "s"}`, halfWidth, halfHeight);
         }
             
         if (this.player && this.player.isAlive() && this.player.getEffect().toLowerCase() == "slowed") {
@@ -574,7 +585,7 @@ export class Game {
 
         _.each(this.impacts, (i: Vector) => {                
             p.noStroke();
-            p.fill('rgba(255, 165, 0, 0.6)');
+            p.fill("rgba(255, 165, 0, 0.6)");
             p.ellipse(i.x, i.y, 20, 20);
         })
             
@@ -583,26 +594,15 @@ export class Game {
             p.textFont(this.debugFont);
             p.fill(255);
             p.textSize(15);
-            p.textAlign('left', 'top');
-            p.text("LitBikes " + this.version, 10, 10);
+            p.textAlign("left", "top");
+            p.text(`LitBikes ${this.version}`, 10, 10);
             if ( this.gameJoined ) {
                 let playerBike = this.player.getBike();
                 p.text(
-                    "fps: " + p.frameRate().toFixed(2) + "\n" +
-                    "ms: " + this.latency + "ms\n" +
-                    "pid: " + this.player.getPid() + "\n" +
-                    "pos: " + playerBike.getPos().x.toFixed(0) + ", " + playerBike.getPos().y.toFixed(0) + "\n" +
-                    "dir: "+ playerBike.getDir().x + ", " + playerBike.getDir().y + "\n" +
-                    "spd: "+ playerBike.getSpd() + "\n" +
-                    "crashed: " + (this.player.isCrashed() ? "yes" : "no") + "\n" +
-                    "crashing: " + (playerBike.isCrashing() ? "yes" : "no") + "\n" + +
-                    "colour: " + playerBike.getColour() + "\n" +
-                    "spectating: " + (this.player.isSpectating() ? "yes" : "no") + "\n" +
-                    "round in progress: " + (this.roundInProgress ? "yes" : "no") + "\n" + 
-                    "round time left: " + this.roundTimeLeft + "\n" + 
-                    "time until next round: " + this.timeUntilNextRound + "\n" + 
-                    "other players: " + this.players.length + "\n" +
-                    "chat message count: " + this.messageCount + "\n"
+                    `fps: ${p.frameRate().toFixed(2)}\nms: ${this.latency}ms\nplayerId: ${this.player.getPlayerId()}\npos: ${playerBike.getPos().x.toFixed(0)}, ${playerBike.getPos().y.toFixed(0)}\ndir: ${playerBike.getDir().x}, ${playerBike.getDir().y}\nspd: ${playerBike.getSpd()}\ncrashed: ${this.player.isCrashed() ? "yes" : "no"}\ncrashing: ${playerBike.isCrashing() ? "yes" : "no"}\n${+
+                    "colour: "}${playerBike.getColour()
+                    }\nspectating: ${this.player.isSpectating() ? "yes" : "no"}\nround in progress: ${this.roundInProgress ? "yes" : "no"}\nround time left: ${this.roundTimeLeft}\ntime until next round: ${this.timeUntilNextRound}\nother players: ${this.players.length
+                    }\nchat message count: ${this.messageCount}\n`
                 , 10, 30, 300, 500);
             } else {
                 p.text("Game not joined", 10, 30, 300, 500);
@@ -612,11 +612,19 @@ export class Game {
     }
 }
 
+$(document).ready(() => {
+    console.log("READY");
+});
+/*document.addEventListener("DOMContentLoaded", event => {
+    console.log("READY");
+});*/
+let game = new Game();
+game.go();
 
 //new Game();
 
 
-var hubConnection = new signalR.HubConnectionBuilder().withUrl("http://localhost:59833/hub").build();
+/*var hubConnection = new signalR.HubConnectionBuilder().withUrl("http://localhost:59833/hub").build();
 
 hubConnection.on("ReceiveMessage", (user, message) => {
     const msg = message.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
@@ -645,4 +653,4 @@ document.getElementById("sendButton").addEventListener("click", event => {
 
     hubConnection.invoke("ChatMessage", payload).catch(err => console.error(err.toString()));
     event.preventDefault();
-});
+});*/

@@ -81,10 +81,6 @@ namespace LitBikes.Game.Engine
             });
             _tickThread.Start();
 
-            //Runnable gameLoop = new GameTick();
-            //ScheduledExecutorService executor = Executors.newScheduledThreadPool(1);
-            //executor.scheduleAtFixedRate(gameLoop, 0, GAME_TICK_MS, TimeUnit.MILLISECONDS);
-
             //PowerUpSpawner powerUpSpawner = new PowerUpSpawner();
             //powerUpSpawner.run();
 
@@ -95,12 +91,9 @@ namespace LitBikes.Game.Engine
         private void GameTick()
         {
             gameTick++;
-
-            if (roundKeeper.IsRoundInProgress())
-            {
-                UpdatePlayerPositions(out var activePlayers, out var trails);
-                CheckForEvents(activePlayers, trails);
-            }
+            if (!roundKeeper.IsRoundInProgress()) return;
+            UpdatePlayerPositions(out var activePlayers, out var trails);
+            CheckForEvents(activePlayers, trails);
         }
 
         public void StartRound()
@@ -156,6 +149,7 @@ namespace LitBikes.Game.Engine
                 // Decrement player score if they crashed into themselves or the wall
                 score.GrantScore(player.GetId(), player.GetName(), -1);
             }
+            _gameEventController.PlayerCrashed(player);
             _gameEventController.ScoreUpdated(score.GetScores());
             return crashedInto;
         }
@@ -171,14 +165,14 @@ namespace LitBikes.Game.Engine
             }
         }
 
-        public Player PlayerJoin(Guid pid, String name, bool isHuman)
+        public Player PlayerJoin(Guid pid, string name, bool isHuman)
         {
             //LOG.info("Creating new player with pid " + pid);
 
-            Player player = new Player(pid, isHuman);
+            var player = new Player(pid, isHuman);
             player.SetName(name);
 
-            Bike bike = new Bike(pid);
+            var bike = new Bike(pid);
             bike.Init(FindSpawn(), true);
             player.SetBike(bike);
 
@@ -203,12 +197,12 @@ namespace LitBikes.Game.Engine
         {
             if (data.IsValid())
             {
-                var player = players.FirstOrDefault(p => p.GetId() == data.pid);
+                var player = players.FirstOrDefault(p => p.GetId() == data.PlayerId);
                 if (player == null)
                     return false;
 
                 var bike = player.GetBike();
-                bike.SetDir(new Vector2(data.xDir.Value, data.yDir.Value));
+                bike.SetDir(new Vector2(data.XDir.Value, data.YDir.Value));
                 player.UpdateBike(bike);
                 return true;
             }
@@ -230,20 +224,20 @@ namespace LitBikes.Game.Engine
             var powerUpsDto = new List<PowerUpDto>();
             foreach (var p in powerUps)
             {
-                PowerUpDto powerUpDto = p.GetDto();
+                var powerUpDto = p.GetDto();
                 powerUpsDto.Add(powerUpDto);
             }
 
-            worldDto.timestamp = (long)(DateTime.Now - new DateTime(1970, 1, 1)).TotalSeconds;
-            worldDto.roundInProgress = roundKeeper.IsRoundInProgress();
-            worldDto.roundTimeLeft = roundKeeper.GetTimeUntilRoundEnd().Seconds;
-            worldDto.timeUntilNextRound = roundKeeper.GetTimeUntilCountdownEnd().Seconds;
-            worldDto.currentWinner = score.GetCurrentWinner();
-            worldDto.gameTick = gameTick;
-            worldDto.arena = arena.GetDto();
-            worldDto.players = playersDto;
-            worldDto.powerUps = powerUpsDto;
-            worldDto.debug = debug.GetDto();
+            worldDto.Timestamp = (long)(DateTime.Now - new DateTime(1970, 1, 1)).TotalSeconds;
+            worldDto.RoundInProgress = roundKeeper.IsRoundInProgress();
+            worldDto.RoundTimeLeft = roundKeeper.GetTimeUntilRoundEnd().Seconds;
+            worldDto.TimeUntilNextRound = roundKeeper.GetTimeUntilCountdownEnd().Seconds;
+            worldDto.CurrentWinner = score.GetCurrentWinner();
+            worldDto.GameTick = gameTick;
+            worldDto.Arena = arena.GetDto();
+            worldDto.Players = playersDto;
+            worldDto.PowerUps = powerUpsDto;
+            worldDto.Debug = debug.GetDto();
 
             return worldDto;
         }
@@ -258,7 +252,7 @@ namespace LitBikes.Game.Engine
             if (player != null && player.IsCrashed())
             {
                 player.Respawn(FindSpawn());
-                _gameEventController.PlayerSpawned(player.GetId());
+                _gameEventController.PlayerSpawned();
             }
         }
 
@@ -269,8 +263,8 @@ namespace LitBikes.Game.Engine
 
         public Spawn FindSpawn()
         {
-            Spawn spawn = new Spawn(gameSize, BaseBikeSpeed);
-            int i = 0;
+            var spawn = new Spawn(gameSize, BaseBikeSpeed);
+            var i = 0;
             while (!SpawnIsAcceptable(spawn) && i++ < 10)
             {
                 spawn = new Spawn(gameSize, BaseBikeSpeed);
@@ -299,7 +293,7 @@ namespace LitBikes.Game.Engine
 
         private List<TrailSegment> GetTrails()
         {
-            List<TrailSegment> trails = new List<TrailSegment>();
+            var trails = new List<TrailSegment>();
             foreach (var p in players)
             {
                 trails.AddRange(p.GetBike().GetTrailSegmentList(true));

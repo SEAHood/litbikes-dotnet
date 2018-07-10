@@ -12,12 +12,12 @@
 //            {
 //                try
 //                {
-//                    PowerUpType type = PowerUpType.SLOW;
+//                    PowerUpType type = PowerUpType.Slow;
 //                    int rand = new Random().nextInt(2);
 //                    if (rand == 1)
-//                        type = PowerUpType.ROCKET;
+//                        type = PowerUpType.Rocket;
 //                    else
-//                        type = PowerUpType.SLOW;
+//                        type = PowerUpType.Slow;
 
 //                    PowerUp powerUp = new PowerUp(Vector.random(gameSize, gameSize), type);
 //                    powerUps.add(powerUp);

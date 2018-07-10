@@ -4,24 +4,21 @@ using System.Collections.Generic;
 using System.Text;
 using LitBikes.Model;
 using LitBikes.Model.Dtos.FromClient;
+using LitBikes.Exceptions;
 
 namespace LitBikes.Game.Controller
 {
     public class ClientEventHandler
     {
         // CLIENT EVENTS
-        public void ClientJoiningGame(ClientGameJoinDto gameJoinDto)
+        /*public void ClientJoiningGame(Guid playerId, ClientGameJoinDto gameJoinDto)
         {
-            /*if (!gameJoinDto.isValid())
-            {
-                // TODO Implement some error handling
-                client.sendEvent(C_ERROR, "invalid name");
-                return;
-            }
+            if (!gameJoinDto.IsValid())
+                throw new InvalidPayloadException("Invalid name"); // TODO Refactor - error from IsValid()
 
-            int pid = sessionPlayers.get(client.getSessionId());
-            String name = gameJoinDto.name;
-            Player player = game.playerJoin(pid, name, true);
+            //int pid = sessionPlayers.get(client.getSessionId());
+            //String name = gameJoinDto.name;
+            var player = _game.PlayerJoin(pid, name, true);
 
             GameSettingsDto gameSettings = new GameSettingsDto();
             gameSettings.gameTickMs = game.getGameTickMs();
@@ -32,8 +29,8 @@ namespace LitBikes.Game.Controller
 
             balanceBots();
 
-            client.sendEvent(C_JOINED_GAME, dto);*/
-        }
+            client.sendEvent(C_JOINED_GAME, dto);
+        }*/
 
         public void ClientHello()
         {
@@ -66,7 +63,7 @@ namespace LitBikes.Game.Controller
             balanceBots();*/
         }
 
-        public void ClientChatMessageEvent(Player player, string message)
+        /*public void ClientChatMessageEvent(Player player, string message)
         {
             var colour = player.GetBike().GetColour();
             var sourceColour = $"rgba({colour.R:X2},{colour.G:X2},{colour.B:X2},%A%)";
@@ -75,10 +72,10 @@ namespace LitBikes.Game.Controller
             // TODO BROADCAST THAT SHIT
 
             //BroadcastData("chat-message", dto);
-        }
+        }*/
 
 
-        public void ClientUpdateEvent(ClientUpdateDto updateDto)
+        /*public void ClientUpdateEvent(ClientUpdateDto updateDto)
         {
             /*Integer pid = sessionPlayers.get(client.getSessionId());
             if (pid == null)
@@ -87,11 +84,11 @@ namespace LitBikes.Game.Controller
             if (game.HandleClientUpdate(updateDto))
             {
                 broadcastWorldUpdate();
-            }*/
-        }
+            }#1#
+        }*/
 
 
-        public void ClientRequestRespawnEvent()
+        /*public void ClientRequestRespawnEvent()
         {
             /*Integer pid = sessionPlayers.get(client.getSessionId());
             if (pid == null)
@@ -99,11 +96,11 @@ namespace LitBikes.Game.Controller
 
             Player player = game.getPlayer(pid);
             LOG.info("Respawn request from " + player.getName());
-            game.requestRespawn(player);*/
-        }
+            game.requestRespawn(player);#1#
+        }*/
 
 
-        public void ClientRequestUsePowerUpEvent()
+        /*public void ClientRequestUsePowerUpEvent()
         {
             /*Integer pid = sessionPlayers.get(client.getSessionId());
             if (pid == null)
@@ -115,8 +112,8 @@ namespace LitBikes.Game.Controller
 
             LOG.info("PowerUp used by " + player.getName());
             game.requestUsePowerUp(player);
-            broadcastWorldUpdate();*/
-        }
+            broadcastWorldUpdate();#1#
+        }*/
 
 
         public void ClientHelloEvent()
@@ -136,7 +133,7 @@ namespace LitBikes.Game.Controller
             //client.sendEvent("keep-alive-ack");
         }
 
-        public void ClientRequestGameJoinEvent(ClientGameJoinDto gameJoinDto)
+        /*public void ClientRequestGameJoinEvent(ClientGameJoinDto gameJoinDto)
         {
             /*LOG.info("Received game join request event");
             clientJoiningGame(client, gameJoinDto);
@@ -145,8 +142,8 @@ namespace LitBikes.Game.Controller
 
             String newPlayerMessage = gameJoinDto.name + " joined!";
             ChatMessageDto dto = new ChatMessageDto(null, null, newPlayerMessage, true);
-            broadcastData("chat-message", dto);*/
-        }
+            broadcastData("chat-message", dto);#1#
+        }*/
 
         // END CLIENT EVENTS
 

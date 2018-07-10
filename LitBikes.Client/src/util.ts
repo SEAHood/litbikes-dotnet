@@ -45,15 +45,15 @@ export class NumberUtil {
     }
 
     public static pad(n: number, width: number, z?: string) {
-        z = z || '0';
-        let ns = n + '';
+        z = z || "0";
+        let ns = n + "";
         return ns.length >= width ? ns : new Array(width - ns.length + 1).join(z) + ns;
     }
 }
 
 export class ColourUtil {
     public static rgba(r, g, b, a): string {
-        return 'rgba(' + r + ',' + g + ',' + b + ',' + a + ')';
+        return "rgba(" + r + "," + g + "," + b + "," + a + ")";
     }
 
     /* accepts parameters
@@ -90,11 +90,11 @@ export class ColourUtil {
 // WTF IS THIS
 //export class Connection {
 //    public socket: any;
-//    public pid: number;
+//    public playerId: number;
 
-//    constructor(socket: any, pid: number) {
+//    constructor(socket: any, playerId: number) {
 //        this.socket = socket;
-//        this.pid = pid;
+//        this.playerId = playerId;
 //    }
 
 //    public fireWorldUpdated(worldUpdate: WorldUpdateDto) {

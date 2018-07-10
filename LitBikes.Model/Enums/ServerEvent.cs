@@ -5,6 +5,8 @@
         WorldUpdate,
         ScoreUpdate,
         ChatMessage,
-        Hello
+        Hello,
+        JoinedGame,
+        KeepAliveAck
     }
 }

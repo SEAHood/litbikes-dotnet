@@ -1,5 +1,5 @@
-import { Vector } from '../util'
-import { PowerUpDto } from '../dto'
+import { Vector } from "../util"
+import { PowerUpDto } from "../dto"
 
 export class PowerUp {
     private id: string;
@@ -63,7 +63,7 @@ export class PowerUp {
             switch (this.type.toLowerCase()) {
                 case "rocket":
                     p.rotate(p.frameCount / -10.0);
-                    p.fill('rgb(255,255,105)');
+                    p.fill("rgb(255,255,105)");
                     p.triangle(
                         -size, size * 0.8, 
                         size, size * 0.8, 
@@ -72,7 +72,7 @@ export class PowerUp {
                     break;
                 case "slow":
                     p.rotate(p.frameCount / 50.0);
-                    p.fill('rgb(105,255,255)');
+                    p.fill("rgb(105,255,255)");
                     p.triangle(
                         -size, size, 
                         size, size, 
@@ -90,7 +90,7 @@ export class PowerUp {
             }
             p.pop();
         } else if (this.collecting) {
-            p.fill('rgba(0,0,0,0)');
+            p.fill("rgba(0,0,0,0)");
             p.stroke(255);
             p.strokeWeight(2);
             p.ellipse(this.pos.x, this.pos.y, this.popSize, this.popSize);

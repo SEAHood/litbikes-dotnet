@@ -7,6 +7,7 @@ using System.Timers;
 using LitBikes.Game.Engine;
 using LitBikes.Model.Dtos;
 using LitBikes.Events;
+using LitBikes.Model.Dtos.FromClient;
 using LitBikes.Model.Enums;
 
 namespace LitBikes.Game.Controller
@@ -60,14 +61,15 @@ namespace LitBikes.Game.Controller
         {
             clientEventReceiver.Event += (sender, args) =>
             {
+                var player = _game.GetPlayer(args.PlayerId);
                 switch (args.Event)
                 {
                     case ClientEvent.Hello:
                         //int pid = pidGen++;
                         //sessionPlayers.put(client.getSessionId(), pid);
-                        _game.PlayerJoin(args.PlayerId, "Test Player", true);
+                        //_game.PlayerJoin(args.PlayerId, "Test Player", true);
 
-                        var dto = new HelloDto
+                        var helloDto = new HelloDto
                         {
                             GameSettings = new GameSettingsDto
                             {
@@ -76,32 +78,65 @@ namespace LitBikes.Game.Controller
                             World = _game.GetWorldDto()
                         };
 
-                        _eventSender.SendEvent(ServerEvent.Hello, dto);
-                        //client.sendEvent(C_HELLO, dto);
+                        _eventSender.SendEvent(ServerEvent.Hello, helloDto);
                         break;
                     case ClientEvent.ChatMessage:
-                        var player = _game.GetPlayer(args.PlayerId);
-                        _clientEventHandler.ClientChatMessageEvent(player, "something");
+                        var messageDto = (ClientChatMessageDto)args.Dto;
+                        var colour = player.GetBike().GetColour();
+                        var sourceColour = $"rgba({colour.R:X2},{colour.G:X2},{colour.B:X2},%A%)";
+                        var dto = new ChatMessageDto(player.GetName(), sourceColour, messageDto.Message, false);
+                        _eventSender.SendEvent(ServerEvent.ChatMessage, dto);
                         break;
                     case ClientEvent.KeepAlive:
-                        _clientEventHandler.ClientKeepAliveEvent();
+                        _eventSender.SendEvent(ServerEvent.KeepAliveAck);
                         break;
                     case ClientEvent.RequestJoinGame:
-                        _clientEventHandler.ClientRequestGameJoinEvent(null);
+                        RequestGameJoin(player.GetId(), (ClientGameJoinDto)args.Dto);
                         break;
                     case ClientEvent.RequestRespawn:
-                        _clientEventHandler.ClientRequestRespawnEvent();
+                        _game.RequestRespawn(player);
                         break;
                     case ClientEvent.Update:
-                        _clientEventHandler.ClientUpdateEvent(null);
+                        var updateDto = (ClientUpdateDto)args.Dto;
+                        if (_game.HandleClientUpdate(updateDto))
+                            BroadcastWorldUpdate();
                         break;
                     case ClientEvent.UsePowerup:
-                        _clientEventHandler.ClientRequestUsePowerUpEvent();
+                        if (player.GetCurrentPowerUpType() == PowerUpType.Nothing)
+                            return; // player doesn't have a powerup
+                        _game.RequestUsePowerUp(player);
+                        BroadcastWorldUpdate();
                         break;
                     default:
                         throw new ArgumentOutOfRangeException();
                 }
             };
+        }
+
+
+        private void RequestGameJoin(Guid playerId, ClientGameJoinDto dto)
+        {
+            //var gameJoinDto = (ClientGameJoinDto) args.Dto;
+
+
+            if (!dto.IsValid())
+                return;
+            //throw new InvalidPayloadException("Invalid name"); // TODO Refactor - error from IsValid()
+
+            //int pid = sessionPlayers.get(client.getSessionId());
+            //String name = gameJoinDto.name;
+            var player = _game.PlayerJoin(playerId, dto.Name, true);
+
+            //var gameSettings = new GameSettingsDto { GameTickMs = _game.GetGameTickMs() };
+
+            var gameJoinDto = new GameJoinDto
+            {
+                Player = player.GetDto(),
+                Scores = _game.GetScores()
+            };
+
+            //balanceBots();
+            _eventSender.SendEvent(ServerEvent.JoinedGame, gameJoinDto);
         }
 
         private void SetupGameEventHandlers(GameEventController gameEventController)
@@ -111,10 +146,10 @@ namespace LitBikes.Game.Controller
                 switch (args.Event)
                 {
                     case GameEvent.PlayerCrashed:
-                        PlayerCrashed(null);
+                        PlayerCrashed(args.Player);
                         break;
                     case GameEvent.PlayerSpawned:
-                        PlayerSpawned(1);
+                        PlayerSpawned();
                         break;
                     case GameEvent.ScoreUpdated:
                         ScoreUpdated();
@@ -158,7 +193,7 @@ namespace LitBikes.Game.Controller
             _eventSender.SendEvent(ServerEvent.ChatMessage, dto);
         }
 
-        public void PlayerSpawned(int pid)
+        public void PlayerSpawned()
         {
             BroadcastWorldUpdate();
         }

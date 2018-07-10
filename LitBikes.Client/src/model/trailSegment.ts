@@ -1,6 +1,6 @@
-import { Vector } from '../util'
-import { ArenaDto, TrailSegmentDto } from '../dto'
-import 'p5'
+import { Vector } from "../util"
+import { ArenaDto, TrailSegmentDto } from "../dto"
+import "p5"
 
 export class TrailSegment {
 

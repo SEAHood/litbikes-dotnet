@@ -1,24 +1,24 @@
-import { PlayerDto } from '../dto'
-import { Bike } from './bike'
+import { PlayerDto } from "../dto"
+import { Bike } from "./bike"
 
 export class Player {        
-    private pid: number;
+    private playerId: number;
     private name: string;
     private bike: Bike;
     private crashed: boolean;
     private spectating: boolean;
     private deathTimestamp: number;
-    private crashedInto: number; // pid last crashed into
+    private crashedInto: number; // playerId last crashed into
     private crashedIntoName: string;
     private score: number;
     private isControlledPlayer: boolean;
     private currentPowerUp: string;
     private effect: string;
 
-    constructor(pid: number, name: string, bike: Bike, crashed: boolean, 
+    constructor(playerId: number, name: string, bike: Bike, crashed: boolean, 
         spectating: boolean, deathTimestamp: number, crashedInto: number, 
         crashedIntoName: string, score: number, isControlledPlayer: boolean) {
-        this.pid = pid;
+        this.playerId = playerId;
         this.name = name;
         this.bike = bike;
         this.crashed = crashed;
@@ -34,8 +34,8 @@ export class Player {
         }
     }
 
-    public getPid(): number {
-        return this.pid;
+    public getPlayerId(): number {
+        return this.playerId;
     }
     public getName(): string {
         return this.name;
@@ -85,7 +85,7 @@ export class Player {
                 
             if (showName) {
                 p.textSize(15);
-                p.textAlign('center', 'middle');
+                p.textAlign("center", "middle");
                 p.text(this.name, this.bike.getPos().x, Math.max(0, this.bike.getPos().y - 15));
             }
                 
