@@ -48,7 +48,7 @@ namespace LitBikes.Game.Engine
             powerUps = new List<PowerUp>();
             score = new ScoreKeeper();
             debug = new Debug();
-            roundKeeper = new RoundKeeper(300, 15);
+            roundKeeper = new RoundKeeper(15, 15, _gameEventController);
             powerUpKeeper = new PowerUpKeeper();
             this.gameSize = gameSize;
         }
@@ -67,8 +67,8 @@ namespace LitBikes.Game.Engine
             {
                 while (true)
                 {
-                    if (players.Count == 0)
-                        Thread.Sleep(1000);
+                    //if (players.Count == 0)
+                        //Thread.Sleep(1000);
                     var tickRequired = _lastTick == null || DateTime.Now.Subtract(_lastTick).Milliseconds > GAME_TICK_MS;
                     if (tickRequired)
                     {
@@ -91,7 +91,7 @@ namespace LitBikes.Game.Engine
         private void GameTick()
         {
             gameTick++;
-            if (!roundKeeper.IsRoundInProgress()) return;
+            if (!players.Any() || !roundKeeper.IsRoundInProgress()) return;
             UpdatePlayerPositions(out var activePlayers, out var trails);
             CheckForEvents(activePlayers, trails);
         }
@@ -230,8 +230,8 @@ namespace LitBikes.Game.Engine
 
             worldDto.Timestamp = (long)(DateTime.Now - new DateTime(1970, 1, 1)).TotalSeconds;
             worldDto.RoundInProgress = roundKeeper.IsRoundInProgress();
-            worldDto.RoundTimeLeft = roundKeeper.GetTimeUntilRoundEnd().Seconds;
-            worldDto.TimeUntilNextRound = roundKeeper.GetTimeUntilCountdownEnd().Seconds;
+            worldDto.RoundTimeLeft = (int)roundKeeper.GetTimeUntilRoundEnd().TotalSeconds;
+            worldDto.TimeUntilNextRound = (int)roundKeeper.GetTimeUntilCountdownEnd().TotalSeconds;
             worldDto.CurrentWinner = score.GetCurrentWinner();
             worldDto.GameTick = gameTick;
             worldDto.Arena = arena.GetDto();

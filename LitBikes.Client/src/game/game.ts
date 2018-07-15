@@ -340,7 +340,7 @@ export class Game {
         this.roundInProgress = data.roundInProgress;
         this.timeUntilNextRound = data.timeUntilNextRound;
         this.currentWinner = data.currentWinner;
-            
+        console.log(data.roundTimeLeft);
         if (this.roundTimeLeft != data.roundTimeLeft) {
             var t = new Date(data.roundTimeLeft * 1000);
             var minutes = NumberUtil.pad(t.getMinutes(), 2);

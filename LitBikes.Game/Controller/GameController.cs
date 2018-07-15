@@ -91,7 +91,7 @@ namespace LitBikes.Game.Controller
                         _eventSender.SendEvent(ServerEvent.KeepAliveAck);
                         break;
                     case ClientEvent.RequestJoinGame:
-                        RequestGameJoin(player.GetId(), (ClientGameJoinDto)args.Dto);
+                        RequestGameJoin(args.PlayerId, (ClientGameJoinDto)args.Dto);
                         break;
                     case ClientEvent.RequestRespawn:
                         _game.RequestRespawn(player);

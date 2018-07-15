@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Timers;
+using LitBikes.Game.Controller;
 
 namespace LitBikes.Game.Engine
 {
@@ -14,42 +15,45 @@ namespace LitBikes.Game.Engine
         private DateTime _roundCountdownStartedAt;
         private DateTime _roundStartedAt;
 
-        private Timer _roundTimer;
-        private Timer _countdownTimer;
+        private readonly Timer _roundTimer;
+        private readonly Timer _countdownTimer;
 
-        public RoundKeeper(int roundDuration, int countdownDuration)
+        private readonly GameEventController _eventController;
+
+        public RoundKeeper(int roundDuration, int countdownDuration, GameEventController eventController)
         {
             _roundDuration = roundDuration;
             _countdownDuration = countdownDuration;
+            _eventController = eventController;
+
+            _countdownTimer = new Timer(_countdownDuration * 1000);
+            _countdownTimer.Elapsed += CountdownTimerEndHandler;
+
+            _roundTimer = new Timer(_roundDuration * 1000);
+            _roundTimer.Elapsed += RoundTimerEndHandler;
         }
                 
         public void StartRound()
         {
-            if (!_roundInProgress)
-            {
-                _countdownTimer = new Timer(_countdownDuration * 1000);
-                _countdownTimer.Elapsed += new ElapsedEventHandler(CountdownTimerEndHandler);
-                _countdownTimer.Start();
+            if (_roundInProgress) return;
 
-                _roundCountdownStartedAt = DateTime.Now;
-                _roundCountdownInProgress = true;
-            }
+            _countdownTimer.Start();
+            _roundCountdownStartedAt = DateTime.Now;
+            _roundCountdownInProgress = true;
         }
 
         private void RoundStarted()
         {
-            _roundTimer = new Timer(_roundDuration * 1000);
-            _roundTimer.Elapsed += new ElapsedEventHandler(RoundTimerEndHandler);
-            _roundTimer.Start();
-
             _roundStartedAt = DateTime.Now;
             _roundInProgress = true;
             _roundCountdownInProgress = false;
+            _eventController.RoundStarted();
         }
 
         private void RoundEnded()
         {
             _roundInProgress = false;
+            _eventController.RoundEnded();
         }
 
         public bool IsRoundInProgress()
@@ -59,21 +63,26 @@ namespace LitBikes.Game.Engine
 
         public TimeSpan GetTimeUntilCountdownEnd()
         {
-            return _roundCountdownInProgress ? DateTime.Now - _roundCountdownStartedAt : new TimeSpan(0);
+            var countdownEndsAt = _roundCountdownStartedAt.AddSeconds(_countdownDuration);
+            return _roundCountdownInProgress ? countdownEndsAt - DateTime.Now : new TimeSpan(0);
         }
 
         public TimeSpan GetTimeUntilRoundEnd()
         {
-            return _roundInProgress ? DateTime.Now - _roundStartedAt : new TimeSpan(0);
+            var roundEndsAt = _roundStartedAt.AddSeconds(_roundDuration);
+            return _roundInProgress ? roundEndsAt - DateTime.Now : new TimeSpan(0);
         }
 
         private void RoundTimerEndHandler(object sender, ElapsedEventArgs e)
         {
+            _roundTimer.Stop();
             RoundEnded();
         }
 
         private void CountdownTimerEndHandler(object sender, ElapsedEventArgs e)
         {
+            _countdownTimer.Stop();
+            _roundTimer.Start();
             RoundStarted();
         }
     }
