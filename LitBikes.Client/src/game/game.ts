@@ -242,8 +242,8 @@ export class Game {
         this.secondaryFont = p.loadFont("fonts/visitor.ttf");
         this.debugFont = p.loadFont("fonts/larabie.ttf");
             
-        this.powerUpIconRocket = p.loadImage("images/game/powerups/rocket.png");
-        this.powerUpIconSlow = p.loadImage("images/game/powerups/slow.png");
+        this.powerUpIconRocket = p.loadImage("img/game/powerups/rocket.png");
+        this.powerUpIconSlow = p.loadImage("img/game/powerups/slow.png");
 
         p.createCanvas(this.arena.size, this.arena.size);
     }
@@ -612,45 +612,5 @@ export class Game {
     }
 }
 
-$(document).ready(() => {
-    console.log("READY");
-});
-/*document.addEventListener("DOMContentLoaded", event => {
-    console.log("READY");
-});*/
 let game = new Game();
 game.go();
-
-//new Game();
-
-
-/*var hubConnection = new signalR.HubConnectionBuilder().withUrl("http://localhost:59833/hub").build();
-
-hubConnection.on("ReceiveMessage", (user, message) => {
-    const msg = message.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
-    const encodedMsg = user + " says " + msg;
-    const li = document.createElement("li");
-    li.textContent = encodedMsg;
-    document.getElementById("messagesList").appendChild(li);
-});
-
-hubConnection.on("Hello", (dto) => {
-    console.log(dto);
-});
-
-hubConnection.start().then(() => {
-    console.log("invoking");
-    hubConnection.invoke("Hello").catch(err => console.error(err.toString()));
-}).catch(err => console.error(err.toString()));
-
-document.getElementById("sendButton").addEventListener("click", event => {
-    const user = $("#userInput").val();
-    const message = $("#messageInput").val().toString();
-
-    const payload: SendChatMessageDto = {
-        message: message
-    };
-
-    hubConnection.invoke("ChatMessage", payload).catch(err => console.error(err.toString()));
-    event.preventDefault();
-});*/

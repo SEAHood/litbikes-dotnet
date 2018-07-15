@@ -1,4 +1,5 @@
-﻿const path = require('path');
+﻿var webpack = require('webpack');
+const path = require('path');
 
 module.exports = {
     entry: './src/game/game.ts',
@@ -17,5 +18,10 @@ module.exports = {
     output: {
         filename: 'bundle.js',
         path: path.resolve(__dirname, 'public/js')
-    }
+    },
+    plugins: [
+        new webpack.ProvidePlugin({
+            p5: 'p5'
+        })
+    ]
 };
