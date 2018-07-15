@@ -2,21 +2,21 @@ import { PlayerDto } from "../dto"
 import { Bike } from "./bike"
 
 export class Player {        
-    private playerId: number;
+    private playerId: string;
     private name: string;
     private bike: Bike;
     private crashed: boolean;
     private spectating: boolean;
     private deathTimestamp: number;
-    private crashedInto: number; // playerId last crashed into
+    private crashedInto: string; // playerId last crashed into
     private crashedIntoName: string;
     private score: number;
     private isControlledPlayer: boolean;
     private currentPowerUp: string;
     private effect: string;
 
-    constructor(playerId: number, name: string, bike: Bike, crashed: boolean, 
-        spectating: boolean, deathTimestamp: number, crashedInto: number, 
+    constructor(playerId: string, name: string, bike: Bike, crashed: boolean, 
+        spectating: boolean, deathTimestamp: number, crashedInto: string, 
         crashedIntoName: string, score: number, isControlledPlayer: boolean) {
         this.playerId = playerId;
         this.name = name;
@@ -34,7 +34,7 @@ export class Player {
         }
     }
 
-    public getPlayerId(): number {
+    public getPlayerId(): string {
         return this.playerId;
     }
     public getName(): string {
@@ -52,7 +52,7 @@ export class Player {
     public isCrashed() : boolean {
         return this.crashed;
     }
-    public getCrashedInto() : number {
+    public getCrashedInto(): string {
         return this.crashedInto;
     }
     public getCrashedIntoName() : string {

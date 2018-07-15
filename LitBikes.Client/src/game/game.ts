@@ -38,7 +38,7 @@ export class Game {
     private roundInProgress: boolean;
     private roundTimeLeft: number;
     private timeUntilNextRound: number;
-    private currentWinner: number;
+    private currentWinner: string; // ID
     private messageCount : number;
     private tabPressed : boolean;
     private serverTimeoutTimer : any;
@@ -351,7 +351,7 @@ export class Game {
 
         let updatedPlayers = _.pluck(data.players, "playerId");
         let existingPlayers = _.pluck(this.players, "playerId");
-        _.each( existingPlayers, ( playerId : number ) => {
+        _.each(existingPlayers, (playerId: string ) => {
             if ( !_.contains(updatedPlayers, playerId ) ) {
                 this.players = _.reject(this.players, (p : Player) => p.getPlayerId() === playerId );
             }

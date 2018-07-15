@@ -44,7 +44,8 @@ namespace LitBikes.Events
 
         public void Update(Guid playerId, ClientUpdateDto dto)
         {
-            Event?.Invoke(this, new ClientEventReceiverArgs(playerId, ClientEvent.Update));
+            dto.PlayerId = playerId; // TODO Refactor this out, just give engine the ID
+            Event?.Invoke(this, new ClientEventReceiverArgs(playerId, ClientEvent.Update, dto));
         }
 
         public void ChatMessage(Guid playerId, ClientChatMessageDto dto)

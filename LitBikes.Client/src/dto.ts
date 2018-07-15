@@ -1,7 +1,7 @@
 ﻿import { Vector } from "./util";
 
 export interface BikeDto {
-    playerId: number;
+    playerId: string;
     name: string;
     pos: Vector;
     dir: Vector;
@@ -11,14 +11,14 @@ export interface BikeDto {
 }
 
 export interface PlayerDto {
-    playerId: number;
+    playerId: string;
     name: string;
     bike: BikeDto;
     crashed: boolean;
     crashing: boolean;
-    crashedInto: number;
+    crashedInto: string;
     crashedIntoName: string;
-    deathTimestamp?: number
+    deathTimestamp?: number;
     spectating: boolean;
     score: number;
     currentPowerUp: string;
@@ -58,7 +58,7 @@ export interface WorldUpdateDto {
     roundInProgress: boolean;
     roundTimeLeft: number;
     timeUntilNextRound: number;
-    currentWinner: number;
+    currentWinner: string;
     players: PlayerDto[];
     powerUps: PowerUpDto[];
     arena: ArenaDto;
@@ -78,7 +78,7 @@ export interface SendChatMessageDto {
 }
 
 export interface ScoreDto {
-    playerId: number;
+    playerId: string;
     name: string;
     score: number;
 }
@@ -96,7 +96,7 @@ export interface ImpactDto {
 }
 
 export interface ClientUpdateDto {
-    playerId: number;
+    playerId: string;
     xDir: number;
     yDir: number;
     xPos: number;
