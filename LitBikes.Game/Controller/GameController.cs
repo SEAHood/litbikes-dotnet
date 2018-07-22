@@ -2,8 +2,10 @@
 using System;
 using System.Collections.Generic;
 using System.Drawing;
+using System.Linq;
 using System.Text;
 using System.Timers;
+using LitBikes.Ai;
 using LitBikes.Game.Engine;
 using LitBikes.Model.Dtos;
 using LitBikes.Events;
@@ -17,7 +19,7 @@ namespace LitBikes.Game.Controller
         //private static Logger LOG = Log.getLogger(GameController.class);
 	    private Dictionary<Guid, int> sessionPlayers; //session ID -> engine player ID
         private readonly GameEngine _game;
-	    //private BotController botController;
+	    private readonly BotController _botController;
 	    private int pidGen = 0;
 
         private static String C_HELLO = "hello";
@@ -27,32 +29,32 @@ namespace LitBikes.Game.Controller
         private static int ROUND_TIME = 300;
         private static int ROUND_DELAY = 15;
 
-        private int minPlayers;
+        private readonly int _minPlayers;
         private Random random = new Random();
 
-        private Timer broadcastWorldTimer;
-        private int broadcastWorldInterval = 100; // MS
+        private readonly Timer _broadcastWorldTimer;
+        private readonly int _broadcastWorldInterval = 25; // MS
 
-        private readonly ClientEventHandler _clientEventHandler;
-        private IServerEventSender _eventSender;
+        //private readonly ClientEventHandler _clientEventHandler;
+        private readonly IServerEventSender _eventSender;
         
         public GameController(IClientEventReceiver clientEventReceiver, IServerEventSender serverEventSender)
         {
             var gameEventController = new GameEventController();
-            _clientEventHandler = new ClientEventHandler();
+            //_clientEventHandler = new ClientEventHandler();
             SetupGameEventHandlers(gameEventController);
             SetupClientEventHandlers(clientEventReceiver);
 
             _eventSender = serverEventSender;
-            minPlayers = 5;
-            var gameSize = 600;
+            _minPlayers = 5;
+            const int gameSize = 600;
             _game = new GameEngine(gameEventController, gameSize);
             sessionPlayers = new Dictionary<Guid, int>();
-            // botController = new BotController(this);
+            _botController = new BotController(this, clientEventReceiver);
 
-            broadcastWorldTimer = new Timer { Interval = broadcastWorldInterval };
-            broadcastWorldTimer.Elapsed += (sender, e) => BroadcastWorldUpdate();
-            broadcastWorldTimer.Start();
+            _broadcastWorldTimer = new Timer { Interval = _broadcastWorldInterval };
+            _broadcastWorldTimer.Elapsed += (sender, e) => BroadcastWorldUpdate();
+            _broadcastWorldTimer.Start();
             
             Start();
         }
@@ -114,7 +116,7 @@ namespace LitBikes.Game.Controller
         }
 
 
-        private void RequestGameJoin(Guid playerId, ClientGameJoinDto dto)
+        public void RequestGameJoin(Guid playerId, ClientGameJoinDto dto)
         {
             //var gameJoinDto = (ClientGameJoinDto) args.Dto;
 
@@ -135,7 +137,7 @@ namespace LitBikes.Game.Controller
                 Scores = _game.GetScores()
             };
 
-            //balanceBots();
+            BalanceBots();
             _eventSender.SendEvent(ServerEvent.JoinedGame, gameJoinDto);
         }
 
@@ -172,9 +174,9 @@ namespace LitBikes.Game.Controller
         {
             //SetupGameListeners();
             _game.Start();
-            //BalanceBots();
+            BalanceBots();
             _game.StartRound();
-            broadcastWorldTimer.Start();
+            _broadcastWorldTimer.Start();
         }
 
         //// START GAME EVENTS
@@ -222,37 +224,29 @@ namespace LitBikes.Game.Controller
         public void BroadcastWorldUpdate()
         {
             _eventSender.SendEvent(ServerEvent.WorldUpdate, _game.GetWorldDto());
-            //ioServer.getBroadcastOperations().sendEvent("world-update", game.getWorldDto());
-            //botController.doUpdate(game.getPlayers(), game.getArena());
+            _botController.DoUpdate(_game.GetPlayers(), _game.GetArena());
         }
 
 
-        /*public Bot BotCreated()
+        public Player CreateBot()
         {
-            /*String botName = "BOT#" + String.format("%04d", random.nextInt(10000));
-            int pid = pidGen++;
-            Player player = game.playerJoin(pid, botName, false);
-            Bot bot = new Bot(player.getId(), game.getPlayers(), game.getArena());
-            bot.setName(botName);
-            bot.setBike(player.getBike());
-            sessionPlayers.put(bot.getSessionId(), pid);
-            return bot;#1#
+            var botId = Guid.NewGuid();
+            var botName = $"BOT#{botId.ToString().Substring(0, 4)}";
+            var bot = _game.PlayerJoin(botId, botName, false);
+            return bot;
         }
 
-        public void BotDestroyed(Bot bot)
+        public void BotDestroyed(Guid botId)
         {
-            /*game.dropPlayer(bot.getId());
-            sessionPlayers.remove(bot.getSessionId());#1#
-        }*/
+            _game.DropPlayer(botId);
+        }
 
         private void BalanceBots()
         {
-            /*int totalHumans = (int)game.getPlayers().stream()
-                    .filter(p->p.isHuman())
-                    .count();
-            int requiredBots = Math.max(0, minPlayers - totalHumans);
-            LOG.info("Balancing game - " + totalHumans + " humans and " + requiredBots + " bots");
-            botController.setBotCount(requiredBots);*/
+            var totalHumans = _game.GetPlayers().Count(p => p.IsHuman());
+            var requiredBots = Math.Max(0, _minPlayers - totalHumans);
+            Console.WriteLine($"Balancing game - {totalHumans} humans and {requiredBots} bots");
+            _botController.SetBotCount(requiredBots);
         }
 
         

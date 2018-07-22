@@ -1,0 +1,12 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netcoreapp2.0</TargetFramework>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\LitBikes.Events\LitBikes.Events.csproj" />
+    <ProjectReference Include="..\LitBikes.Game\LitBikes.Game.csproj" />
+  </ItemGroup>
+
+</Project>

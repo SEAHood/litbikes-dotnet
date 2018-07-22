@@ -1,23 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using LitBikes.Model.Dtos;
 
 namespace LitBikes.Model
 {
-    public class PlayerDto
-    {
-        public Guid pid;
-        public string name;
-        public BikeDto bike;
-        public bool spectating;
-        public bool crashed;
-        public Guid? crashedInto;
-        public string crashedIntoName;
-        public int score;
-        public PowerUpType currentPowerUp;
-        public PlayerEffect effect;
-    }
-
     public enum PlayerEffect
     {
         None,
@@ -35,6 +22,8 @@ namespace LitBikes.Model
         private readonly bool _isHuman;
         private PowerUpType _currentPowerUpType = PowerUpType.Nothing;
         private PlayerEffect _effect = PlayerEffect.None;
+
+        public Player() { }
 
         public Player(Guid pid, bool isHuman)
         {
@@ -101,15 +90,15 @@ namespace LitBikes.Model
         {
             return new PlayerDto
             {
-                pid = _pid,
-                name = name,
-                bike = _bike.GetDto(),
-                crashed = _crashed,
-                crashedInto = _crashedInto?.GetId(),
-                crashedIntoName = _crashedInto?.GetName(),
-                spectating = _spectating,
-                currentPowerUp = _currentPowerUpType,
-                effect = _effect
+                PlayerId = _pid,
+                Name = name,
+                Bike = _bike.GetDto(),
+                Crashed = _crashed,
+                CrashedInto = _crashedInto?.GetId(),
+                CrashedIntoName = _crashedInto?.GetName(),
+                Spectating = _spectating,
+                CurrentPowerUp = _currentPowerUpType,
+                Effect = _effect
             };
         }
 

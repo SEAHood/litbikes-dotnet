@@ -48,12 +48,12 @@ namespace LitBikes.Game.Engine
 
         public Guid GetCurrentWinner()
         {
-            return !_scores.Any() ? Guid.Empty : _scores.OrderBy(s => s.Score).First().PlayerId;
+            return !_scores.Any() ? Guid.Empty : _scores.ToList().OrderBy(s => s.Score).First().PlayerId;
         }
 
         public string GetCurrentWinnerName()
         {
-            return !_scores.Any() ? "Unknown" : _scores.OrderBy(s => s.Score).First().Name;
+            return !_scores.Any() ? "Unknown" : _scores.ToList().OrderBy(s => s.Score).First().Name;
         }
 
     }

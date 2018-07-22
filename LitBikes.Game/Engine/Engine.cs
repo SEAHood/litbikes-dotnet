@@ -17,7 +17,7 @@ namespace LitBikes.Game.Engine
 
         public static readonly float BaseBikeSpeed = 1.5f;
         //private static Logger LOG = Log.getLogger(GameEngine.class);
-        private static readonly int GAME_TICK_MS = 25;
+        private static readonly int GameTickMs = 25;
         private static readonly int PU_SPAWN_DELAY_MIN = 4;
         private static readonly int PU_SPAWN_DELAY_MAX = 7;
         private static readonly int PU_DURATION_MIN = 10;
@@ -69,7 +69,7 @@ namespace LitBikes.Game.Engine
                 {
                     //if (players.Count == 0)
                         //Thread.Sleep(1000);
-                    var tickRequired = _lastTick == null || DateTime.Now.Subtract(_lastTick).Milliseconds > GAME_TICK_MS;
+                    var tickRequired = DateTime.Now.Subtract(_lastTick).Milliseconds > GameTickMs;
                     if (tickRequired)
                     {
                         // Last tick from start or end? not sure yet
@@ -84,7 +84,7 @@ namespace LitBikes.Game.Engine
             //PowerUpSpawner powerUpSpawner = new PowerUpSpawner();
             //powerUpSpawner.run();
 
-            //LOG.info("Starting game at " + GAME_TICK_MS + "ms per game tick");
+            //LOG.info("Starting game at " + GameTickMs + "ms per game tick");
             //eventListener.gameStarted();
         }
         
@@ -214,10 +214,10 @@ namespace LitBikes.Game.Engine
         {
             var worldDto = new ServerWorldDto();
             var playersDto = new List<PlayerDto>();
-            foreach (var player in players)
+            foreach (var player in players.ToList())
             {
                 var playerDto = player.GetDto();
-                playerDto.score = score.GetScore(playerDto.pid);
+                playerDto.Score = score.GetScore(playerDto.PlayerId);
                 playersDto.Add(playerDto);
             }
 
@@ -308,7 +308,7 @@ namespace LitBikes.Game.Engine
 
         public int GetGameTickMs()
         {
-            return GAME_TICK_MS;
+            return GameTickMs;
         }
 
         public Arena GetArena()

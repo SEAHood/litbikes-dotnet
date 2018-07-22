@@ -164,7 +164,7 @@ namespace LitBikes.Model
                 dir = new Vector2(_dir.X, _dir.Y),
                 spd = _spd,
                 trail = _trail.GetList().Select(t => t.GetDto()).ToList(),
-                colour = $"rgba({_colour.R:X2},{_colour.G:X2},{_colour.B:X2},%A%)"
+                colour = $"rgba({_colour.R},{_colour.G},{_colour.B},%A%)"
             };
         }
 

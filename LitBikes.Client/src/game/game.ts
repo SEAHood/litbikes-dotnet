@@ -357,7 +357,7 @@ export class Game {
             }
         });
 
-        _.each( data.players, ( p : PlayerDto ) => {
+        _.each(data.players, (p: PlayerDto) => {
             if ( this.gameJoined && p.playerId === this.player.getPlayerId() && this.player ) {
                 this.player.updateFromDto(p);
             } else {
@@ -365,6 +365,7 @@ export class Game {
                 if ( existingPlayer ) {
                     existingPlayer.updateFromDto(p);
                 } else {
+                    console.log("Adding new player: " + p.playerId);
                     let player = new Player(
                         p.playerId, 
                         p.name, 
