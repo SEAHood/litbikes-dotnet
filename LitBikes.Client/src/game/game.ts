@@ -123,7 +123,6 @@ export class Game {
         };
 
         $(document).on("keyup", ev => {
-            console.log("OKAJWDNKAJWND");
             let keyCode = ev.which;
             if ( this.player ) {
                 if (keyCode === Keys.TAB) {
@@ -133,7 +132,6 @@ export class Game {
         });
 
         $(document).on("keydown", ev => {
-            console.log("OKAJWDNKAJWND");
             if ( $(ev.target).is("input") ) {
                 // Typing in chat, don't process as game keys
                 if ( ev.which === Keys.ENTER ) { // enter
@@ -207,7 +205,6 @@ export class Game {
             
         $(document).ready(() => {        
             $("#player-name-input").on("input", () => {
-                console.log("OKAJWDNKAJWND");
                 let name = $("#player-name-input").val();
                 if (this.nameIsValid(name.toString())) {
                     $("#player-name-submit").show();
@@ -224,9 +221,6 @@ export class Game {
     }
 
     go() {
-        $(document).on("keyup", ev => {
-            console.log("OKAJWDNKAJWND");
-        });
 
         this.hubConnection.start().then(() => {
             this.hubConnection.invoke("Hello");
@@ -293,6 +287,7 @@ export class Game {
         this.gameTick = data.world.gameTick;
         this.arena = new Arena(data.world.arena);
         this.gameTickMs = data.gameSettings.gameTickMs;
+        console.log(`Game Tick: ${this.gameTickMs}ms`);
             
         this.processWorldUpdate(data.world);
 
@@ -340,7 +335,6 @@ export class Game {
         this.roundInProgress = data.roundInProgress;
         this.timeUntilNextRound = data.timeUntilNextRound;
         this.currentWinner = data.currentWinner;
-        console.log(data.roundTimeLeft);
         if (this.roundTimeLeft != data.roundTimeLeft) {
             var t = new Date(data.roundTimeLeft * 1000);
             var minutes = NumberUtil.pad(t.getMinutes(), 2);

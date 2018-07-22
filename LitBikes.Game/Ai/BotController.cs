@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using LitBikes.Model;
 using LitBikes.Model.Dtos.FromClient;
 using LitBikes.Game.Controller;
@@ -17,6 +18,14 @@ namespace LitBikes.Ai
         private ServerEventSender _serverEventSender;
 
         private GameController _gameController;
+        private Thread _tickThread;
+        private DateTime _nextTickTime;
+
+        private const int AiTickMs = 100;
+        private const int AiRespawnMs = 3000;
+
+
+        //public double AiTickMs { get; private set; }
 
         public BotController(GameController gameController, IClientEventReceiver clientEventReceiver)
         {
@@ -26,7 +35,42 @@ namespace LitBikes.Ai
             //_serverEventSender = serverEventSender;
         }
 
-        private void deployBots(int count)
+        public void Start()
+        {
+            _tickThread = new Thread(delegate ()
+            {
+                while (true)
+                {
+                    if (DateTime.UtcNow <= _nextTickTime) continue;
+                    _nextTickTime = DateTime.UtcNow.AddMilliseconds(AiTickMs);
+
+                    GetBots().ForEach(b =>
+                    {
+                        if (!b.HasBike()) return;
+                        if (!b.IsCrashed())
+                        {
+                            var result = b.PredictCollision();
+                            if (result != null)
+                                SendUpdate(b.GetId(), result);
+                        }
+                        else
+                        {
+                            Thread.Sleep(AiRespawnMs);
+                            SendRespawnRequest(b.GetId());
+                        }
+
+                    });
+                }
+            });
+            _tickThread.Start();
+        }
+
+        private List<Bot> GetBots()
+        {
+            return _bots.ToList();
+        }
+
+        private void DeployBots(int count)
         {
             Console.WriteLine($"Creating {count} bots");
             for (var i = 0; i < count; i++)
@@ -34,13 +78,14 @@ namespace LitBikes.Ai
                 var player = _gameController.CreateBot();
                 var bot = new Bot(player.GetId());
                 bot.AttachController(this);
-                bot.Start();
+                //bot.Start();
                 _bots.Add(bot);
             }
+
             //LOG.info("Current bot count: " + bots.size());
         }
 
-        private void destroyBots(int count)
+        private void DestroyBots(int count)
         {
             // TODO this is bad i think
             //LOG.info("Destroying " + count + " bots");
@@ -68,9 +113,9 @@ namespace LitBikes.Ai
             var currentBotCount = _bots.Count;
             var botDeficit = botCount - currentBotCount;
             if (botDeficit > 0)
-                deployBots(botDeficit);
+                DeployBots(botDeficit);
             else if (botDeficit < 0)
-                destroyBots(Math.Abs(botDeficit));
+                DestroyBots(Math.Abs(botDeficit));
         }
 
         public void DoUpdate(List<Player> players, Arena arena)

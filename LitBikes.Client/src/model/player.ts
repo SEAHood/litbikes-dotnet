@@ -79,8 +79,6 @@ export class Player {
     }
 
     public draw(p: p5, showName: boolean) {
-        console.log("Drawing player " + this.playerId);
-        console.log(this);
         if (this.isVisible()) {
             let showRespawnRing = this.isAlive() && this.isControlledPlayer;
             this.bike.draw(p, showRespawnRing, this.isControlledPlayer);

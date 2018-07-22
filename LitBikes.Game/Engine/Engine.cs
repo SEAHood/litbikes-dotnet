@@ -40,17 +40,17 @@ namespace LitBikes.Game.Engine
 
         private readonly GameEventController _gameEventController;
 
-        public GameEngine(GameEventController gameEventController, int gameSize)
+        public GameEngine(GameEventController gameEventController, GameSettings settings)
         {
             _gameEventController = gameEventController;
-            arena = new Arena(gameSize);
+            arena = new Arena(settings.ArenaSize);
             players = new List<Player>();
             powerUps = new List<PowerUp>();
             score = new ScoreKeeper();
             debug = new Debug();
-            roundKeeper = new RoundKeeper(15, 15, _gameEventController);
+            roundKeeper = new RoundKeeper(settings.RoundDuration, settings.RoundCountdownDuration, _gameEventController);
             powerUpKeeper = new PowerUpKeeper();
-            this.gameSize = gameSize;
+            gameSize = settings.ArenaSize;
         }
 
         private bool _started;

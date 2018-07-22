@@ -46,11 +46,18 @@ namespace LitBikes.Game.Controller
             SetupClientEventHandlers(clientEventReceiver);
 
             _eventSender = serverEventSender;
-            _minPlayers = 5;
-            const int gameSize = 600;
-            _game = new GameEngine(gameEventController, gameSize);
+            _minPlayers = 10;
+
+            _game = new GameEngine(gameEventController, new GameSettings
+            {
+                ArenaSize = 600,
+                RoundDuration = 120,
+                RoundCountdownDuration = 15
+            });
+
             sessionPlayers = new Dictionary<Guid, int>();
             _botController = new BotController(this, clientEventReceiver);
+            _botController.Start();
 
             _broadcastWorldTimer = new Timer { Interval = _broadcastWorldInterval };
             _broadcastWorldTimer.Elapsed += (sender, e) => BroadcastWorldUpdate();

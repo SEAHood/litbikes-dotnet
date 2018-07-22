@@ -43,11 +43,13 @@ export class Bike {
     }
 
     public update(canMove: boolean) {
-        if (canMove) {
+        /*if (canMove) {
             let xDiff = this.dir.x * this.spd;// * this.timeDilation.x;
             let yDiff = this.dir.y * this.spd;// * this.timeDilation.y;
-            this.setPos(new Vector(this.pos.x + xDiff, this.pos.y + yDiff));
-        }
+            this.pos.x += xDiff;
+            this.pos.y += yDiff;
+            //this.setPos(new Vector(this.pos.x + xDiff, this.pos.y + yDiff));
+        }*/
 
         if (this.crashing) {
             this.trailOpacity = Math.max(this.trailOpacity - 0.02, 0);
@@ -58,7 +60,14 @@ export class Bike {
         }
     }
 
-    public updateFromDto( dto : BikeDto ) {
+    public updateFromDto(dto: BikeDto) {
+
+        if (this.dir.x == 0) {
+            console.log(`Changing pos from (${this.pos.y}) to (${dto.pos.y}): Diff ${this.pos.y - dto.pos.y}`);
+        } else if (this.dir.y == 0) {
+            console.log(`Changing pos from (${this.pos.x}) to (${dto.pos.x}): Diff ${this.pos.x - dto.pos.x}`);
+        }
+
         this.pos = dto.pos;
         this.dir = dto.dir;
         this.spd = dto.spd;

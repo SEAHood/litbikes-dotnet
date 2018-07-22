@@ -221,7 +221,7 @@ namespace LitBikes.Model
                 var head = _trail.GetHead();
                 if (head == null)
                 {
-                    return null;
+                    return new List<TrailSegment>();
                 }
                 var lastSeg = _trail.GetHead().GetLine();
                 headSegmentStartX = lastSeg.End.X;
