@@ -182,7 +182,7 @@ namespace LitBikes.Game.Controller
             //SetupGameListeners();
             _game.Start();
             BalanceBots();
-            _game.StartRound();
+            _game.NewRound();
             _broadcastWorldTimer.Start();
         }
 
@@ -217,13 +217,14 @@ namespace LitBikes.Game.Controller
             const string msg = "Round started!";
             SendServerMessage(msg);
             ScoreUpdated();
+            _game.RoundStarted();
         }
 
         public void RoundEnded()
         {
             const string msg = "Round ended!";
             SendServerMessage(msg);
-            _game.StartRound();
+            _game.NewRound();
         }
         // END GAME EVENTS
 

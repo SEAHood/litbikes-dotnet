@@ -96,9 +96,22 @@ namespace LitBikes.Game.Engine
             CheckForEvents(activePlayers, trails);
         }
 
-        public void StartRound()
+        public void NewRound()
         {
+            foreach (var p in players)
+            {
+                p.SetSpectating(true);
+            }
             roundKeeper.StartRound();
+        }
+
+        public void RoundStarted()
+        {
+            foreach (var p in players)
+            {
+                p.Respawn(FindSpawn());
+            }
+            score.Reset();
         }
 
         private void CheckForEvents(List<Player> activePlayers, List<TrailSegment> trails)
@@ -241,7 +254,7 @@ namespace LitBikes.Game.Engine
 
             return worldDto;
         }
-
+        
         //public void attachListener(GameEventListener listener)
         //{
         //    eventListener = listener;

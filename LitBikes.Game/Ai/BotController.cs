@@ -43,8 +43,7 @@ namespace LitBikes.Ai
                 {
                     if (DateTime.UtcNow <= _nextTickTime) continue;
                     _nextTickTime = DateTime.UtcNow.AddMilliseconds(AiTickMs);
-
-                    GetBots().ForEach(b =>
+                    _bots.ToList().ForEach(b =>
                     {
                         if (!b.HasBike()) return;
                         if (!b.IsCrashed())
@@ -55,10 +54,14 @@ namespace LitBikes.Ai
                         }
                         else
                         {
-                            Thread.Sleep(AiRespawnMs);
-                            SendRespawnRequest(b.GetId());
+                            if (b.RespawnTime == null)
+                                b.RespawnTime = DateTime.UtcNow.AddMilliseconds(AiRespawnMs);
+                            else if (b.RespawnTime <= DateTime.UtcNow)
+                            {
+                                SendRespawnRequest(b.GetId());
+                                b.RespawnTime = null;
+                            }
                         }
-
                     });
                 }
             });
@@ -77,7 +80,6 @@ namespace LitBikes.Ai
             {
                 var player = _gameController.CreateBot();
                 var bot = new Bot(player.GetId());
-                bot.AttachController(this);
                 //bot.Start();
                 _bots.Add(bot);
             }

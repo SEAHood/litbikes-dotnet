@@ -62,11 +62,11 @@ export class Bike {
 
     public updateFromDto(dto: BikeDto) {
 
-        if (this.dir.x == 0) {
+        /*if (this.dir.x == 0) {
             console.log(`Changing pos from (${this.pos.y}) to (${dto.pos.y}): Diff ${this.pos.y - dto.pos.y}`);
         } else if (this.dir.y == 0) {
             console.log(`Changing pos from (${this.pos.x}) to (${dto.pos.x}): Diff ${this.pos.x - dto.pos.x}`);
-        }
+        }*/
 
         this.pos = dto.pos;
         this.dir = dto.dir;

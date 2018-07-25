@@ -15,6 +15,8 @@ namespace LitBikes.Ai
 	    private List<Player> _players;
         private Arena _arena;
         private readonly Random _rand = new Random();
+
+        public DateTime? RespawnTime { get; set; }
         
         public Guid GetId() => _botId;
 
@@ -79,5 +81,9 @@ namespace LitBikes.Ai
             return updateDto;
         }
 
+        public void SetRespawnTime(DateTime dateTime)
+        {
+            RespawnTime = dateTime;
+        }
     }
 }

@@ -359,7 +359,7 @@ export class Game {
                 if ( existingPlayer ) {
                     existingPlayer.updateFromDto(p);
                 } else {
-                    console.log("Adding new player: " + p.playerId);
+                    //console.log("Adding new player: " + p.playerId);
                     let player = new Player(
                         p.playerId, 
                         p.name, 
