@@ -1,12 +1,18 @@
-﻿namespace LitBikes.Model.Dtos.FromClient
+﻿using LitBikes.Model.Dtos.FromClient.Short;
+
+namespace LitBikes.Model.Dtos.FromClient
 {
     public class ClientChatMessageDto : IDto
     {
-        public string Message;
+        public string Message { get; set; }
 
-        public ClientChatMessageDto(string message)
+        public IDtoShort MapToShortDto()
         {
-            Message = message;
+            var shortDto = new ClientChatMessageDtoShort
+            {
+                M = Message
+            };
+            return shortDto;
         }
     }
 }

@@ -1,9 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 
-namespace LitBikes.Model.Dtos
+namespace LitBikes.Model.Dtos.Short
 {
-    public class ServerWorldDtoShort : IDto
+    public class ServerWorldDtoShort : IDtoShort
     {
         public long T { get; set; }
         public long Gt { get; set; }
@@ -15,5 +16,23 @@ namespace LitBikes.Model.Dtos
         public List<PowerUpDtoShort> Pu { get; set; }
         public ArenaDtoShort A { get; set; }
         public DebugDtoShort D { get; set; }
+
+        public IDto MapToFullDto()
+        {
+            var dto = new ServerWorldDto
+            {
+                Arena = (ArenaDto) A.MapToFullDto(),
+                CurrentWinner = Cw,
+                Debug = (DebugDto) D.MapToFullDto(),
+                GameTick = Gt,
+                Players = P.Select(p => (PlayerDto) p.MapToFullDto()).ToList(),
+                PowerUps = Pu.Select(pu => (PowerUpDto) pu.MapToFullDto()).ToList(),
+                RoundInProgress = Rip,
+                RoundTimeLeft = Rtl,
+                Timestamp = T,
+                TimeUntilNextRound = Tunr
+            };
+            return dto;
+        }
     }
 }

@@ -224,7 +224,8 @@ namespace LitBikes.Game.Controller
 
         public void ScoreUpdated()
         {
-            _eventSender.SendEvent(ServerEvent.ScoreUpdate, _game.GetScores());
+            // Todo: send a score object instead, that contains list of scores, winner, etc
+            _eventSender.SendListEvent(ServerEvent.ScoreUpdate, new List<IDto>(_game.GetScores()));
         }
 
         public void RoundStarted()

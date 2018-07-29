@@ -1,8 +1,8 @@
 ﻿using System;
 
-namespace LitBikes.Model.Dtos
+namespace LitBikes.Model.Dtos.Short
 {
-    public class PlayerDtoShort : IDto
+    public class PlayerDtoShort : IDtoShort
     {
         public Guid I { get; set; }
         public string N { get; set; }
@@ -14,5 +14,23 @@ namespace LitBikes.Model.Dtos
         public int Sc { get; set; }
         public PowerUpType Cpu { get; set; }
         public PlayerEffect E { get; set; }
+
+        public IDto MapToFullDto()
+        {
+            var dto = new PlayerDto
+            {
+                PlayerId = I,
+                Name = N,
+                Bike = (BikeDto) B.MapToFullDto(),
+                Crashed = C,
+                CrashedInto = Ci,
+                CrashedIntoName = Cin,
+                CurrentPowerUp = Cpu,
+                Effect = E,
+                Spectating = S,
+                Score = Sc
+            };
+            return dto;
+        }
     }
 }

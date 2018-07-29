@@ -4,8 +4,8 @@ using System.Text;
 
 namespace LitBikes.Model
 {
-    public interface IDto
+    public interface IDtoShort
     {
-        IDtoShort MapToShortDto();
+        IDto MapToFullDto();
     }
 }

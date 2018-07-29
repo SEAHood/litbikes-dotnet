@@ -1,11 +1,18 @@
 ﻿using System.Numerics;
 
-namespace LitBikes.Model.Dtos
+namespace LitBikes.Model.Dtos.Short
 {
-    public class ImpactDtoShort
+    public class ImpactDtoShort : IDtoShort
     {
-        //public int ownerPid;
         public Vector2 P;
-        //public PowerUpType type;
+
+        public IDto MapToFullDto()
+        {
+            var dto = new ImpactDto
+            {
+                Pos = P
+            };
+            return dto;
+        }
     }
 }
