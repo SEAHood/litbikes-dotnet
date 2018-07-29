@@ -2,18 +2,21 @@ import { Bike } from "../model/bike"
 import { Player } from "../model/player"
 import { PowerUp } from "../model/powerUp"
 import { Arena } from "../model/arena"
-import { Vector, NumberUtil, NetworkUtil } from "../util"
+import { Vector, NumberUtil } from "../util"
 import {
-    WorldUpdateDto, BikeDto, PlayerDto, PowerUpDto,
+    WorldUpdateDto, PlayerDto, PowerUpDto,
     ClientUpdateDto, GameJoinDto, ClientGameJoinDto,
-    HelloDto, ChatMessageDto, ScoreDto,
-    SendChatMessageDto
-} from "../dto"
+    HelloDto, ChatMessageDto, ScoreDto
+} from "../dto/dto"
 
 import "p5"
 import * as signalR from "@aspnet/signalr"
 import * as _ from "underscore"
 import * as $ from "jquery"
+import { WorldUpdateDtoShort, HelloDtoShort, GameJoinDtoShort, ScoreDtoShort, ClientChatMessageDtoShort as ChatMessageDtoShort,
+    ClientGameJoinDtoShort,
+    ClientUpdateDtoShort
+} from "../dto/shortDto";
 
 export class Game {
     private player : Player;
@@ -56,42 +59,48 @@ export class Game {
     private impacts: Vector[];
 
     constructor() {
-        this.hubConnection.on("Hello", ( data : HelloDto ) => {
-            this.initGame(data);
+        this.hubConnection.on("Hello", (data: HelloDtoShort) => {
+            var fullDto = data.toFullDto() as HelloDto;
+            this.initGame(fullDto);
         });
 
-        this.hubConnection.on("JoinedGame", (data : GameJoinDto ) => {
-            this.joinGame(data);
+        this.hubConnection.on("JoinedGame", (data: GameJoinDtoShort) => {
+            var fullDto = data.toFullDto() as GameJoinDto;
+            this.joinGame(fullDto);
         });
         
         this.hubConnection.on("KeepAliveAck", data => {
-            let timeNow = new Date().getTime();
+            const timeNow = new Date().getTime();
             this.latency = timeNow - this.timeKeepAliveSent;
             this.refreshServerTimeout();
         });
 
-        this.hubConnection.on("WorldUpdate", ( data : WorldUpdateDto ) => {
-            if ( this.gameStarted ) {
-                this.processWorldUpdate(data);
+        this.hubConnection.on("WorldUpdate", (data: WorldUpdateDtoShort) => {
+            if (this.gameStarted) {
+                const fullDto = data.toFullDto() as WorldUpdateDto;
+                this.processWorldUpdate(fullDto);
             }
         });
 
-        this.hubConnection.on("ScoreUpdate", (data: ScoreDto[]) => {
-            this.updateScores(data);
+        this.hubConnection.on("ScoreUpdate", (data: ScoreDtoShort[]) => {
+            var fullDto = data.map(s => s.toFullDto() as ScoreDto);
+            this.updateScores(fullDto);
         });
 
-        this.hubConnection.on("ChatMessage", ( data : ChatMessageDto ) => {
+        this.hubConnection.on("ChatMessage", (data: ChatMessageDtoShort) => {
+            const fullDto = data.toFullDto() as ChatMessageDto;
+
             // TODO: Use moment or something?
-            let messageTime = new Date(data.timestamp).toTimeString().split(" ")[0];
+            const messageTime = new Date(fullDto.timestamp).toTimeString().split(" ")[0];
             let chatElement = "<li>";
 
             chatElement += `[${messageTime}]`;
-            if ( data.isSystemMessage ) {
-                chatElement += `&nbsp;<span style='color:#AFEEEE'>${_.escape(data.message)}</span>`;
+            if (fullDto.isSystemMessage ) {
+                chatElement += `&nbsp;<span style='color:#AFEEEE'>${_.escape(fullDto.message)}</span>`;
             } else {
-                let colour = data.sourceColour.replace("%A%", "100");
-                chatElement += `&nbsp;<span style='color:${colour}'><strong>${data.source}</strong></span>:`;
-                chatElement += `&nbsp;${_.escape(data.message)}`;
+                const colour = fullDto.sourceColour.replace("%A%", "100");
+                chatElement += `&nbsp;<span style='color:${colour}'><strong>${fullDto.source}</strong></span>:`;
+                chatElement += `&nbsp;${_.escape(fullDto.message)}`;
             }
             chatElement += "</li>";
 
@@ -123,7 +132,7 @@ export class Game {
         };
 
         $(document).on("keyup", ev => {
-            let keyCode = ev.which;
+            const keyCode = ev.which;
             if ( this.player ) {
                 if (keyCode === Keys.TAB) {
                     this.tabPressed = false;
@@ -141,9 +150,11 @@ export class Game {
                             this.requestJoinGame(name.toString());
                         }                            
                     } else if ($(ev.target).is("#chat-input")) { // enter when inside chat box
-                        let message = $("#chat-input").val();
+                        let message = $("#chat-input").val() as string;
+                        let dto = new ChatMessageDtoShort();
+                        dto.m = message;
                         if (message.toString().trim() != "") {
-                            this.hubConnection.invoke("ChatMessage", message);
+                            this.hubConnection.invoke("ChatMessage", dto);
                             $("#chat-input").val("");
                         }
                     }
@@ -191,13 +202,12 @@ export class Game {
                     //this.player.setDirection(newVector);
                     //this.sendClientUpdate();
                     // TODO MOVE THIS SOMEWHERE ELSE
-                    let updateDto : ClientUpdateDto = {
-                        playerId : this.player.getPlayerId(),
-                        xDir : newVector.x,
-                        yDir : newVector.y,
-                        xPos : this.player.getBike().getPos().x,
-                        yPos : this.player.getBike().getPos().y
-                    };
+                    let updateDto = new ClientUpdateDtoShort();
+                    updateDto.i = this.player.getPlayerId();
+                    updateDto.xd = newVector.x;
+                    updateDto.yd = newVector.y;
+                    updateDto.xp = this.player.getBike().getPos().x;
+                    updateDto.yp = this.player.getBike().getPos().y;
                     this.hubConnection.invoke("Update", updateDto);
                 }
             }
@@ -205,7 +215,7 @@ export class Game {
             
         $(document).ready(() => {        
             $("#player-name-input").on("input", () => {
-                let name = $("#player-name-input").val();
+                const name = $("#player-name-input").val();
                 if (this.nameIsValid(name.toString())) {
                     $("#player-name-submit").show();
                 } else {
@@ -214,7 +224,7 @@ export class Game {
             });
                 
             $("#player-name-submit").on("click", () => {
-                let name = $("#player-name-input").val();
+                const name = $("#player-name-input").val();
                 this.requestJoinGame(name.toString());
             });
         });
@@ -256,9 +266,8 @@ export class Game {
     }
 
     private requestJoinGame(name: string) {
-        const joinObj: ClientGameJoinDto = {
-            name: name
-        };
+        const joinObj = new ClientGameJoinDtoShort()
+        joinObj.n = name;
         this.hubConnection.invoke("RequestJoinGame", joinObj);
     }
 
@@ -280,7 +289,7 @@ export class Game {
         this.updateScores(data.scores);
     }
 
-    private initGame( data : HelloDto ) {
+    private initGame(data: HelloDto) {
         if ( !data.gameSettings.gameTickMs ) {
             console.error("Cannot start game - game tick interval is not defined");
         }
@@ -317,40 +326,40 @@ export class Game {
     }
 
     private calculateSpeedModifier( b : Bike ): number {            
-        let gameSize = this.arena.size;
-        let center = new Vector(gameSize/2, gameSize/2);
-        let bikePos = new Vector(b.getPos().x, b.getPos().y),
-            distance = Vector.distance(bikePos, center),
-            oldMin = 0,
-            oldMax = gameSize/2,
-            newMin = 0,
-            newMax = 0.5,
-            oldRange = oldMax - oldMin,
-            newRange = newMax - newMin,
-            spdModifier = ((distance - oldMin) * newRange / oldRange) + newMin; // Trust me
+        const gameSize = this.arena.size;
+        const center = new Vector(gameSize/2, gameSize/2);
+        const bikePos = new Vector(b.getPos().x, b.getPos().y);
+        const distance = Vector.distance(bikePos, center);
+        const oldMin = 0;
+        const oldMax = gameSize/2;
+        const newMin = 0;
+        const newMax = 0.5;
+        const oldRange = oldMax - oldMin;
+        const newRange = newMax - newMin;
+        const spdModifier = ((distance - oldMin) * newRange / oldRange) + newMin; // Trust me
         return spdModifier;
     }
 
     private getTime() {
-        let dt = new Date();
+        const dt = new Date();
         return ((dt.getHours() < 10) ? "0" : "") + dt.getHours() + ":" + ((dt.getMinutes() < 10) ? "0" : "") + dt.getMinutes() + ":" + ((dt.getSeconds() < 10) ? "0" : "") + dt.getSeconds();
     }
-        
+
     private processWorldUpdate(data: WorldUpdateDto) {
         //console.log(this.getTime() + ": " + JSON.stringify(data).length);
         this.roundInProgress = data.roundInProgress;
         this.timeUntilNextRound = data.timeUntilNextRound;
         this.currentWinner = data.currentWinner;
         if (this.roundTimeLeft != data.roundTimeLeft) {
-            var t = new Date(data.roundTimeLeft * 1000);
-            var minutes = NumberUtil.pad(t.getMinutes(), 2);
-            var seconds = NumberUtil.pad(t.getSeconds(), 2);
+            const t = new Date(data.roundTimeLeft * 1000);
+            const minutes = NumberUtil.pad(t.getMinutes(), 2);
+            const seconds = NumberUtil.pad(t.getSeconds(), 2);
             $("#round-timer").text(minutes + ":" + seconds);
         }
         this.roundTimeLeft = data.roundTimeLeft;
 
-        let updatedPlayers = _.pluck(data.players, "playerId");
-        let existingPlayers = _.pluck(this.players, "playerId");
+        const updatedPlayers = _.pluck(data.players, "playerId");
+        const existingPlayers = _.pluck(this.players, "playerId");
         _.each(existingPlayers, (playerId: string ) => {
             if ( !_.contains(updatedPlayers, playerId ) ) {
                 this.players = _.reject(this.players, (p : Player) => p.getPlayerId() === playerId );
@@ -361,12 +370,12 @@ export class Game {
             if ( this.gameJoined && p.playerId === this.player.getPlayerId() && this.player ) {
                 this.player.updateFromDto(p);
             } else {
-                let existingPlayer = _.find(this.players, (ep: Player) => ep.getPlayerId() === p.playerId);
+                const existingPlayer = _.find(this.players, (ep: Player) => ep.getPlayerId() === p.playerId);
                 if ( existingPlayer ) {
                     existingPlayer.updateFromDto(p);
                 } else {
                     //console.log("Adding new player: " + p.playerId);
-                    let player = new Player(
+                    const player = new Player(
                         p.playerId, 
                         p.name, 
                         new Bike(p.bike), 
@@ -382,14 +391,13 @@ export class Game {
             }
         });
 
-        let powerUps = [];
+        const powerUps: PowerUp[] = [];
         _.each(data.powerUps, (p: PowerUpDto) => {
-            let powerUpDto = new PowerUp(p.id, p.pos, p.type);
             let existingPowerUp = _.find(this.powerUps, (ep: PowerUp) => ep.getId() === p.id);
             if ( existingPowerUp ) {
                 existingPowerUp.updateFromDto(p);
             } else {
-                let powerUp = new PowerUp(p.id, p.pos, p.type);
+                const powerUp = new PowerUp(p.id, p.pos, p.type);
                 this.powerUps.push(powerUp);
                 existingPowerUp = powerUp;
             }
@@ -401,36 +409,35 @@ export class Game {
 
     private updateScores(scores: ScoreDto[]) {            
         scores = _.sortBy(scores, x => x.score).reverse();
-        let topFive = _.first(scores, 5);
+        const topFive = _.first(scores, 5);
         $("#score ul").empty();
         let playerInTopFive = false;
         topFive.forEach((score: ScoreDto, i: number) => {                
-            let isPlayer = this.gameJoined && score.playerId == this.player.getPlayerId();
-            let player: Player = _.first(this.players.filter((p: Player) => p.getPlayerId() == score.playerId));
+            const isPlayer = this.gameJoined && score.playerId == this.player.getPlayerId();
+            const player: Player = _.first(this.players.filter((p: Player) => p.getPlayerId() == score.playerId));
             playerInTopFive = isPlayer || playerInTopFive;
-            let li = isPlayer ? "<li style='color:yellow'>" : "<li>";
-            let position = `#${i + 1}`;
-            let bikeColour = !player || isPlayer 
+            const li = isPlayer ? "<li style='color:yellow'>" : "<li>";
+            const position = `#${i + 1}`;
+            const bikeColour = !player || isPlayer 
                 ? "inherit"
                 :  player.getBike().getColour().replace("%A%", "1");
-            let scoreElement = li + position + " <span style='color:" + bikeColour + "'>" + score.name + "</span>: " + score.score + "</li>";
+            const scoreElement = li + position + " <span style='color:" + bikeColour + "'>" + score.name + "</span>: " + score.score + "</li>";
             $("#score ul").append(scoreElement);
         });
 
         if (this.gameJoined && !playerInTopFive) {
-            let playerScore = scores.filter(x => x.playerId == this.player.getPlayerId())[0];
+            const playerScore = scores.filter(x => x.playerId == this.player.getPlayerId())[0];
             if (!playerScore) {
                 return;
             }
-            let li = "<li style='color:yellow'>";
-            let position = `#${scores.indexOf(playerScore) + 1}`;
-            let scoreElement = li + position + " " + playerScore.name + ": " + playerScore.score + "</li>";
+            const li = "<li style='color:yellow'>";
+            const position = `#${scores.indexOf(playerScore) + 1}`;
+            const scoreElement = li + position + " " + playerScore.name + ": " + playerScore.score + "</li>";
             $("#score ul").append(scoreElement);
         }
     }
 
-    private getPowerUpIcon(powerUp: string) {            
-        let powerUpIcon = null;
+    private getPowerUpIcon(powerUp: string) {
         switch (powerUp) {
             case "rocket":
                 return this.powerUpIconRocket;

@@ -1,15 +1,14 @@
-import { ArenaDto } from "../dto"
-import { NumberUtil, Vector } from "../util"
+import { ArenaDto } from "../dto/dto";
 
 export class Arena {
-    public size : number;
+    size: number;
     private spacing = 10;
 
-    constructor( dto : ArenaDto ) {
+    constructor (dto: ArenaDto) {
         this.size = dto.size;
     }
 
-    public draw( p : p5 ) {
+    draw( p : p5 ) {
         p.background(51);            
         // THE OLD BLUEISH GRID
         // p.strokeWeight(1);

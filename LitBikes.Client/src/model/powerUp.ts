@@ -1,5 +1,5 @@
 import { Vector } from "../util"
-import { PowerUpDto } from "../dto"
+import { PowerUpDto } from "../dto/dto";
 
 export class PowerUp {
     private id: string;

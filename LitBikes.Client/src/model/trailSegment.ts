@@ -1,26 +1,25 @@
 import { Vector } from "../util"
-import { ArenaDto, TrailSegmentDto } from "../dto"
 import "p5"
+import { TrailSegmentDto } from "../dto/dto";
 
 export class TrailSegment {
 
-    public isHead: boolean;
-    public start: Vector;
-    public end: Vector;
+    isHead: boolean;
+    start: Vector;
+    end: Vector;
 
     constructor( start: Vector, end: Vector ) {
         this.start = start;
         this.end = end;
     }
 
-    public static fromDto( dto: TrailSegmentDto ) : TrailSegment {
-        let segment = new TrailSegment( dto.start, dto.end );
+    static fromDto( dto: TrailSegmentDto ) : TrailSegment {
+        const segment = new TrailSegment( dto.start, dto.end );
         segment.isHead = dto.isHead;
         return segment;
     }
 
-    public draw( p : p5 ) {
+    draw( p : p5 ) {
 
     }
-
 }

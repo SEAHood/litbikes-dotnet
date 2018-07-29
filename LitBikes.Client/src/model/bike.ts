@@ -1,8 +1,8 @@
-import { BikeDto, TrailSegmentDto } from "../dto"
-import { Vector, NumberUtil, ColourUtil } from "../util"
+import { Vector, NumberUtil } from "../util"
 import { TrailSegment } from "./trailSegment"
 import * as _ from "underscore"
 import "p5"
+import { BikeDto, TrailSegmentDto } from "../dto/dto";
 
 export class Bike {
     private pos : Vector;

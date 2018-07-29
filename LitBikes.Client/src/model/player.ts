@@ -1,5 +1,5 @@
-import { PlayerDto } from "../dto"
 import { Bike } from "./bike"
+import { PlayerDto } from "../dto/dto";
 
 export class Player {        
     private playerId: string;
