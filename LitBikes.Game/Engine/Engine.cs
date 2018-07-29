@@ -287,7 +287,7 @@ namespace LitBikes.Game.Engine
 
         public bool SpawnIsAcceptable(Spawn spawn)
         {
-            var limit = 100; // Distance to nearest trail
+            var limit = 100; // Distance to nearest Trail
             var trails = GetTrails();
 
             var aheadX = spawn.GetPos().X + (limit * spawn.GetDir().X);

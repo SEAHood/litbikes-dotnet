@@ -1,14 +1,10 @@
 ﻿using System.Collections.Generic;
 using System.Numerics;
 using System.Threading.Tasks;
+using LitBikes.Model.Dtos;
 
 namespace LitBikes.Model
 {
-    public class DebugDto
-    {
-        public List<ImpactDto> impacts;
-    }
-
     public class Debug
     {
         private List<ImpactPoint> impacts;
@@ -32,18 +28,18 @@ namespace LitBikes.Model
 
         public DebugDto GetDto()
         {
-            DebugDto dto = new DebugDto
+            var dto = new DebugDto
             {
-                impacts = new List<ImpactDto>()
+                Impacts = new List<ImpactDto>()
             };
 
             foreach (var impact in impacts)
             {
-                ImpactDto impactDto = new ImpactDto
+                var impactDto = new ImpactDto
                 {
-                    pos = new Vector2(impact.GetPoint().X, impact.GetPoint().Y)
+                    Pos = new Vector2(impact.GetPoint().X, impact.GetPoint().Y)
                 };
-                dto.impacts.Add(impactDto);
+                dto.Impacts.Add(impactDto);
             }
             return dto;
         }

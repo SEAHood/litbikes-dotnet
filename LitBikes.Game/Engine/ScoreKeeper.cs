@@ -19,7 +19,12 @@ namespace LitBikes.Game.Engine
             var currentScore = _scores.FirstOrDefault(s => s.PlayerId == pid);
             if (currentScore == null)
             {
-                currentScore = new ScoreDto(pid, name, 0);
+                currentScore = new ScoreDto
+                {
+                    Name = name,
+                    PlayerId = pid,
+                    Score = 0
+                };
                 _scores.Add(currentScore);
             }
             currentScore.Score = currentScore.Score + score;

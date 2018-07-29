@@ -3,13 +3,6 @@ using System.Numerics;
 
 namespace LitBikes.Model
 {
-    public class ImpactDto
-    {
-        //public int ownerPid;
-        public Vector2 pos;
-        //public PowerUpType type;
-    }
-
     public class ImpactPoint
     {
         private TrailSegment trailSegment;

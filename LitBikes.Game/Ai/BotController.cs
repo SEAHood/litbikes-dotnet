@@ -80,7 +80,6 @@ namespace LitBikes.Ai
             {
                 var player = _gameController.CreateBot();
                 var bot = new Bot(player.GetId());
-                //bot.Start();
                 _bots.Add(bot);
             }
 

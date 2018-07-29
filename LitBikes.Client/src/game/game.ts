@@ -2,7 +2,7 @@ import { Bike } from "../model/bike"
 import { Player } from "../model/player"
 import { PowerUp } from "../model/powerUp"
 import { Arena } from "../model/arena"
-import { Vector, NumberUtil } from "../util"
+import { Vector, NumberUtil, NetworkUtil } from "../util"
 import {
     WorldUpdateDto, BikeDto, PlayerDto, PowerUpDto,
     ClientUpdateDto, GameJoinDto, ClientGameJoinDto,
@@ -330,8 +330,14 @@ export class Game {
             spdModifier = ((distance - oldMin) * newRange / oldRange) + newMin; // Trust me
         return spdModifier;
     }
+
+    private getTime() {
+        let dt = new Date();
+        return ((dt.getHours() < 10) ? "0" : "") + dt.getHours() + ":" + ((dt.getMinutes() < 10) ? "0" : "") + dt.getMinutes() + ":" + ((dt.getSeconds() < 10) ? "0" : "") + dt.getSeconds();
+    }
         
-    private processWorldUpdate( data : WorldUpdateDto ) {
+    private processWorldUpdate(data: WorldUpdateDto) {
+        //console.log(this.getTime() + ": " + JSON.stringify(data).length);
         this.roundInProgress = data.roundInProgress;
         this.timeUntilNextRound = data.timeUntilNextRound;
         this.currentWinner = data.currentWinner;

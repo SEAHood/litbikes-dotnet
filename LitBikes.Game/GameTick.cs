@@ -63,10 +63,10 @@
 
 //                            for (PowerUp powerUp : powerUps)
 //                            {
-//                                Vector pos = p.getBike().getPos();
-//                                double aheadX = pos.x + (2 * p.getBike().getDir().x);
-//                                double aheadY = pos.y + (2 * p.getBike().getDir().y);
-//                                Line2D line = new Line2D.Double(pos.x, pos.y, aheadX, aheadY);
+//                                Vector Pos = p.getBike().getPos();
+//                                double aheadX = Pos.x + (2 * p.getBike().getDir().x);
+//                                double aheadY = Pos.y + (2 * p.getBike().getDir().y);
+//                                Line2D line = new Line2D.Double(Pos.x, Pos.y, aheadX, aheadY);
 //                                if (powerUp.collides(line))
 //                                {
 //                                    powerUpCollected = powerUp;

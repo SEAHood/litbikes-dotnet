@@ -65,8 +65,8 @@ namespace LitBikes.Game.Controller
 
         /*public void ClientChatMessageEvent(Player player, string message)
         {
-            var colour = player.GetBike().GetColour();
-            var sourceColour = $"rgba({colour.R:X2},{colour.G:X2},{colour.B:X2},%A%)";
+            var Colour = player.GetBike().GetColour();
+            var sourceColour = $"rgba({Colour.R:X2},{Colour.G:X2},{Colour.B:X2},%A%)";
             var dto = new ChatMessageDto(player.GetName(), sourceColour, message, false);
 
             // TODO BROADCAST THAT SHIT

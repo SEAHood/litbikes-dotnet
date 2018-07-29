@@ -6,26 +6,11 @@ using System.Drawing;
 using System.Linq;
 using System.Numerics;
 using System.Text;
+using LitBikes.Model.Dtos;
 using Point = Nine.Geometry.Point;
 
 namespace LitBikes.Model
 {
-    public class TrailSegmentDto
-    {
-        public bool isHead;
-        public Vector2 start;
-        public Vector2 end;
-    }
-
-    public class BikeDto
-    {
-        public Vector2 pos;
-        public Vector2 dir;
-        public float spd;
-        public List<TrailSegmentDto> trail;
-        public string colour; // in rgba(0,0,0,%A%) format
-    }
-
     public class Bike
     {
         //private static Logger LOG = Log.getLogger(Bike.class);	
@@ -160,11 +145,11 @@ namespace LitBikes.Model
         {
             return new BikeDto
             {
-                pos = new Vector2(_pos.X, _pos.Y),
-                dir = new Vector2(_dir.X, _dir.Y),
-                spd = _spd,
-                trail = _trail.GetList().Select(t => t.GetDto()).ToList(),
-                colour = $"rgba({_colour.R},{_colour.G},{_colour.B},%A%)"
+                Pos = new Vector2(_pos.X, _pos.Y),
+                Dir = new Vector2(_dir.X, _dir.Y),
+                Spd = _spd,
+                Trail = _trail.GetList().Select(t => t.GetDto()).ToList(),
+                Colour = $"rgba({_colour.R},{_colour.G},{_colour.B},%A%)"
             };
         }
 

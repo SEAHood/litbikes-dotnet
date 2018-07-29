@@ -4,15 +4,15 @@ namespace LitBikes.Model.Dtos
 {
     public class PlayerDto
     {
-        public Guid PlayerId;
-        public string Name;
-        public BikeDto Bike;
-        public bool Spectating;
-        public bool Crashed;
-        public Guid? CrashedInto;
-        public string CrashedIntoName;
-        public int Score;
-        public PowerUpType CurrentPowerUp;
-        public PlayerEffect Effect;
+        public Guid PlayerId { get; set; }
+        public string Name { get; set; }
+        public BikeDto Bike { get; set; }
+        public bool Spectating { get; set; }
+        public bool Crashed { get; set; }
+        public Guid? CrashedInto { get; set; }
+        public string CrashedIntoName { get; set; }
+        public int Score { get; set; }
+        public PowerUpType CurrentPowerUp { get; set; }
+        public PlayerEffect Effect { get; set; }
     }
 }

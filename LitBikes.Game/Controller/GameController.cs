@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.Linq;
+using System.Net;
 using System.Text;
 using System.Timers;
 using LitBikes.Ai;
@@ -93,7 +94,14 @@ namespace LitBikes.Game.Controller
                         var messageDto = (ClientChatMessageDto)args.Dto;
                         var colour = player.GetBike().GetColour();
                         var sourceColour = $"rgba({colour.R:X2},{colour.G:X2},{colour.B:X2},%A%)";
-                        var dto = new ChatMessageDto(player.GetName(), sourceColour, messageDto.Message, false);
+                        var dto = new ChatMessageDto
+                        {
+                            IsSystemMessage = false,
+                            Message = messageDto.Message,
+                            SourceColour = sourceColour,
+                            Source = player.GetName(),
+                            Timestamp = DateTimeOffset.UtcNow.ToUnixTimeSeconds()
+                        };
                         _eventSender.SendEvent(ServerEvent.ChatMessage, dto);
                         break;
                     case ClientEvent.KeepAlive:
@@ -107,14 +115,14 @@ namespace LitBikes.Game.Controller
                         break;
                     case ClientEvent.Update:
                         var updateDto = (ClientUpdateDto)args.Dto;
-                        if (_game.HandleClientUpdate(updateDto))
-                            BroadcastWorldUpdate();
+                        _game.HandleClientUpdate(updateDto);//if ()
+                            //BroadcastWorldUpdate();
                         break;
                     case ClientEvent.UsePowerup:
                         if (player.GetCurrentPowerUpType() == PowerUpType.Nothing)
                             return; // player doesn't have a powerup
                         _game.RequestUsePowerUp(player);
-                        BroadcastWorldUpdate();
+                        //BroadcastWorldUpdate();
                         break;
                     default:
                         throw new ArgumentOutOfRangeException();
@@ -190,21 +198,28 @@ namespace LitBikes.Game.Controller
 
         public void PlayerCrashed(Player player)
         {
-            var crashedInto = player.IsCrashedIntoSelf() ? "their own trail!" : player.GetCrashedInto().GetName();
+            var crashedInto = player.IsCrashedIntoSelf() ? "their own Trail!" : player.GetCrashedInto().GetName();
             var playerCrashedMessage = player.GetName() + " crashed into " + crashedInto;
             SendServerMessage(playerCrashedMessage);
-            BroadcastWorldUpdate();
+            //BroadcastWorldUpdate();
         }
 
         private void SendServerMessage(string message)
         {
-            var dto = new ChatMessageDto(null, null, message, true);
+            var dto = new ChatMessageDto
+            {
+                IsSystemMessage = true,
+                Message = message,
+                SourceColour = null,
+                Source = null,
+                Timestamp = DateTimeOffset.UtcNow.ToUnixTimeSeconds()
+            };
             _eventSender.SendEvent(ServerEvent.ChatMessage, dto);
         }
 
         public void PlayerSpawned()
         {
-            BroadcastWorldUpdate();
+            //BroadcastWorldUpdate();
         }
 
         public void ScoreUpdated()
@@ -229,10 +244,31 @@ namespace LitBikes.Game.Controller
         // END GAME EVENTS
 
 
+        private ServerWorldDto _lastWorldUpdate;
         public void BroadcastWorldUpdate()
         {
+            var worldDto = GetWorldDiff(out var currentWorldDto);
+            _lastWorldUpdate = currentWorldDto;
+            _eventSender.SendEvent(ServerEvent.Dev, worldDto);
             _eventSender.SendEvent(ServerEvent.WorldUpdate, _game.GetWorldDto());
             _botController.DoUpdate(_game.GetPlayers(), _game.GetArena());
+        }
+
+        private ServerWorldDto GetWorldDiff(out ServerWorldDto currentWorldDto)
+        {
+            currentWorldDto = _game.GetWorldDto();
+            if (_lastWorldUpdate == null) return currentWorldDto;
+
+            var lastWorld = _lastWorldUpdate;
+            var type = currentWorldDto.GetType();
+            var diff = new ServerWorldDto();
+            foreach (var prop in type.GetProperties())
+            {
+                var lastWorldProp = prop.GetValue(lastWorld);
+                var thisWorldProp = prop.GetValue(currentWorldDto);
+                prop.SetValue(diff, Equals(lastWorldProp, thisWorldProp) ? null : thisWorldProp);
+            }
+            return diff;
         }
 
 

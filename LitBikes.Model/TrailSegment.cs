@@ -2,6 +2,7 @@
 using Nine.Geometry;
 using System;
 using System.Numerics;
+using LitBikes.Model.Dtos;
 
 namespace LitBikes.Model
 {
@@ -59,9 +60,9 @@ namespace LitBikes.Model
         {
             return new TrailSegmentDto
             {
-                isHead = _isHead,
-                start = new Vector2(_line.Start.X, _line.Start.Y),
-                end = new Vector2(_line.End.X, _line.End.Y)
+                IsHead = _isHead,
+                Start = new Vector2(_line.Start.X, _line.Start.Y),
+                End = new Vector2(_line.End.X, _line.End.Y)
             };
         }
 

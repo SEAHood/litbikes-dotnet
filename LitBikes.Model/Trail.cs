@@ -17,7 +17,7 @@ namespace LitBikes.Model
         public List<TrailSegment> GetList()
         {
             var copy = new List<TrailSegment>();
-            foreach (TrailSegment s in segments.Values)
+            foreach (var s in segments.Values)
             {
                 copy.Add(s.Clone());
             }

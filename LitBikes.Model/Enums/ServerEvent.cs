@@ -7,6 +7,7 @@
         ChatMessage,
         Hello,
         JoinedGame,
-        KeepAliveAck
+        KeepAliveAck,
+        Dev    
     }
 }

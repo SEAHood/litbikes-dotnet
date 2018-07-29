@@ -2,18 +2,10 @@
 using Nine.Geometry;
 using System;
 using System.Numerics;
+using LitBikes.Model.Dtos;
 
 namespace LitBikes.Model
 {
-    public class PowerUpDto
-    {
-        public string Id;
-        public string Name;
-        public Vector2 Pos;
-        public PowerUpType Type;
-        public bool Collected;
-    }
-
     public enum PowerUpType
     {
         Nothing,

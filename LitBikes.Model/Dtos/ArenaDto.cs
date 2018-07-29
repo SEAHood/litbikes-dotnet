@@ -1,8 +1,7 @@
-﻿
-namespace LitBikes.Model.Dtos
+﻿namespace LitBikes.Model.Dtos
 {
     public class ArenaDto : IDto
     {
-        public int Size;
+        public int Size { get; set; }
     }
 }
