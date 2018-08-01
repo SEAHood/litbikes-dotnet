@@ -59,6 +59,8 @@ export class Game {
 
     private impacts: Vector[];
 
+    private lastGameTickProcessed: number;
+
     constructor() {
         this.hubConnection.on("Hello", (data: HelloDtoShort) => {
             var fullDto = new HelloDto(data);
@@ -347,6 +349,8 @@ export class Game {
     }
 
     private processWorldUpdate(data: WorldUpdateDto) {
+        if (data.gameTick < this.lastGameTickProcessed) return; // Ignore a delayed packet
+        this.lastGameTickProcessed = data.gameTick;
         //console.log(this.getTime() + ": " + JSON.stringify(data).length);
         this.roundInProgress = data.roundInProgress;
         this.timeUntilNextRound = data.timeUntilNextRound;
