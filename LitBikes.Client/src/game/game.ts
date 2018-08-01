@@ -13,9 +13,10 @@ import "p5"
 import * as signalR from "@aspnet/signalr"
 import * as _ from "underscore"
 import * as $ from "jquery"
-import { WorldUpdateDtoShort, HelloDtoShort, GameJoinDtoShort, ScoreDtoShort, ClientChatMessageDtoShort as ChatMessageDtoShort,
+import { WorldUpdateDtoShort, HelloDtoShort, GameJoinDtoShort, ScoreDtoShort, ClientChatMessageDtoShort,
     ClientGameJoinDtoShort,
-    ClientUpdateDtoShort
+    ClientUpdateDtoShort,
+    ChatMessageDtoShort
 } from "../dto/shortDto";
 
 export class Game {
@@ -60,12 +61,12 @@ export class Game {
 
     constructor() {
         this.hubConnection.on("Hello", (data: HelloDtoShort) => {
-            var fullDto = data.toFullDto() as HelloDto;
+            var fullDto = new HelloDto(data);
             this.initGame(fullDto);
         });
 
         this.hubConnection.on("JoinedGame", (data: GameJoinDtoShort) => {
-            var fullDto = data.toFullDto() as GameJoinDto;
+            var fullDto = new GameJoinDto(data);
             this.joinGame(fullDto);
         });
         
@@ -77,18 +78,18 @@ export class Game {
 
         this.hubConnection.on("WorldUpdate", (data: WorldUpdateDtoShort) => {
             if (this.gameStarted) {
-                const fullDto = data.toFullDto() as WorldUpdateDto;
+                const fullDto = new WorldUpdateDto(data);
                 this.processWorldUpdate(fullDto);
             }
         });
 
         this.hubConnection.on("ScoreUpdate", (data: ScoreDtoShort[]) => {
-            var fullDto = data.map(s => s.toFullDto() as ScoreDto);
+            var fullDto = data.map(s => new ScoreDto(s));
             this.updateScores(fullDto);
         });
 
         this.hubConnection.on("ChatMessage", (data: ChatMessageDtoShort) => {
-            const fullDto = data.toFullDto() as ChatMessageDto;
+            const fullDto = new ChatMessageDto(data);
 
             // TODO: Use moment or something?
             const messageTime = new Date(fullDto.timestamp).toTimeString().split(" ")[0];

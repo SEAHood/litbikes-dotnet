@@ -1,13 +1,9 @@
 ﻿import { Vector } from "../util";
-import { IDto, BikeDto, TrailSegmentDto, PlayerDto, PowerUpDto, HelloDto, GameSettingsDto, WorldUpdateDto, ArenaDto,
+import { BikeDto, TrailSegmentDto, PlayerDto, PowerUpDto, HelloDto, GameSettingsDto, WorldUpdateDto, ArenaDto,
     DebugDto, ImpactDto, ChatMessageDto, ClientChatMessageDto, ScoreDto, ClientUpdateDto, GameJoinDto, ClientGameJoinDto
 } from "./dto";
 
-export interface IDtoShort {
-    toFullDto(): IDto;
-}
-
-export class BikeDtoShort implements IDtoShort {
+export class BikeDtoShort {
     i: string;
     n: string;
     p: Vector;
@@ -16,20 +12,20 @@ export class BikeDtoShort implements IDtoShort {
     t: TrailSegmentDtoShort[];
     c: string; // includes %A% alpha
 
-    toFullDto(): IDto {
-        const dto = new BikeDto();
-        dto.playerId = this.i;
-        dto.name = this.n;
-        dto.pos = this.p;
-        dto.dir = this.d;
-        dto.spd = this.s;
-        dto.trail = this.t.map(t => t.toFullDto() as TrailSegmentDto);
-        dto.colour = this.c;
-        return dto;
+    constructor(fullDto?: BikeDto) {
+        if (fullDto) {
+            this.i = fullDto.playerId;
+            this.n = fullDto.name;
+            this.p = fullDto.pos;
+            this.d = fullDto.dir;
+            this.s = fullDto.spd;
+            this.t = fullDto.trail.map(t => new TrailSegmentDtoShort(t));
+            this.c = fullDto.colour;
+        }
     }
 }
 
-export class PlayerDtoShort implements IDtoShort {
+export class PlayerDtoShort {
     i: string;
     n: string;
     b: BikeDtoShort;
@@ -43,89 +39,89 @@ export class PlayerDtoShort implements IDtoShort {
     cpu: string;
     e: string;
 
-    toFullDto(): IDto {
-        const dto = new PlayerDto();
-        dto.playerId = this.i;
-        dto.name = this.n;
-        dto.bike = this.b.toFullDto() as BikeDto;
-        dto.crashed = this.c;
-        dto.crashing = this.cr;
-        dto.crashedInto = this.ci;
-        dto.crashedIntoName = this.cin;
-        dto.deathTimestamp = this.dt;
-        dto.spectating = this.s;
-        dto.score = this.sc;
-        dto.currentPowerUp = this.cpu;
-        dto.effect = this.e;
-        return dto;
+    constructor(fullDto?: PlayerDto) {
+        if (fullDto) {
+            this.i = fullDto.playerId;
+            this.n = fullDto.name;
+            this.b = new BikeDtoShort(fullDto.bike);
+            this.c = fullDto.crashed;
+            this.cr = fullDto.crashing;
+            this.ci = fullDto.crashedInto;
+            this.cin = fullDto.crashedIntoName;
+            this.dt = fullDto.deathTimestamp;
+            this.s = fullDto.spectating;
+            this.sc = fullDto.score;
+            this.cpu = fullDto.currentPowerUp;
+            this.e = fullDto.effect;
+        }
     }
 }
 
-export class PowerUpDtoShort implements IDtoShort {
+export class PowerUpDtoShort {
     i: string;
     p: Vector;
     t: string;
     c: boolean;
 
-    toFullDto(): IDto {
-        const dto = new PowerUpDto();
-        dto.id = this.i;
-        dto.pos = this.p;
-        dto.type = this.t;
-        dto.collected = this.c;
-        return dto;
+    constructor(fullDto?: PowerUpDto) {
+        if (fullDto) {
+            this.i = fullDto.id;
+            this.p = fullDto.pos;
+            this.t = fullDto.type;
+            this.c = fullDto.collected;
+        }
     }
 }
 
-export class HelloDtoShort implements IDtoShort {
+export class HelloDtoShort {
     gs: GameSettingsDtoShort;
     w: WorldUpdateDtoShort;
 
-    toFullDto(): IDto {
-        const dto = new HelloDto();
-        dto.gameSettings = this.gs.toFullDto() as GameSettingsDto;
-        dto.world = this.w.toFullDto() as WorldUpdateDto;
-        return dto;
+    constructor(fullDto?: HelloDto) {
+        if (fullDto) {
+            this.gs = new GameSettingsDtoShort(fullDto.gameSettings);
+            this.w = new WorldUpdateDtoShort(fullDto.world);
+        }
     }
 }
 
-export class GameJoinDtoShort implements IDtoShort {
+export class GameJoinDtoShort {
     p: PlayerDtoShort;
     s: ScoreDtoShort[];
 
-    toFullDto(): IDto {
-        const dto = new GameJoinDto();
-        dto.player = this.p.toFullDto() as PlayerDto;
-        dto.scores = this.s.map(s => s.toFullDto() as ScoreDto);
-        return dto;
+    constructor(fullDto?: GameJoinDto) {
+        if (fullDto) {
+            this.p = new PlayerDtoShort(fullDto.player);
+            this.s = fullDto.scores.map(s => new ScoreDtoShort(s));
+        }
     }
 }
 
-export class ArenaDtoShort implements IDtoShort {
+export class ArenaDtoShort {
     s: number;
 
-    toFullDto(): IDto {
-        const dto = new ArenaDto();
-        dto.size = this.s;
-        return dto;
+    constructor(fullDto?: ArenaDto) {
+        if (fullDto) {
+            this.s = fullDto.size;
+        }
     }
 }
 
-export class TrailSegmentDtoShort implements IDtoShort {
+export class TrailSegmentDtoShort {
     ih: boolean;
     s: Vector;
     e: Vector;
 
-    toFullDto(): IDto {
-        const dto = new TrailSegmentDto();
-        dto.isHead = this.ih;
-        dto.start = this.s;
-        dto.end = this.e;
-        return dto;
+    constructor(fullDto?: TrailSegmentDto) {
+        if (fullDto) {
+            this.ih = fullDto.isHead;
+            this.s = fullDto.start;
+            this.e = fullDto.end;
+        }
     }
 }
 
-export class WorldUpdateDtoShort implements IDtoShort {
+export class WorldUpdateDtoShort {
     t: number;
     gt: number;
     rip: boolean;
@@ -137,118 +133,118 @@ export class WorldUpdateDtoShort implements IDtoShort {
     a: ArenaDtoShort;
     d: DebugDtoShort;
 
-    toFullDto(): IDto {
-        const dto = new WorldUpdateDto();
-        dto.timestamp = this.t;
-        dto.gameTick = this.gt;
-        dto.roundInProgress = this.rip;
-        dto.roundTimeLeft = this.rtl;
-        dto.timeUntilNextRound = this.tunr;
-        dto.currentWinner = this.cw;
-        dto.players = this.p.map(p => p.toFullDto() as PlayerDto);
-        dto.powerUps = this.pu.map(pu => pu.toFullDto() as PowerUpDto);
-        dto.arena = this.a.toFullDto() as ArenaDto;
-        dto.debug = this.d.toFullDto() as DebugDto;
-        return dto;
+    constructor(fullDto?: WorldUpdateDto) {
+        if (fullDto) {
+            this.t = fullDto.timestamp;
+            this.gt = fullDto.gameTick;
+            this.rip = fullDto.roundInProgress;
+            this.rtl = fullDto.roundTimeLeft;
+            this.tunr = fullDto.timeUntilNextRound;
+            this.cw = fullDto.currentWinner;
+            this.p = fullDto.players.map(p => new PlayerDtoShort(p));
+            this.pu = fullDto.powerUps.map(pu => new PowerUpDtoShort(pu));
+            this.a = new ArenaDtoShort(fullDto.arena);
+            this.d = new DebugDtoShort(fullDto.debug);
+        }
     }
 }
 
-export class ChatMessageDtoShort implements IDtoShort {
+export class ChatMessageDtoShort {
     m: string;
     t: number;
     s: string;
     sc: string; // includes %A% alpha
     ism: boolean;
 
-    toFullDto(): IDto {
-        const dto = new ChatMessageDto();
-        dto.message = this.m;
-        dto.timestamp = this.t;
-        dto.source = this.s;
-        dto.sourceColour = this.sc;
-        dto.isSystemMessage = this.ism;
-        return dto;
+    constructor(fullDto?: ChatMessageDto) {
+        if (fullDto) {
+            this.m = fullDto.message;
+            this.t = fullDto.timestamp;
+            this.s = fullDto.source;
+            this.sc = fullDto.sourceColour;
+            this.ism = fullDto.isSystemMessage;
+        }
     }
 }
 
-export class ClientChatMessageDtoShort implements IDtoShort {
+export class ClientChatMessageDtoShort {
     m: string;
 
-    toFullDto(): IDto {
-        const dto = new ClientChatMessageDto();
-        dto.message = this.m;
-        return dto;
+    constructor(fullDto?: ClientChatMessageDto) {
+        if (fullDto) {
+            this.m = fullDto.message;
+        }
     }
 }
 
-export class ScoreDtoShort implements IDtoShort {
+export class ScoreDtoShort {
     i: string;
     n: string;
     s: number;
 
-    toFullDto(): IDto {
-        const dto = new ScoreDto();
-        dto.playerId = this.i;
-        dto.name = this.n;
-        dto.score = this.s;
-        return dto;
+    constructor(fullDto?: ScoreDto) {
+        if (fullDto) {
+            this.i = fullDto.playerId;
+            this.n = fullDto.name;
+            this.s = fullDto.score;
+        }
     }
 }
 
-export class GameSettingsDtoShort implements IDtoShort {
+export class GameSettingsDtoShort {
     gt: number;
 
-    toFullDto(): IDto {
-        const dto = new GameSettingsDto();
-        dto.gameTickMs = this.gt;
-        return dto;
+    constructor(fullDto?: GameSettingsDto) {
+        if (fullDto) {
+            this.gt = fullDto.gameTickMs;
+        }
     }
 }
 
-export class DebugDtoShort implements IDtoShort {
+export class DebugDtoShort {
     i: ImpactDtoShort[];
-
-    toFullDto(): IDto {
-        const dto = new DebugDto();
-        dto.impacts = this.i.map(i => i.toFullDto() as ImpactDto);
-        return dto;
+    
+    constructor(fullDto?: DebugDto) {
+        if (fullDto) {
+            this.i = fullDto.impacts.map(i => new ImpactDtoShort(i));
+        }
     }
 }
 
-export class ImpactDtoShort implements IDtoShort {
+export class ImpactDtoShort {
     p: Vector;
 
-    toFullDto(): IDto {
-        const dto = new ImpactDto();
-        dto.pos = this.p;
-        return dto;
+    constructor(fullDto?: ImpactDto) {
+        if (fullDto) {
+            this.p = fullDto.pos;
+        }
     }
 }
 
-export class ClientUpdateDtoShort implements IDtoShort {
+export class ClientUpdateDtoShort {
     i: string;
     xd: number;
     yd: number;
     xp: number;
     yp: number;
 
-    toFullDto(): IDto {
-        const dto = new ClientUpdateDto();
-        dto.playerId = this.i;
-        dto.xDir = this.xd;
-        dto.yDir = this.yd;
-        dto.xPos = this.xp;
-        dto.yPos = this.yp;
-        return dto;
+    constructor(fullDto?: ClientUpdateDto) {
+        if (fullDto) {
+            this.i = fullDto.playerId;
+            this.xd = fullDto.xDir;
+            this.yd = fullDto.yDir;
+            this.xp = fullDto.xPos;
+            this.yp = fullDto.yPos;
+        }
     }
 }
 
-export class ClientGameJoinDtoShort implements IDtoShort {
+export class ClientGameJoinDtoShort {
     n: string;
 
-    toFullDto(): IDto {
-        const dto = new ClientGameJoinDto();
-        dto.name = this.n;
-        return dto;
+    constructor(fullDto?: ClientGameJoinDto) {
+        if (fullDto) {
+            this.n = fullDto.name;
+        }
     }
 }

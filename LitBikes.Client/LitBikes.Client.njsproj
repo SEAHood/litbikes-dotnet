@@ -51,9 +51,6 @@
     <TypeScriptCompile Include="src\model\arena.ts" />
     <TypeScriptCompile Include="src\model\bike.ts" />
     <TypeScriptCompile Include="src\dto\dto.ts" />
-    <TypeScriptCompile Include="src\dto.ts">
-      <SubType>Code</SubType>
-    </TypeScriptCompile>
     <TypeScriptCompile Include="src\model\player.ts" />
     <TypeScriptCompile Include="src\model\powerUp.ts" />
     <TypeScriptCompile Include="src\game\game.ts">
