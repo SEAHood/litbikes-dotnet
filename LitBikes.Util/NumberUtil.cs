@@ -10,5 +10,10 @@ namespace LitBikes.Util
         {
             return _rand.Next(min, max);
         }
+
+        public static float RandFloat(float min, float max)
+        {
+            return (float)_rand.NextDouble() * (max - min) + min;
+        }
     }
 }

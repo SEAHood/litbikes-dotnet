@@ -2,7 +2,7 @@ import { Bike } from "../model/bike"
 import { Player } from "../model/player"
 import { PowerUp } from "../model/powerUp"
 import { Arena } from "../model/arena"
-import { Vector, NumberUtil } from "../util"
+import { Vector, NumberUtil, RenderUtil, TextEffect } from "../util"
 import {
     WorldUpdateDto, PlayerDto, PowerUpDto,
     ClientUpdateDto, GameJoinDto, ClientGameJoinDto,
@@ -561,37 +561,41 @@ export class Game {
         } 
 
         if (!this.roundInProgress) {
-            let winner = this.gameJoined && this.currentWinner === this.player.getPlayerId()
-                ? this.player
-                : _.find(this.players, (player: Player) => player.getPlayerId() === this.currentWinner);
-                
-            let winnerName = "The Wall";
-            if (winner)
-                winnerName = winner.getName();
+            if (this.timeUntilNextRound > 3) {
+                let winner = this.gameJoined && this.currentWinner === this.player.getPlayerId()
+                    ? this.player
+                    : _.find(this.players, (player: Player) => player.getPlayerId() === this.currentWinner);
 
-            p.noStroke();
-            p.fill("rgba(0,0,0,0.4)");
-            p.rect(0, halfHeight - 35, this.arena.size, 55);
+                let winnerName = "The Wall";
+                if (winner)
+                    winnerName = winner.getName();
+                p.noStroke();
+                p.fill("rgba(0,0,0,0.4)");
+                p.rect(0, halfHeight - 35, this.arena.size, 55);
 
-            p.textFont(this.mainFont);
-            p.textAlign("center", "top");
+                p.textFont(this.mainFont);
+                p.textAlign("center", "top");
 
-            p.fill("rgba(125,249,255,0.50)");
-            p.textSize(29);
-            p.text(winnerName + " won!",
-                halfWidth + NumberUtil.randInt(0, 2), halfHeight - 30 + NumberUtil.randInt(0, 2));
-            p.fill("rgba(255,255,255,0.80)");
-            p.textSize(28);
-            p.text(winnerName + " won!",
-                halfWidth, halfHeight - 30);
+                p.fill("rgba(125,249,255,0.50)");
+                p.textSize(29);
+                p.text(winnerName + " won!",
+                    halfWidth + NumberUtil.randInt(0, 2), halfHeight - 30 + NumberUtil.randInt(0, 2));
+                p.fill("rgba(255,255,255,0.80)");
+                p.textSize(28);
+                p.text(winnerName + " won!", halfWidth, halfHeight - 30);
 
-            p.fill("rgba(0,0,0,0.40)");
-            p.fill(255);
-            p.textFont(this.secondaryFont);
-            p.textSize(15);
-            p.text(`Next round starting in ${this.timeUntilNextRound} second${this.timeUntilNextRound === 1 ? "" : "s"}`, halfWidth, halfHeight);
+                p.fill("rgba(0,0,0,0.40)");
+                p.fill(255);
+                p.textFont(this.secondaryFont);
+                p.textSize(15);
+                p.text(`Next round starting in ${this.timeUntilNextRound} second${this.timeUntilNextRound === 1 ? "" : "s"}`, halfWidth, halfHeight);
+            } else if (this.timeUntilNextRound > 0) {
+                RenderUtil.renderText(p, this.timeUntilNextRound.toString(), 100, halfWidth, halfHeight, TextEffect.None);
+            } else {
+                RenderUtil.renderText(p, "Go!", 100, halfWidth, halfHeight, TextEffect.Fire);
+            }
         }
-            
+             
         if (this.player && this.player.isAlive() && this.player.getEffect().toLowerCase() == "slowed") {
             p.filter("INVERT", 0);
         }

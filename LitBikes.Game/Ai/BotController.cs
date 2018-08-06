@@ -2,7 +2,6 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Threading;
 using LitBikes.Model;
 using LitBikes.Model.Dtos.FromClient;
@@ -12,10 +11,9 @@ namespace LitBikes.Ai
 {
     public class BotController
     {
-
         private List<Bot> _bots;
         private IClientEventReceiver _clientEventReceiver;
-        private ServerEventSender _serverEventSender;
+        private readonly ServerEventSender _serverEventSender;
 
         private GameController _gameController;
         private Thread _tickThread;
@@ -23,16 +21,12 @@ namespace LitBikes.Ai
 
         private const int AiTickMs = 100;
         private const int AiRespawnMs = 3000;
-
-
-        //public double AiTickMs { get; private set; }
-
+        
         public BotController(GameController gameController, IClientEventReceiver clientEventReceiver)
         {
             _gameController = gameController;
             _clientEventReceiver = clientEventReceiver;
-            _bots = new List<Bot>();  
-            //_serverEventSender = serverEventSender;
+            _bots = new List<Bot>();
         }
 
         public void Start()
@@ -48,9 +42,18 @@ namespace LitBikes.Ai
                         if (!b.HasBike()) return;
                         if (!b.IsCrashed())
                         {
-                            var result = b.PredictCollision();
-                            if (result != null)
-                                SendUpdate(b.GetId(), result);
+                            var behaviourResult = b.ExhibitBehaviour();
+                            var collisionResult = b.PredictCollision();
+
+                            // Prefer the behaviour result
+                            if (behaviourResult != null)
+                            {
+                                SendUpdate(b.GetId(), behaviourResult);
+                                return;
+                            }
+
+                            if (collisionResult != null)
+                                SendUpdate(b.GetId(), collisionResult);
                         }
                         else
                         {

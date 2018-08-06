@@ -26,12 +26,13 @@ namespace LitBikes.Model
 
         public void Add(TrailSegment segment)
         {
-            foreach (var s in segments.Values)
-            {
-                s.SetHead(false);
-            }
             segment.SetHead(true);
             segments.TryAdd(segment.GetId(), segment);
+            foreach (var s in segments.Values)
+            {
+                if (s.GetId() != segment.GetId())
+                    s.SetHead(false);
+            }
         }
 
         public int Size()

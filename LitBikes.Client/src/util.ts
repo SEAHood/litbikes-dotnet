@@ -87,6 +87,51 @@ export class ColourUtil {
     }
 }
 
+export class RenderUtil {
+    static defaultColour = "125,248,255";
+    static red = "255,32,32";
+    static orange = "255,153,50";
+    static yellow = "255,255,84";
+
+    static renderText(p: p5, text: string, fontSize: number, x: number, y: number, effect: TextEffect) {
+        let yOffset = fontSize / 10;
+        effect = effect || TextEffect.None;
+        p.textAlign("center", "center");
+
+        if (effect != TextEffect.None) {
+            let accentColour = this.defaultColour;
+            if (effect == TextEffect.Fire) {
+                let rand = NumberUtil.randInt(0, 2);
+                switch (rand) {
+                    case 0:
+                        accentColour = this.red;
+                        break;
+                    case 1:
+                        accentColour = this.orange;
+                        break;
+                    case 2:
+                    default:
+                        accentColour = this.yellow;
+                        break;
+                }
+            }
+            p.fill(`rgba(${accentColour},0.50)`);
+            p.textSize(fontSize + 1);
+            p.text(text, x + NumberUtil.randInt(0, fontSize / 10), y + NumberUtil.randInt(0, fontSize / 10) - yOffset);
+        }        
+        p.fill("rgba(255,255,255,0.80)");
+        p.textSize(fontSize);
+        p.text(text, x, y - yOffset);
+    }
+}
+
+export enum TextEffect {
+    None,
+    Default,
+    Fire
+}
+
+
 export class NetworkUtil {
     static sizeOfObject(obj: any) {
 

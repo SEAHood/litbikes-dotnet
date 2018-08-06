@@ -39,22 +39,16 @@ namespace LitBikes.Game.Controller
         //private readonly ClientEventHandler _clientEventHandler;
         private readonly IServerEventSender _eventSender;
         
-        public GameController(IClientEventReceiver clientEventReceiver, IServerEventSender serverEventSender)
+        public GameController(IClientEventReceiver clientEventReceiver, IServerEventSender serverEventSender, GameSettings settings)
         {
             var gameEventController = new GameEventController();
-            //_clientEventHandler = new ClientEventHandler();
             SetupGameEventHandlers(gameEventController);
             SetupClientEventHandlers(clientEventReceiver);
 
             _eventSender = serverEventSender;
-            _minPlayers = 10;
+            _minPlayers = settings.MinPlayers;
 
-            _game = new GameEngine(gameEventController, new GameSettings
-            {
-                ArenaSize = 600,
-                RoundDuration = 120,
-                RoundCountdownDuration = 15
-            });
+            _game = new GameEngine(gameEventController, settings);
 
             sessionPlayers = new Dictionary<Guid, int>();
             _botController = new BotController(this, clientEventReceiver);

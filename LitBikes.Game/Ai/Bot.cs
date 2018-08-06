@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading;
 using LitBikes.Model;
 using LitBikes.Model.Dtos.FromClient;
+using LitBikes.Util;
 
 namespace LitBikes.Ai
 {
@@ -15,6 +16,7 @@ namespace LitBikes.Ai
 	    private List<Player> _players;
         private Arena _arena;
         private readonly Random _rand = new Random();
+        private readonly float _randomTurnChance;
 
         public DateTime? RespawnTime { get; set; }
         
@@ -24,6 +26,7 @@ namespace LitBikes.Ai
         {
             _botId = botId;
             _players = new List<Player>();
+            _randomTurnChance = NumberUtil.RandFloat(0.2f, 0.8f);
         }
 
         public bool HasBike()
@@ -46,6 +49,33 @@ namespace LitBikes.Ai
         public bool IsCrashed()
         {
             return _crashed;
+        }
+
+        public ClientUpdateDto ExhibitBehaviour()
+        {
+            var rand = NumberUtil.RandInt(0, (int)(_randomTurnChance * 100));
+            if (rand == 0)
+                return RandomDirectionDto();
+            return null;
+        }
+
+        private ClientUpdateDto RandomDirectionDto()
+        {
+            var newVal = _rand.Next(0, 2) == 0 ? -1 : 1;
+            var updateDto = new ClientUpdateDto { PlayerId = _botId };
+
+            if (_botBike.GetDir().X != 0)
+            {
+                updateDto.XDir = 0;
+                updateDto.YDir = newVal;
+            }
+            else if (_botBike.GetDir().Y != 0)
+            {
+                updateDto.XDir = newVal;
+                updateDto.YDir = 0;
+            }
+
+            return updateDto;
         }
 
         public ClientUpdateDto PredictCollision()
@@ -78,7 +108,7 @@ namespace LitBikes.Ai
                 updateDto.YDir = 0;
             }
 
-            return updateDto;
+            return RandomDirectionDto();
         }
 
         public void SetRespawnTime(DateTime dateTime)
