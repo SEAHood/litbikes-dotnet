@@ -122,8 +122,8 @@ namespace LitBikes.Model
             var line = new LineSegment2D
             {
                 Start = {
-                    X = _pos.X,
-                    Y = _pos.Y
+                    X = _pos.X - _dir.X,
+                    Y = _pos.Y - _dir.Y
                 },
                 End = {
                     X = aheadX,
@@ -131,8 +131,11 @@ namespace LitBikes.Model
                 }
             };
 
+            var thisHeadId = _trail.GetHead().GetId();
+
             foreach (var segment in trail)
             {
+                if (thisHeadId == segment.GetId()) continue; // No collision with own head-segment
                 if (!line.Intersects(segment.GetLine())) continue;
                 collidedWith = segment.GetOwnerPid();
                 return true;
@@ -148,7 +151,7 @@ namespace LitBikes.Model
                 Pos = new Vector2(_pos.X, _pos.Y),
                 Dir = new Vector2(_dir.X, _dir.Y),
                 Spd = _spd,
-                Trail = _trail.GetList().Select(t => t.GetDto()).ToList(),
+                Trail = _trail.GetDtoList(),
                 Colour = $"rgba({_colour.R},{_colour.G},{_colour.B},%A%)"
             };
         }
@@ -218,12 +221,7 @@ namespace LitBikes.Model
                 headSegmentStartY = _startPos.Y;
             }
 
-            foreach (var t in trailWithHead)
-            {
-                t.SetHead(false);
-            }
             var headSegment = new TrailSegment(_ownerPid, new LineSegment2D(new Vector2(headSegmentStartX, headSegmentStartY), new Vector2(_pos.X, _pos.Y)));
-            headSegment.SetHead(true);
             trailWithHead.Add(headSegment);
 
             return trailWithHead;

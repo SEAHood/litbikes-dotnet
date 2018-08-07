@@ -12,18 +12,15 @@ namespace LitBikes.Model
 	    private readonly Guid _ownerPid;
         private readonly LineSegment2D _line;
 	    private readonly Vector2 _orientation;
-	    private bool _isHead;
 
-        public TrailSegment(Guid ownerPid, LineSegment2D line) :
-            this(Guid.NewGuid().ToString(), ownerPid, line, GeometryUtil.GetLineOrientation(line), false) { }
+        public TrailSegment(Guid ownerPid, LineSegment2D line) : this(Guid.NewGuid().ToString(), ownerPid, line, GeometryUtil.GetLineOrientation(line)) { }
 
-        private TrailSegment(string id, Guid ownerPid, LineSegment2D line, Vector2 orientation, bool isHead)
+        private TrailSegment(string id, Guid ownerPid, LineSegment2D line, Vector2 orientation)
         {
             _id = id;
             _ownerPid = ownerPid;
             _line = line;
             _orientation = orientation;
-            _isHead = isHead;
         }
 
         public string GetId()
@@ -45,22 +42,12 @@ namespace LitBikes.Model
         {
             return _orientation;
         }
-
-        public bool IsHead()
-        {
-            return _isHead;
-        }
-
-        public void SetHead(bool isHead)
-        {
-            _isHead = isHead;
-        }
-
-        public TrailSegmentDto GetDto()
+        
+        public TrailSegmentDto GetDto(bool isHead)
         {
             return new TrailSegmentDto
             {
-                IsHead = _isHead,
+                IsHead = isHead,
                 Start = new Vector2(_line.Start.X, _line.Start.Y),
                 End = new Vector2(_line.End.X, _line.End.Y)
             };
@@ -68,7 +55,7 @@ namespace LitBikes.Model
 
         public TrailSegment Clone()
         {
-            return new TrailSegment(_id, _ownerPid, _line, _orientation, _isHead);
+            return new TrailSegment(_id, _ownerPid, _line, _orientation);
         }
     }
 }

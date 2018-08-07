@@ -1,4 +1,5 @@
-﻿using Nine.Geometry;
+﻿using LitBikes.Model.Dtos;
+using Nine.Geometry;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
@@ -7,52 +8,54 @@ namespace LitBikes.Model
 {
     public class Trail
     {
-        private readonly ConcurrentDictionary<string, TrailSegment> segments;
+        private readonly ConcurrentDictionary<string, TrailSegment> _segments;
+        private TrailSegment _head;
 
         public Trail()
         {
-            segments = new ConcurrentDictionary<string, TrailSegment>();
+            _segments = new ConcurrentDictionary<string, TrailSegment>();
         }
 
         public List<TrailSegment> GetList()
         {
             var copy = new List<TrailSegment>();
-            foreach (var s in segments.Values)
+            foreach (var s in _segments.Values)
             {
                 copy.Add(s.Clone());
             }
             return copy;
         }
 
+        public List<TrailSegmentDto> GetDtoList()
+        {
+            var dtoList = new List<TrailSegmentDto>();
+            var segments = GetList();
+            foreach (var s in segments)
+            {
+                dtoList.Add(s.GetDto(s.GetId() == _head.GetId()));
+            }
+            return dtoList;
+        }
+
         public void Add(TrailSegment segment)
         {
-            segment.SetHead(true);
-            segments.TryAdd(segment.GetId(), segment);
-            foreach (var s in segments.Values)
-            {
-                if (s.GetId() != segment.GetId())
-                    s.SetHead(false);
-            }
+            _segments.TryAdd(segment.GetId(), segment);
+            _head = segment;
         }
 
         public int Size()
         {
-            return segments.Values.Count;
+            return _segments.Values.Count;
         }
 
         public TrailSegment GetHead()
         {
-            foreach (var s in segments.Values)
-            {
-                if (s.IsHead())
-                    return s;
-            }
-            return null;
+            return _head;
         }
 
         public void ReplaceSegments(TrailSegment s, params TrailSegment[] newSegments)
         {
-            var segment = segments.GetValueOrDefault(s.GetId());
+            var segment = _segments.GetValueOrDefault(s.GetId());
             if (segment == null)
                 return;
 
@@ -140,10 +143,10 @@ namespace LitBikes.Model
                 newSegment2 = new TrailSegment(requestedSegment.GetOwnerPid(), newSegment2Line);
             }
 
-            segments.TryGetValue(requestedSegment.GetId(), out var segment);
+            _segments.TryGetValue(requestedSegment.GetId(), out var segment);
             if (segment == null)
             {
-                if (requestedSegment.IsHead())
+                if (requestedSegment.GetId() == _head.GetId())
                 {
                     segment = requestedSegment; // Segment being broken is (missing) segment between bike and last corner
                 }
@@ -160,26 +163,21 @@ namespace LitBikes.Model
             var newSegment2Point1 = new Point((int)newSegment2.GetLine().Start.X, (int)newSegment2.GetLine().Start.Y);
             var newSegment2Point2 = new Point((int)newSegment2.GetLine().End.X, (int)newSegment2.GetLine().End.Y);
 
-            if (segment.IsHead())
+            if (segment.GetId() == _head.GetId())
             {
-                foreach (var s in segments.Values)
-                {
-                    s.SetHead(false);
-                }
-
                 if (frontOfSegment.Equals(newSegment1Point1) || frontOfSegment.Equals(newSegment1Point2))
                 {
-                    newSegment1.SetHead(true);
+                    _head = newSegment1;
                 }
                 else if (frontOfSegment.Equals(newSegment2Point1) || frontOfSegment.Equals(newSegment2Point2))
                 {
-                    newSegment2.SetHead(true);
+                    _head = newSegment2;
                 }
             }
 
-            segments.Remove(requestedSegment.GetId(), out var _);
-            segments.TryAdd(newSegment1.GetId(), newSegment1);
-            segments.TryAdd(newSegment2.GetId(), newSegment2);
+            _segments.Remove(requestedSegment.GetId(), out var _);
+            _segments.TryAdd(newSegment1.GetId(), newSegment1);
+            _segments.TryAdd(newSegment2.GetId(), newSegment2);
         }
     }
 }

@@ -128,7 +128,7 @@ export class Game {
             D = 68,
             R = 82,
             SPACE = 32,
-            F3 = 114,
+            V = 86,
             H = 72,
             TAB = 9,
             ENTER = 13
@@ -180,7 +180,7 @@ export class Game {
                     newVector = new Vector(1, 0);
                 } else if (keyCode === Keys.LEFT_ARROW || keyCode === Keys.A) {
                     newVector = new Vector(-1, 0);
-                } else if (keyCode === Keys.F3) {
+                } else if (keyCode === Keys.V) {
                     this.showDebug = !this.showDebug;
                 } else if (keyCode === Keys.R) {
                     this.hubConnection.invoke("RequestRespawn");

@@ -331,7 +331,7 @@ namespace LitBikes.Game.Engine
 
         public List<Player> GetPlayers()
         {
-            return players;
+            return players.ToList();
         }
 
         public Player GetPlayer(Guid pid)

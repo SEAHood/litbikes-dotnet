@@ -124,7 +124,7 @@ namespace LitBikes.Ai
 
         public void DoUpdate(List<Player> players, Arena arena)
         {
-            foreach (var bot in _bots)
+            foreach (var bot in _bots.ToList())
             {
                 var botPlayer = players.FirstOrDefault(p => p.GetId() == bot.GetId());
                 if (botPlayer != null)

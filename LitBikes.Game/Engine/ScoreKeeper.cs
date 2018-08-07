@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using LitBikes.Model.Dtos;
@@ -7,16 +8,18 @@ namespace LitBikes.Game.Engine
 {
     public class ScoreKeeper
     {
-        private readonly List<ScoreDto> _scores;
+        private readonly ConcurrentDictionary<Guid, ScoreDto> _scores;
+        //private static readonly Object _scoreLock = new object();
 
         public ScoreKeeper()
         {
-            _scores = new List<ScoreDto>();
+            _scores = new ConcurrentDictionary<Guid, ScoreDto>();
         }
 
         public void GrantScore(Guid pid, string name, int score)
         {
-            var currentScore = _scores.FirstOrDefault(s => s.PlayerId == pid);
+            //var currentScore = _scores.FirstOrDefault(s => s.PlayerId == pid);
+            _scores.TryGetValue(pid, out var currentScore);
             if (currentScore == null)
             {
                 currentScore = new ScoreDto
@@ -25,25 +28,26 @@ namespace LitBikes.Game.Engine
                     PlayerId = pid,
                     Score = 0
                 };
-                _scores.Add(currentScore);
+                //_scores.Add(currentScore);
+                _scores.TryAdd(pid, currentScore);
             }
             currentScore.Score = currentScore.Score + score;
         }
 
         public int GetScore(Guid playerId)
         {
-            return _scores.FirstOrDefault(s => s.PlayerId == playerId)?.Score ?? 0;
+            _scores.TryGetValue(playerId, out var scoreObj);
+            return scoreObj?.Score ?? 0;
         }
 
         public void RemoveScore(Guid playerId)
         {
-            var currentScore = _scores.FirstOrDefault(s => s.PlayerId == playerId);
-            _scores.Remove(currentScore);
+            _scores.TryRemove(playerId, out _);
         }
 
         public List<ScoreDto> GetScores()
         {
-            return _scores;
+            return _scores.Values.ToList();
         }
 
         public void Reset()
@@ -53,12 +57,14 @@ namespace LitBikes.Game.Engine
 
         public Guid GetCurrentWinner()
         {
-            return !_scores.Any() ? Guid.Empty : _scores.ToList().OrderByDescending(s => s.Score).First().PlayerId;
+            var scores = _scores.Values.ToList();
+            return !scores.Any() ? Guid.Empty : scores.OrderByDescending(s => s.Score).First().PlayerId;
         }
 
         public string GetCurrentWinnerName()
         {
-            return !_scores.Any() ? "Unknown" : _scores.ToList().OrderByDescending(s => s.Score).First().Name;
+            var scores = _scores.Values.ToList();
+            return !scores.Any() ? "Unknown" : scores.OrderByDescending(s => s.Score).First().Name;
         }
 
     }
