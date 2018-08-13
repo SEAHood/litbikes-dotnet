@@ -104,7 +104,7 @@ export class Bike {
         this.lastRespawn = Date.now();
     }
 
-    public draw(p: p5, showRespawnRing: boolean, isControlledPlayer: boolean) {
+    public draw(p: p5, showRespawnRing: boolean, isControlledPlayer: boolean, debug: boolean) {
         // Respawning effect
         if (this.respawning && showRespawnRing) {
             let innerRingSize = Math.max(0, this.idRingSize - 10);
@@ -140,13 +140,15 @@ export class Bike {
         trail.push(newSeg);
 
         p.noFill();
-        _.each( trail, ( tp : TrailSegment ) => {
-            // if (tp.isHead) {
-            //     p.stroke('rgb(255,0,0)');
-            // } else {
-            //     p.stroke(this.colour.replace('%A%', this.trailOpacity.toString()));
-            // }
-            //p.ellipse(tp.start.x, tp.start.y, 3, 3);
+        _.each(trail, (tp: TrailSegment) => {
+            if (debug) {
+                if (tp.isHead) {
+                    p.stroke('rgb(255,0,0)');
+                } else {
+                    p.stroke(this.colour.replace('%A%', this.trailOpacity.toString()));
+                }
+                p.ellipse(tp.start.x, tp.start.y, 2, 2);
+            }
             p.line(tp.start.x, tp.start.y, tp.end.x, tp.end.y);
         });
 

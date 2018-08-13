@@ -1,15 +1,21 @@
 import { Vector } from "../util"
 import { PowerUpDto } from "../dto/dto";
 
+export enum PowerUpType {
+    Nothing,
+    Rocket,
+    Slow
+}
+
 export class PowerUp {
     private id: string;
     private pos: Vector;
-    private type: string;
+    private type: PowerUpType;
     private collected: boolean;
     private collecting: boolean;
     private popSize: number;
         
-    constructor(_id: string, _pos: Vector, _type: string) {
+    constructor(_id: string, _pos: Vector, _type: PowerUpType) {
         this.id = _id;
         this.pos = _pos;
         this.type = _type;
@@ -34,7 +40,7 @@ export class PowerUp {
         return this.type;
     }
     
-    public setType(type: string) {
+    public setType(type: PowerUpType) {
         this.type = type;
     }
 
@@ -60,8 +66,9 @@ export class PowerUp {
             p.noStroke();
             p.translate(this.pos.x, this.pos.y);
             let size = 3;
-            switch (this.type.toLowerCase()) {
-                case "rocket":
+            switch (this.type) {
+                case PowerUpType.Rocket:
+                    console.log(`Drawing rocket at ${this.pos.x}, ${this.pos.y}`);
                     p.rotate(p.frameCount / -10.0);
                     p.fill("rgb(255,255,105)");
                     p.triangle(
@@ -70,7 +77,8 @@ export class PowerUp {
                         0, -size
                     );
                     break;
-                case "slow":
+                case PowerUpType.Slow:
+                    console.log(`Drawing slow at ${this.pos.x}, ${this.pos.y}`);
                     p.rotate(p.frameCount / 50.0);
                     p.fill("rgb(105,255,255)");
                     p.triangle(

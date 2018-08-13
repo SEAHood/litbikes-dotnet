@@ -78,10 +78,10 @@ export class Player {
         this.bike.update(this.isAlive());
     }
 
-    public draw(p: p5, showName: boolean) {
+    public draw(p: p5, showName: boolean, debug: boolean) {
         if (this.isVisible()) {
             let showRespawnRing = this.isAlive() && this.isControlledPlayer;
-            this.bike.draw(p, showRespawnRing, this.isControlledPlayer);
+            this.bike.draw(p, showRespawnRing, this.isControlledPlayer, debug);
                 
             if (showName) {
                 p.textSize(15);
@@ -114,7 +114,6 @@ export class Player {
         this.score = dto.score;
         this.currentPowerUp = dto.currentPowerUp ? dto.currentPowerUp.toLowerCase() : null;
         this.effect = dto.effect;
-        this.bike.updateFromDto(dto.bike);
-          
+        this.bike.updateFromDto(dto.bike);          
     }
 }

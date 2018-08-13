@@ -1,20 +1,33 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Timers;
+using System.Numerics;
+using System.Threading;
+using System.Threading.Tasks;
 using LitBikes.Model;
+using LitBikes.Model.Dtos;
+using LitBikes.Util;
 using Nine.Geometry;
 
 namespace LitBikes.Game.Engine
 {
     class PowerUpKeeper
     {
-        private bool _isSpawning;
         private readonly Dictionary<Guid, PowerUp> _playerPowerUps;
         private readonly List<PowerUp> _availablePowerUps;
+        private readonly int _gameSize;
 
-        public PowerUpKeeper()
+        private bool _isSpawning;
+        private Thread _spawnThread;
+
+        private readonly int SpawnDelayMin = 4000;
+        private readonly int SpawnDelayMax = 7000;
+        private readonly int DurationMin = 10000;
+        private readonly int DurationMax = 20000;
+
+        public PowerUpKeeper(int gameSize)
         {
+            _gameSize = gameSize;
             _availablePowerUps = new List<PowerUp>();
             _playerPowerUps = new Dictionary<Guid, PowerUp>();
         }
@@ -24,6 +37,15 @@ namespace LitBikes.Game.Engine
             if (!_isSpawning)
             {
                 _isSpawning = true;
+                _spawnThread = new Thread(delegate ()
+                {
+                    while (true)
+                    {
+                        Thread.Sleep(NumberUtil.RandInt(SpawnDelayMin, SpawnDelayMax));
+                        SpawnPowerUp();
+                    }
+                });
+                _spawnThread.Start();
             }
         }
 
@@ -35,19 +57,43 @@ namespace LitBikes.Game.Engine
             }
         }
 
+        public void SpawnPowerUp()
+        {
+            PowerUpType type = PowerUpType.Slow;
+            if (NumberUtil.RandInt(0, 2) == 0)
+                type = PowerUpType.Rocket;
+            else
+                type = PowerUpType.Slow;
+
+            var powerUpPos = new Vector2(NumberUtil.RandInt(0, _gameSize), NumberUtil.RandInt(0, _gameSize));
+            PowerUp powerUp = new PowerUp(powerUpPos, type);
+            _availablePowerUps.Add(powerUp);
+            Console.WriteLine($"Spawned {type} powerup at {powerUpPos.X}, {powerUpPos.Y}");
+            
+            Task.Factory.StartNew(() =>
+            {
+                Thread.Sleep(NumberUtil.RandInt(DurationMin, DurationMax));
+                if (!powerUp.IsCollected())
+                    _availablePowerUps.Remove(powerUp);
+            });
+        }
+
         public void PlayerCollectedPowerUp(Player player, PowerUp powerUp)
         {
             var availablePowerUp = _availablePowerUps.FirstOrDefault(p => p.GetId() == powerUp.GetId());
             if (availablePowerUp == null || !availablePowerUp.Equals(powerUp))
                 throw new Exception("PowerUp does not exist");
 
+            _playerPowerUps.Remove(player.GetId());
             _playerPowerUps.Add(player.GetId(), availablePowerUp);
+
             _availablePowerUps.Remove(availablePowerUp);
         }
 
         public void PlayerRequestsUse(Player player, List<Player> playerList, List<TrailSegment> trails, int gameSize)
         {
             if (!_playerPowerUps.TryGetValue(player.GetId(), out var powerUp)) return;
+            _playerPowerUps.Remove(player.GetId());
             switch (powerUp.GetPowerUpType())
             {
                 case PowerUpType.Rocket:
@@ -92,7 +138,7 @@ namespace LitBikes.Game.Engine
 
                     if (trailOwner == null)
                     {
-                        //LOG.warn("Trail exists without a player - this is a bug");
+                        //Console.warn("Trail exists without a player - this is a bug");
                         return;
                     }
 
@@ -110,22 +156,38 @@ namespace LitBikes.Game.Engine
                             p.UpdateBike(b);
                             p.SetEffect(PlayerEffect.Slowed);
 
-                            var timer = new Timer(3000);
-                            timer.Elapsed += (sender, e) =>
+                            Task.Factory.StartNew(() =>
                             {
+                                Thread.Sleep(NumberUtil.RandInt(DurationMin, DurationMax));
                                 b.SetSpd(oldSpd);
                                 p.UpdateBike(b);
                                 p.SetEffect(PlayerEffect.None);
-                            };
-                            timer.Start();
+                            });
                         }
                     }
                     break;
                 default:
                     return;
             }
+
             player.SetCurrentPowerUpType(PowerUpType.Nothing);
             _playerPowerUps.Remove(player.GetId());
+        }
+
+        public List<PowerUpDto> GetDtoList()
+        {
+            var powerUpsDto = new List<PowerUpDto>();
+            foreach (var p in _availablePowerUps)
+            {
+                var powerUpDto = p.GetDto();
+                powerUpsDto.Add(powerUpDto);
+            }
+            return powerUpsDto;
+        }
+
+        public List<PowerUp> GetList()
+        {
+            return _availablePowerUps.ToList();
         }
     }
 }

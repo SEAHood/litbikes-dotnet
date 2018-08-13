@@ -15,28 +15,18 @@ using LitBikes.Model.Enums;
 
 namespace LitBikes.Game.Controller
 {
-    public class GameController// : GameEventListener
+    public class GameController
     {
-        //private static Logger LOG = Log.getLogger(GameController.class);
-	    private Dictionary<Guid, int> sessionPlayers; //session ID -> engine player ID
+	    private readonly Dictionary<Guid, int> sessionPlayers; //session ID -> engine player ID
         private readonly GameEngine _game;
 	    private readonly BotController _botController;
-	    private int pidGen = 0;
-
-        private static String C_HELLO = "hello";
-        private static String C_JOINED_GAME = "joined-game";
-        private static String C_ERROR = "error";
-
-        private static int ROUND_TIME = 300;
-        private static int ROUND_DELAY = 15;
 
         private readonly int _minPlayers;
-        private Random random = new Random();
+        private readonly Random random = new Random();
 
         private readonly Timer _broadcastWorldTimer;
         private readonly int _broadcastWorldInterval = 25; // MS
 
-        //private readonly ClientEventHandler _clientEventHandler;
         private readonly IServerEventSender _eventSender;
         
         public GameController(IClientEventReceiver clientEventReceiver, IServerEventSender serverEventSender, GameSettings settings)
@@ -69,10 +59,6 @@ namespace LitBikes.Game.Controller
                 switch (args.Event)
                 {
                     case ClientEvent.Hello:
-                        //int pid = pidGen++;
-                        //sessionPlayers.put(client.getSessionId(), pid);
-                        //_game.PlayerJoin(args.PlayerId, "Test Player", true);
-
                         var helloDto = new HelloDto
                         {
                             GameSettings = new GameSettingsDto
@@ -109,14 +95,12 @@ namespace LitBikes.Game.Controller
                         break;
                     case ClientEvent.Update:
                         var updateDto = (ClientUpdateDto)args.Dto;
-                        _game.HandleClientUpdate(updateDto);//if ()
-                            //BroadcastWorldUpdate();
+                        _game.HandleClientUpdate(updateDto);
                         break;
                     case ClientEvent.UsePowerup:
                         if (player.GetCurrentPowerUpType() == PowerUpType.Nothing)
                             return; // player doesn't have a powerup
                         _game.RequestUsePowerUp(player);
-                        //BroadcastWorldUpdate();
                         break;
                     default:
                         throw new ArgumentOutOfRangeException();
@@ -127,19 +111,10 @@ namespace LitBikes.Game.Controller
 
         public void RequestGameJoin(Guid playerId, ClientGameJoinDto dto)
         {
-            //var gameJoinDto = (ClientGameJoinDto) args.Dto;
-
-
             if (!dto.IsValid())
                 return;
-            //throw new InvalidPayloadException("Invalid name"); // TODO Refactor - error from IsValid()
 
-            //int pid = sessionPlayers.get(client.getSessionId());
-            //String name = gameJoinDto.name;
             var player = _game.PlayerJoin(playerId, dto.Name, true);
-
-            //var gameSettings = new GameSettingsDto { GameTickMs = _game.GetGameTickMs() };
-
             var gameJoinDto = new GameJoinDto
             {
                 Player = player.GetDto(),
@@ -181,7 +156,6 @@ namespace LitBikes.Game.Controller
 
         public void Start()
         {
-            //SetupGameListeners();
             _game.Start();
             BalanceBots();
             _game.NewRound();
@@ -192,10 +166,10 @@ namespace LitBikes.Game.Controller
 
         public void PlayerCrashed(Player player)
         {
-            var crashedInto = player.IsCrashedIntoSelf() ? "their own Trail!" : player.GetCrashedInto().GetName();
+            var crashedInto = player.IsCrashedIntoSelf() ? "their own trail!" : player.GetCrashedInto().GetName();
             var playerCrashedMessage = player.GetName() + " crashed into " + crashedInto;
             SendServerMessage(playerCrashedMessage);
-            //BroadcastWorldUpdate();
+            Console.WriteLine(playerCrashedMessage);
         }
 
         private void SendServerMessage(string message)
@@ -234,6 +208,7 @@ namespace LitBikes.Game.Controller
         {
             const string msg = "Round ended!";
             SendServerMessage(msg);
+            _game.RoundEnded();
             _game.NewRound();
         }
         // END GAME EVENTS
@@ -244,7 +219,6 @@ namespace LitBikes.Game.Controller
         {
             var worldDto = GetWorldDiff(out var currentWorldDto);
             _lastWorldUpdate = currentWorldDto;
-            _eventSender.SendEvent(ServerEvent.Dev, worldDto);
             _eventSender.SendEvent(ServerEvent.WorldUpdate, _game.GetWorldDto());
             _botController.DoUpdate(_game.GetPlayers(), _game.GetArena());
         }
@@ -286,8 +260,6 @@ namespace LitBikes.Game.Controller
             var requiredBots = Math.Max(0, _minPlayers - totalHumans);
             Console.WriteLine($"Balancing game - {totalHumans} humans and {requiredBots} bots");
             _botController.SetBotCount(requiredBots);
-        }
-
-        
+        }        
     }
 }

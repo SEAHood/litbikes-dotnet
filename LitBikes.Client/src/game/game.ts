@@ -471,8 +471,8 @@ export class Game {
                 powerUp.draw(p);
             });
 
-            _.each( this.players, ( player: Player ) => {
-                player.draw(p, this.tabPressed);
+            _.each(this.players, (player: Player) => {
+                player.draw(p, this.tabPressed, this.showDebug);
             });
         }
 
@@ -504,7 +504,7 @@ export class Game {
 
         if (this.gameJoined) {
             if (this.roundInProgress) {
-                this.player.draw(p, this.tabPressed);
+                this.player.draw(p, this.tabPressed, this.showDebug);
                 let powerUpIcon = this.getPowerUpIcon(this.player.getCurrentPowerUp()); 
                 if (powerUpIcon) {
                     let pos = this.player.getBike().getPos();

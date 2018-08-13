@@ -13,13 +13,12 @@ namespace LitBikes.Ai
     {
         private List<Bot> _bots;
         private IClientEventReceiver _clientEventReceiver;
-        private readonly ServerEventSender _serverEventSender;
 
         private GameController _gameController;
         private Thread _tickThread;
         private DateTime _nextTickTime;
 
-        private const int AiTickMs = 100;
+        private const int AiTickMs = 200;
         private const int AiRespawnMs = 3000;
         
         public BotController(GameController gameController, IClientEventReceiver clientEventReceiver)
@@ -86,13 +85,13 @@ namespace LitBikes.Ai
                 _bots.Add(bot);
             }
 
-            //LOG.info("Current bot count: " + bots.size());
+            Console.WriteLine("Current bot count: " + _bots.Count);
         }
 
         private void DestroyBots(int count)
         {
             // TODO this is bad i think
-            //LOG.info("Destroying " + count + " bots");
+            Console.WriteLine($"Destroying {count} bots");
             var doomedBots = _bots.Take(count).ToList();
 
             foreach (var b in doomedBots)
@@ -100,8 +99,7 @@ namespace LitBikes.Ai
                 _gameController.BotDestroyed(b.GetId());
                 _bots.Remove(b);
             }
-
-            //LOG.info("Current bot count: " + bots.size());
+            Console.WriteLine($"Current bot count: {_bots.Count}");
         }
 
         public int GetBotCount()
@@ -113,7 +111,7 @@ namespace LitBikes.Ai
         {
             if (botCount < 0)
                 return;
-            //LOG.info("Setting bot count to " + botCount);
+            Console.WriteLine($"Setting bot count to {botCount}");
             var currentBotCount = _bots.Count;
             var botDeficit = botCount - currentBotCount;
             if (botDeficit > 0)
@@ -132,12 +130,6 @@ namespace LitBikes.Ai
                 bot.UpdateWorld(players, arena);
             }
         }
-
-        /*public void sendWorldRequest(BotIOClient client)
-        {
-            _clientEventReceiver.
-            gameController.clientRequestWorldEvent(client);
-        }*/
 
         public void SendUpdate(Guid playerId, ClientUpdateDto updateDto)
         {

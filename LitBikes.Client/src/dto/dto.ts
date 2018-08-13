@@ -4,6 +4,7 @@ import { BikeDtoShort, TrailSegmentDtoShort, GameSettingsDtoShort, PlayerDtoShor
     ScoreDtoShort, ClientUpdateDtoShort, GameJoinDtoShort, HelloDtoShort, ClientGameJoinDtoShort,
     ChatMessageDtoShort
 } from "./shortDto";
+import { PowerUpType } from "../model/powerUp";
 
 export class BikeDto {
     playerId: string;
@@ -62,7 +63,7 @@ export class PlayerDto {
 export class PowerUpDto {
     id: string;
     pos: Vector;
-    type: string;
+    type: PowerUpType;
     collected: boolean;
 
     constructor(shortDto?: PowerUpDtoShort) {
