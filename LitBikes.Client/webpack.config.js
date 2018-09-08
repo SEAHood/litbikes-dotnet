@@ -2,7 +2,10 @@
 const path = require('path');
 
 module.exports = {
-    entry: './src/game/game.ts',
+    entry: {
+        app: './src/game/game.ts',
+        dev: './src/dev/dev.ts'
+    },
     module: {
         rules: [
             {
@@ -16,7 +19,7 @@ module.exports = {
         extensions: ['.tsx', '.ts', '.js']
     },
     output: {
-        filename: 'bundle.js',
+        filename: '[name]-bundle.js',
         path: path.resolve(__dirname, 'public/js')
     },
     plugins: [

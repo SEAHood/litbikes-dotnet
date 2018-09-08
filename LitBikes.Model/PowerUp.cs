@@ -15,20 +15,20 @@ namespace LitBikes.Model
 
     public class PowerUp
     {
-        private readonly string _id;
+        private readonly Guid _id;
         private Vector2 _pos;
         private PowerUpType _type;
         private bool _collected;
 
         public PowerUp(Vector2 pos, PowerUpType type)
         {
-            _id = Guid.NewGuid().ToString();
+            _id = Guid.NewGuid();
             _pos = pos;
             _type = type;
             _collected = false;
         }
 
-        public string GetId()
+        public Guid GetId()
         {
             return _id;
         }
@@ -85,7 +85,7 @@ namespace LitBikes.Model
         {
             return new PowerUpDto
             {
-                Id = _id,
+                Id = _id.ToString(),
                 Pos = _pos,
                 Type = _type,
                 Collected = _collected

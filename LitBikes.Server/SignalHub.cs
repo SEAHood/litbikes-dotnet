@@ -3,15 +3,23 @@ using System.Threading.Tasks;
 using LitBikes.Events;
 using LitBikes.Model.Dtos.FromClient;
 using LitBikes.Model.Dtos.FromClient.Short;
+using Microsoft.AspNetCore.Razor.Language;
 using Microsoft.AspNetCore.SignalR;
 
 namespace LitBikes.Server
 {
     public static class SendHub
     {
-        public static async Task SendEvent(IHubClients clients, ServerEventSenderArgs args)
+        private static DateTime lastEvent;
+        public static void SendEvent(IHubClients clients, ServerEventSenderArgs args)
         {
-            await clients.All.SendAsync(args.Event.ToString(), args.Payload);
+            var startTime = DateTime.Now;
+            Console.WriteLine($"SignalHub received game event at {startTime}");
+            var date = DateTime.UtcNow;
+            var dur = date - lastEvent;
+            Console.WriteLine($"Time since last SignalR event broadcast: {dur.TotalMilliseconds}ms");
+            new Task(async () => await clients.All.SendAsync(args.Event.ToString(), args.Payload)).Start();
+            lastEvent = date;
         }
     }
 

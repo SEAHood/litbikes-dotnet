@@ -349,7 +349,10 @@ export class Game {
     }
 
     private processWorldUpdate(data: WorldUpdateDto) {
-        if (data.gameTick < this.lastGameTickProcessed) return; // Ignore a delayed packet
+        if (data.gameTick < this.lastGameTickProcessed) {
+            console.log("Ignoring gametick - already processed");
+            return;
+        } // Ignore a delayed packet
         this.lastGameTickProcessed = data.gameTick;
         //console.log(this.getTime() + ": " + JSON.stringify(data).length);
         this.roundInProgress = data.roundInProgress;
@@ -616,10 +619,21 @@ export class Game {
             if ( this.gameJoined ) {
                 let playerBike = this.player.getBike();
                 p.text(
-                    `fps: ${p.frameRate().toFixed(2)}\nms: ${this.latency}ms\nplayerId: ${this.player.getPlayerId()}\npos: ${playerBike.getPos().x.toFixed(0)}, ${playerBike.getPos().y.toFixed(0)}\ndir: ${playerBike.getDir().x}, ${playerBike.getDir().y}\nspd: ${playerBike.getSpd()}\ncrashed: ${this.player.isCrashed() ? "yes" : "no"}\ncrashing: ${playerBike.isCrashing() ? "yes" : "no"}\n${+
-                    "colour: "}${playerBike.getColour()
-                    }\nspectating: ${this.player.isSpectating() ? "yes" : "no"}\nround in progress: ${this.roundInProgress ? "yes" : "no"}\nround time left: ${this.roundTimeLeft}\ntime until next round: ${this.timeUntilNextRound}\nother players: ${this.players.length
-                    }\nchat message count: ${this.messageCount}\n`
+                    `fps: ${p.frameRate().toFixed(2)}\n` +
+                    `ms: ${this.latency}ms\n` +
+                    `playerId: ${this.player.getPlayerId()}\n` +
+                    `pos: ${playerBike.getPos().x.toFixed(0)}, ${playerBike.getPos().y.toFixed(0)}\n` +
+                    `dir: ${playerBike.getDir().x}, ${playerBike.getDir().y}\n` +
+                    `spd: ${playerBike.getSpd()}\n` +
+                    `crashed: ${this.player.isCrashed() ? "yes" : "no"}\n` +
+                    `crashing: ${playerBike.isCrashing() ? "yes" : "no"}\n` +
+                    `colour: ${playerBike.getColour()}\n` +
+                    `spectating: ${this.player.isSpectating() ? "yes" : "no"}\n` +
+                    `round in progress: ${this.roundInProgress ? "yes" : "no"}\n` +
+                    `round time left: ${this.roundTimeLeft}\n` +
+                    `time until next round: ${this.timeUntilNextRound}\n` +
+                    `other players: ${this.players.length}\n` +
+                    `chat message count: ${this.messageCount}\n`
                 , 10, 30, 300, 500);
             } else {
                 p.text("Game not joined", 10, 30, 300, 500);

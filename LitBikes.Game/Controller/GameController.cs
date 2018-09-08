@@ -1,11 +1,8 @@
 ﻿using LitBikes.Model;
 using System;
 using System.Collections.Generic;
-using System.Drawing;
 using System.Linq;
-using System.Net;
-using System.Text;
-using System.Timers;
+using System.Threading;
 using LitBikes.Ai;
 using LitBikes.Game.Engine;
 using LitBikes.Model.Dtos;
@@ -17,17 +14,13 @@ namespace LitBikes.Game.Controller
 {
     public class GameController
     {
-	    private readonly Dictionary<Guid, int> sessionPlayers; //session ID -> engine player ID
+        private const int BroadcastWorldInterval = 25; // MS
+
         private readonly GameEngine _game;
 	    private readonly BotController _botController;
-
         private readonly int _minPlayers;
-        private readonly Random random = new Random();
-
-        private readonly Timer _broadcastWorldTimer;
-        private readonly int _broadcastWorldInterval = 25; // MS
-
         private readonly IServerEventSender _eventSender;
+        private readonly Thread _worldUpdateThread;
         
         public GameController(IClientEventReceiver clientEventReceiver, IServerEventSender serverEventSender, GameSettings settings)
         {
@@ -40,14 +33,17 @@ namespace LitBikes.Game.Controller
 
             _game = new GameEngine(gameEventController, settings);
 
-            sessionPlayers = new Dictionary<Guid, int>();
             _botController = new BotController(this, clientEventReceiver);
-            _botController.Start();
 
-            _broadcastWorldTimer = new Timer { Interval = _broadcastWorldInterval };
-            _broadcastWorldTimer.Elapsed += (sender, e) => BroadcastWorldUpdate();
-            _broadcastWorldTimer.Start();
-            
+            _worldUpdateThread = new Thread(delegate ()
+            {
+                while (true)
+                {
+                    Thread.Sleep(BroadcastWorldInterval);
+                    BroadcastWorldUpdate();
+                }
+            });
+
             Start();
         }
 
@@ -108,7 +104,6 @@ namespace LitBikes.Game.Controller
             };
         }
 
-
         public void RequestGameJoin(Guid playerId, ClientGameJoinDto dto)
         {
             if (!dto.IsValid())
@@ -159,7 +154,8 @@ namespace LitBikes.Game.Controller
             _game.Start();
             BalanceBots();
             _game.NewRound();
-            _broadcastWorldTimer.Start();
+            _botController.Start();
+            _worldUpdateThread.Start();
         }
 
         //// START GAME EVENTS
@@ -213,17 +209,15 @@ namespace LitBikes.Game.Controller
         }
         // END GAME EVENTS
 
-
-        private ServerWorldDto _lastWorldUpdate;
         public void BroadcastWorldUpdate()
         {
-            var worldDto = GetWorldDiff(out var currentWorldDto);
-            _lastWorldUpdate = currentWorldDto;
+            var startTime = DateTime.Now;
+            Console.WriteLine($"Sent game event at {startTime}");
             _eventSender.SendEvent(ServerEvent.WorldUpdate, _game.GetWorldDto());
             _botController.DoUpdate(_game.GetPlayers(), _game.GetArena());
         }
 
-        private ServerWorldDto GetWorldDiff(out ServerWorldDto currentWorldDto)
+        /*private ServerWorldDto GetWorldDiff(out ServerWorldDto currentWorldDto)
         {
             currentWorldDto = _game.GetWorldDto();
             if (_lastWorldUpdate == null) return currentWorldDto;
@@ -238,7 +232,7 @@ namespace LitBikes.Game.Controller
                 prop.SetValue(diff, Equals(lastWorldProp, thisWorldProp) ? null : thisWorldProp);
             }
             return diff;
-        }
+        }*/
 
 
         public Player CreateBot()

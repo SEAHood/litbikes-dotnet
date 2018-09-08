@@ -68,7 +68,6 @@ export class PowerUp {
             let size = 3;
             switch (this.type) {
                 case PowerUpType.Rocket:
-                    console.log(`Drawing rocket at ${this.pos.x}, ${this.pos.y}`);
                     p.rotate(p.frameCount / -10.0);
                     p.fill("rgb(255,255,105)");
                     p.triangle(
@@ -78,7 +77,6 @@ export class PowerUp {
                     );
                     break;
                 case PowerUpType.Slow:
-                    console.log(`Drawing slow at ${this.pos.x}, ${this.pos.y}`);
                     p.rotate(p.frameCount / 50.0);
                     p.fill("rgb(105,255,255)");
                     p.triangle(

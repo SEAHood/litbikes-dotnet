@@ -42,12 +42,16 @@
     <Content Include="public\img\fav.ico" />
     <Content Include="public\img\game\powerups\rocket.png" />
     <Content Include="public\img\game\powerups\slow.png" />
+    <Content Include="public\dev.html" />
     <Content Include="public\index.html">
       <SubType>Code</SubType>
     </Content>
     <Content Include="public\css\litbikes.css" />
     <Content Include="tsconfig.json" />
     <Content Include="package.json" />
+    <TypeScriptCompile Include="src\dev\dev.ts">
+      <SubType>Code</SubType>
+    </TypeScriptCompile>
     <TypeScriptCompile Include="src\model\arena.ts" />
     <TypeScriptCompile Include="src\model\bike.ts" />
     <TypeScriptCompile Include="src\dto\dto.ts" />
@@ -76,6 +80,7 @@
     <Folder Include="src\game\" />
     <Folder Include="src\model\" />
     <Folder Include="src\dto\" />
+    <Folder Include="src\dev\" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="webpack.config.js">
