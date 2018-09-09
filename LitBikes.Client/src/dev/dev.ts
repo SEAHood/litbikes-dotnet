@@ -12,7 +12,8 @@ export class Dev {
 
     private worldUpdates = 0;
     private scoreUpdates = 0;
-    private chatMessages = 0;
+
+    private trailSegmentCount = 0;
 
     constructor() {
         this.hubConnection.on("Hello", (data: HelloDtoShort) => {
@@ -29,7 +30,11 @@ export class Dev {
 
         this.hubConnection.on("WorldUpdate", (data: WorldUpdateDtoShort) => {
             console.log("Got WorldUpdate");
+            console.log(data);
             this.worldUpdates++;
+            var trailSegments = 0;
+            data.p.map(p => trailSegments += p.b.t.length);
+            this.trailSegmentCount = trailSegments;
         });
 
         this.hubConnection.on("ScoreUpdate", (data: ScoreDtoShort[]) => {
@@ -39,7 +44,6 @@ export class Dev {
 
         this.hubConnection.on("ChatMessage", (data: ChatMessageDtoShort) => {
             console.log("Got ChatMessage");
-            this.chatMessages++;
         });
         
         $("document").ready(() => {
@@ -69,7 +73,7 @@ export class Dev {
                             pointHitRadius: 3
                         },
                         {
-                            label: "Chat messages per second",
+                            label: "Trail segments",
                             data: [] as number[],
                             backgroundColor: 'rgba(0, 0, 0, 0)',
                             borderColor: 'rgba(241, 196, 15, 255)',
@@ -98,12 +102,11 @@ export class Dev {
                 this.chart.data.labels.push(Date.now().toString());
                 (this.chart.data.datasets[0].data as number[]).push(this.worldUpdates);
                 (this.chart.data.datasets[1].data as number[]).push(this.scoreUpdates);
-                (this.chart.data.datasets[2].data as number[]).push(this.chatMessages);
+                (this.chart.data.datasets[2].data as number[]).push(this.trailSegmentCount);
                 this.chart.update();
 
                 this.worldUpdates = 0;
                 this.scoreUpdates = 0;
-                this.chatMessages = 0;
             }, 1000);
         });
     }

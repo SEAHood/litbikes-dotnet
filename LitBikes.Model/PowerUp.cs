@@ -20,6 +20,8 @@ namespace LitBikes.Model
         private PowerUpType _type;
         private bool _collected;
 
+        public DateTime DespawnTime { get; set; }
+
         public PowerUp(Vector2 pos, PowerUpType type)
         {
             _id = Guid.NewGuid();

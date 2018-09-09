@@ -25,6 +25,7 @@ namespace LitBikes.Game.Engine
 
         private bool _isSpawning;
         private Thread _spawnThread;
+        private Thread _cleanupThread;
 
         public PowerUpKeeper(int gameSize)
         {
@@ -47,6 +48,20 @@ namespace LitBikes.Game.Engine
                 }
             });
             _spawnThread.Start();
+
+            _cleanupThread = new Thread(delegate ()
+            {
+                while (true)
+                {
+                    Thread.Sleep(1000);
+                    foreach (var p in _availablePowerUps.Values)
+                    {
+                        if (p.DespawnTime <= DateTime.UtcNow)
+                            _availablePowerUps.TryRemove(p.GetId(), out _);
+                    }
+                }
+            });
+            _cleanupThread.Start();
         }
 
         public void StopSpawner()
@@ -65,17 +80,11 @@ namespace LitBikes.Game.Engine
 
             var powerUpPos = new Vector2(NumberUtil.RandInt(0, _gameSize), NumberUtil.RandInt(0, _gameSize));
             var powerUp = new PowerUp(powerUpPos, type);
+            var duration = NumberUtil.RandInt(DurationMin, DurationMax);
+            powerUp.DespawnTime = DateTime.UtcNow.AddMilliseconds(duration);
             _availablePowerUps.TryAdd(powerUp.GetId(), powerUp);
 
-            var duration = NumberUtil.RandInt(DurationMin, DurationMax);
             Console.WriteLine($"Spawned {type} powerup at {powerUpPos.X}, {powerUpPos.Y}, despawning in {duration/1000}s");
-            
-            Task.Factory.StartNew(() =>
-            {
-                Thread.Sleep(duration);
-                if (!powerUp.IsCollected())
-                    _availablePowerUps.TryRemove(powerUp.GetId(), out _);
-            });
         }
 
         public void PlayerCollectedPowerUp(Player player, PowerUp powerUp)

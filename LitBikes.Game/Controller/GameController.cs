@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
+using System.Threading.Tasks;
 using LitBikes.Ai;
 using LitBikes.Game.Engine;
 using LitBikes.Model.Dtos;
@@ -21,6 +22,9 @@ namespace LitBikes.Game.Controller
         private readonly int _minPlayers;
         private readonly IServerEventSender _eventSender;
         private readonly Thread _worldUpdateThread;
+        private readonly CancellationTokenSource _worldUpdateCancellation;
+        private DateTime _nextWorldUpdate;
+        private readonly Thread t;
         
         public GameController(IClientEventReceiver clientEventReceiver, IServerEventSender serverEventSender, GameSettings settings)
         {
@@ -35,15 +39,35 @@ namespace LitBikes.Game.Controller
 
             _botController = new BotController(this, clientEventReceiver);
 
-            _worldUpdateThread = new Thread(delegate ()
+            /*_worldUpdateThread = new Thread(delegate ()
             {
                 while (true)
                 {
                     Thread.Sleep(BroadcastWorldInterval);
                     BroadcastWorldUpdate();
                 }
+            });*/
+            _worldUpdateCancellation = new CancellationTokenSource();
+            _worldUpdateThread = new Thread(delegate ()
+            {
+                while (true)
+                {
+                    if (DateTime.UtcNow <= _nextWorldUpdate) continue;
+                    //_worldUpdateCancellation.Cancel(); // Cancel update already in progress
+                    Task.Run(() => BroadcastWorldUpdate());//, _worldUpdateCancellation.Token);
+                    _nextWorldUpdate = DateTime.UtcNow.AddMilliseconds(BroadcastWorldInterval);
+                }
             });
 
+            t = new Thread(delegate()
+            {
+                while (true)
+                {
+                    Thread.Sleep(1000);
+                    Console.WriteLine($"{worldUpdatesPerSecond} world updates per second");
+                    worldUpdatesPerSecond = 0;
+                }
+            });
             Start();
         }
 
@@ -156,6 +180,7 @@ namespace LitBikes.Game.Controller
             _game.NewRound();
             _botController.Start();
             _worldUpdateThread.Start();
+            t.Start();
         }
 
         //// START GAME EVENTS
@@ -209,10 +234,12 @@ namespace LitBikes.Game.Controller
         }
         // END GAME EVENTS
 
+        public int worldUpdatesPerSecond = 0;
         public void BroadcastWorldUpdate()
         {
+            worldUpdatesPerSecond++;
             var startTime = DateTime.Now;
-            Console.WriteLine($"Sent game event at {startTime}");
+            //Console.WriteLine($"Sent game event at {startTime}");
             _eventSender.SendEvent(ServerEvent.WorldUpdate, _game.GetWorldDto());
             _botController.DoUpdate(_game.GetPlayers(), _game.GetArena());
         }
