@@ -88,7 +88,7 @@ namespace LitBikes.Game.Controller
                             World = _game.GetWorldDto()
                         };
 
-                        _eventSender.SendEvent(ServerEvent.Hello, helloDto);
+                        _eventSender.SendEvent(ServerEvent.Hello, helloDto, args.PlayerId);
                         break;
                     case ClientEvent.ChatMessage:
                         var messageDto = (ClientChatMessageDto)args.Dto;
@@ -102,10 +102,10 @@ namespace LitBikes.Game.Controller
                             Source = player.GetName(),
                             Timestamp = DateTimeOffset.UtcNow.ToUnixTimeSeconds()
                         };
-                        _eventSender.SendEvent(ServerEvent.ChatMessage, dto);
+                        _eventSender.SendEvent(ServerEvent.ChatMessage, dto, null);
                         break;
                     case ClientEvent.KeepAlive:
-                        _eventSender.SendEvent(ServerEvent.KeepAliveAck);
+                        _eventSender.SendEvent(ServerEvent.KeepAliveAck, args.PlayerId);
                         break;
                     case ClientEvent.RequestJoinGame:
                         RequestGameJoin(args.PlayerId, (ClientGameJoinDto)args.Dto);
@@ -141,7 +141,7 @@ namespace LitBikes.Game.Controller
             };
 
             BalanceBots();
-            _eventSender.SendEvent(ServerEvent.JoinedGame, gameJoinDto);
+            _eventSender.SendEvent(ServerEvent.JoinedGame, gameJoinDto, playerId);
         }
 
         private void SetupGameEventHandlers(GameEventController gameEventController)
@@ -203,7 +203,7 @@ namespace LitBikes.Game.Controller
                 Source = null,
                 Timestamp = DateTimeOffset.UtcNow.ToUnixTimeSeconds()
             };
-            _eventSender.SendEvent(ServerEvent.ChatMessage, dto);
+            _eventSender.SendEvent(ServerEvent.ChatMessage, dto, null);
         }
 
         public void PlayerSpawned()
@@ -214,7 +214,7 @@ namespace LitBikes.Game.Controller
         public void ScoreUpdated()
         {
             // Todo: send a score object instead, that contains list of scores, winner, etc
-            _eventSender.SendListEvent(ServerEvent.ScoreUpdate, new List<IDto>(_game.GetScores()));
+            _eventSender.SendListEvent(ServerEvent.ScoreUpdate, new List<IDto>(_game.GetScores()), null);
         }
 
         public void RoundStarted()
@@ -240,7 +240,7 @@ namespace LitBikes.Game.Controller
             worldUpdatesPerSecond++;
             var startTime = DateTime.Now;
             //Console.WriteLine($"Sent game event at {startTime}");
-            _eventSender.SendEvent(ServerEvent.WorldUpdate, _game.GetWorldDto());
+            _eventSender.SendEvent(ServerEvent.WorldUpdate, _game.GetWorldDto(), null);
             _botController.DoUpdate(_game.GetPlayers(), _game.GetArena());
         }
 

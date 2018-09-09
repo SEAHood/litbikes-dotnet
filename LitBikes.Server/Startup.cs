@@ -40,7 +40,6 @@ namespace LitBikes.Server
 
             services.AddSingleton<IClientEventReceiver, ClientEventReceiver>();
             services.AddSingleton<IServerEventSender, ServerEventSender>();
-            services.AddSingleton<ConnectionManager>();
             services.AddSingleton<SendEventManager>();
             services.AddSingleton<GameController>();
         }

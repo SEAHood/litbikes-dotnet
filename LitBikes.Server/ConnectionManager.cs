@@ -1,36 +1,40 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 
 namespace LitBikes.Server
 {
-    public class ConnectionManager
+    public static class ConnectionManager
     {
-        private readonly Dictionary<string, Guid> _playerConnections;
+        private static readonly Dictionary<string, Guid> ConnectionsToPlayers = new Dictionary<string, Guid>();
+        private static readonly Dictionary<Guid, string> PlayersToConnections = new Dictionary<Guid, string>();
 
-        public ConnectionManager()
-        {
-            _playerConnections = new Dictionary<string, Guid>();
-        }
-
-        public void OnConnected(string connectionId)
+        public static void OnConnected(string connectionId)
         {
             if (PlayerExists(connectionId, out _)) return;
             var newPlayerId = Guid.NewGuid();
-            _playerConnections.Add(connectionId, newPlayerId);
+            ConnectionsToPlayers.Add(connectionId, newPlayerId);
+            PlayersToConnections.Add(newPlayerId, connectionId);
         }
 
-        public void OnDisconnected(string connectionId)
+        public static void OnDisconnected(string connectionId)
         {
-            _playerConnections.Remove(connectionId);
+            ConnectionsToPlayers.TryGetValue(connectionId, out var playerId);
+            ConnectionsToPlayers.Remove(connectionId);
+            PlayersToConnections.Remove(playerId);
         }
 
-        public bool PlayerExists(string connectionId, out Guid playerId)
+        public static bool PlayerExists(string connectionId, out Guid playerId)
         {
-            var exists = _playerConnections.TryGetValue(connectionId, out var fetchedPlayerId);
+            var exists = ConnectionsToPlayers.TryGetValue(connectionId, out var fetchedPlayerId);
             if (exists)
                 playerId = fetchedPlayerId;
+            return exists;
+        }
+
+        public static bool GetConnectionId(Guid playerId, out string connectionId)
+        {
+            var exists = PlayersToConnections.TryGetValue(playerId, out var fetchedConnectionId);
+            connectionId = exists ? fetchedConnectionId : null;
             return exists;
         }
     }

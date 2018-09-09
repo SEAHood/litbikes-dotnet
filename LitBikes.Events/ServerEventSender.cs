@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using LitBikes.Model;
 using LitBikes.Model.Dtos;
@@ -11,30 +12,30 @@ namespace LitBikes.Events
     public interface IServerEventSender
     {
         event ServerSendEventHandler Event;
-        void SendEvent(ServerEvent e);
-        void SendEvent(ServerEvent e, IDto payload);
-        void SendListEvent(ServerEvent e, List<IDto> payload);
+        void SendEvent(ServerEvent e, Guid? playerId);
+        void SendEvent(ServerEvent e, IDto payload, Guid? playerId);
+        void SendListEvent(ServerEvent e, List<IDto> payload, Guid? playerId);
     }
 
     public class ServerEventSender : IServerEventSender
     {
         public event ServerSendEventHandler Event;
 
-        public void SendEvent(ServerEvent e)
+        public void SendEvent(ServerEvent e, Guid? playerId)
         {
-            Event?.Invoke(this, new ServerEventSenderArgs(e, null));
+            Event?.Invoke(this, new ServerEventSenderArgs(e, null, playerId));
         }
 
-        public void SendEvent(ServerEvent e, IDto payload)
+        public void SendEvent(ServerEvent e, IDto payload, Guid? playerId)
         {
             var shortenedPayload = payload.MapToShortDto();
-            Event?.Invoke(this, new ServerEventSenderArgs(e, shortenedPayload));
+            Event?.Invoke(this, new ServerEventSenderArgs(e, shortenedPayload, playerId));
         }
 
-        public void SendListEvent(ServerEvent e, List<IDto> payload)
+        public void SendListEvent(ServerEvent e, List<IDto> payload, Guid? playerId)
         {
             var shortenedPayload = payload.Select(p => p.MapToShortDto()).ToList();
-            Event?.Invoke(this, new ServerEventSenderArgs(e, shortenedPayload));
+            Event?.Invoke(this, new ServerEventSenderArgs(e, shortenedPayload, playerId));
         }
     }
 }
