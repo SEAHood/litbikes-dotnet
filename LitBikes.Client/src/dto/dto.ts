@@ -83,7 +83,7 @@ export class HelloDto {
     constructor(shortDto?: HelloDtoShort) {
         if (shortDto) {
             this.gameSettings = new GameSettingsDto(shortDto.gs);
-            this.world = new WorldUpdateDto(shortDto.w);
+            //this.world = new WorldUpdateDto(shortDto.w);
         }
     }
 }

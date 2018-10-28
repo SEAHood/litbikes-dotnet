@@ -12,7 +12,7 @@ namespace LitBikes.Model.Dtos
             var shortDto = new HelloDtoShort
             {
                 Gs = (GameSettingsDtoShort) GameSettings.MapToShortDto(),
-                W = (ServerWorldDtoShort) World.MapToShortDto()
+                //W = (ServerWorldDtoShort) World.MapToShortDto()
             };
             return shortDto;
         }

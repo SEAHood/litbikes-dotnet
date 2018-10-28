@@ -85,7 +85,7 @@ namespace LitBikes.Game.Controller
                             {
                                 GameTickMs = _game.GetGameTickMs()
                             },
-                            World = _game.GetWorldDto()
+                            //World = _game.GetWorldDto()
                         };
 
                         _eventSender.SendEvent(ServerEvent.Hello, helloDto, args.PlayerId);

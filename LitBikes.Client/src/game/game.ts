@@ -301,7 +301,7 @@ export class Game {
         this.gameTickMs = data.gameSettings.gameTickMs;
         console.log(`Game Tick: ${this.gameTickMs}ms`);
             
-        this.processWorldUpdate(data.world);
+        //this.processWorldUpdate(data.world);
 
         this.p5Instance = new p5(this.sketch(), $("#game-container")[0]);
         this.gameStarted = true;

@@ -217,8 +217,8 @@ namespace LitBikes.Game.Engine
             worldDto.Debug = _debug.GetDto();
             var endTime = DateTime.Now;
             var diff = endTime - startTime;
-            if (diff.TotalMilliseconds > 50)
-                Console.WriteLine($"Generated world dto in {diff.TotalMilliseconds}ms");
+            //if (diff.TotalMilliseconds > 50)
+            Console.WriteLine($"Generated world dto in {diff.TotalMilliseconds}ms");
 
             return worldDto;
         }
