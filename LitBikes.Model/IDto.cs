@@ -6,6 +6,5 @@ namespace LitBikes.Model
 {
     public interface IDto
     {
-        IDtoShort MapToShortDto();
     }
 }

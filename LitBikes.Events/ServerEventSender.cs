@@ -28,14 +28,14 @@ namespace LitBikes.Events
 
         public void SendEvent(ServerEvent e, IDto payload, Guid? playerId)
         {
-            var shortenedPayload = payload.MapToShortDto();
-            Event?.Invoke(this, new ServerEventSenderArgs(e, shortenedPayload, playerId));
+            //var shortenedPayload = payload.MapToShortDto();
+            Event?.Invoke(this, new ServerEventSenderArgs(e, payload, playerId));
         }
 
         public void SendListEvent(ServerEvent e, List<IDto> payload, Guid? playerId)
         {
-            var shortenedPayload = payload.Select(p => p.MapToShortDto()).ToList();
-            Event?.Invoke(this, new ServerEventSenderArgs(e, shortenedPayload, playerId));
+            //var shortenedPayload = payload.Select(p => p.MapToShortDto()).ToList();
+            Event?.Invoke(this, new ServerEventSenderArgs(e, payload, playerId));
         }
     }
 }

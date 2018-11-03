@@ -2,7 +2,6 @@
 using System.Threading.Tasks;
 using LitBikes.Events;
 using LitBikes.Model.Dtos.FromClient;
-using LitBikes.Model.Dtos.FromClient.Short;
 using Microsoft.AspNetCore.SignalR;
 
 namespace LitBikes.Server
@@ -50,10 +49,10 @@ namespace LitBikes.Server
                 _clientEventReceiver.Hello(playerId);
         }
 
-        public void RequestJoinGame(ClientGameJoinDtoShort dto)
+        public void RequestJoinGame(ClientGameJoinDto dto)
         {
             if (ConnectionManager.PlayerExists(Context.ConnectionId, out var playerId))
-                _clientEventReceiver.RequestJoinGame(playerId, (ClientGameJoinDto) dto.MapToFullDto());
+                _clientEventReceiver.RequestJoinGame(playerId, dto);
         }
 
         public void KeepAlive()
@@ -68,16 +67,16 @@ namespace LitBikes.Server
                 _clientEventReceiver.RequestRespawn(playerId);
         }
 
-        public void Update(ClientUpdateDtoShort dto)
+        public void Update(ClientUpdateDto dto)
         {
             if (ConnectionManager.PlayerExists(Context.ConnectionId, out var playerId))
-                _clientEventReceiver.Update(playerId, (ClientUpdateDto) dto.MapToFullDto());
+                _clientEventReceiver.Update(playerId, dto);
         }
 
-        public void ChatMessage(ClientChatMessageDtoShort dto)
+        public void ChatMessage(ClientChatMessageDto dto)
         {
             if (ConnectionManager.PlayerExists(Context.ConnectionId, out var playerId))
-                _clientEventReceiver.ChatMessage(playerId, (ClientChatMessageDto) dto.MapToFullDto());
+                _clientEventReceiver.ChatMessage(playerId, dto);
         }
 
         public void UsePowerup()

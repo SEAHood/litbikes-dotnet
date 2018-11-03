@@ -62,14 +62,14 @@ export class Game {
     private lastGameTickProcessed: number;
 
     constructor() {
-        this.hubConnection.on("Hello", (data: HelloDtoShort) => {
-            var fullDto = new HelloDto(data);
-            this.initGame(fullDto);
+        this.hubConnection.on("Hello", (data: HelloDto) => {
+            //var fullDto = new HelloDto(data);
+            this.initGame(data);
         });
 
-        this.hubConnection.on("JoinedGame", (data: GameJoinDtoShort) => {
-            var fullDto = new GameJoinDto(data);
-            this.joinGame(fullDto);
+        this.hubConnection.on("JoinedGame", (data: GameJoinDto) => {
+            //var fullDto = new GameJoinDto(data);
+            this.joinGame(data);
         });
         
         this.hubConnection.on("KeepAliveAck", data => {
@@ -78,32 +78,32 @@ export class Game {
             this.refreshServerTimeout();
         });
 
-        this.hubConnection.on("WorldUpdate", (data: WorldUpdateDtoShort) => {
+        this.hubConnection.on("WorldUpdate", (data: WorldUpdateDto) => {
             if (this.gameStarted) {
-                const fullDto = new WorldUpdateDto(data);
-                this.processWorldUpdate(fullDto);
+                //const fullDto = new WorldUpdateDto(data);
+                this.processWorldUpdate(data);
             }
         });
 
-        this.hubConnection.on("ScoreUpdate", (data: ScoreDtoShort[]) => {
-            var fullDto = data.map(s => new ScoreDto(s));
-            this.updateScores(fullDto);
+        this.hubConnection.on("ScoreUpdate", (data: ScoreDto[]) => {
+            //var fullDto = data.map(s => new ScoreDto(s));
+            this.updateScores(data);
         });
 
-        this.hubConnection.on("ChatMessage", (data: ChatMessageDtoShort) => {
-            const fullDto = new ChatMessageDto(data);
+        this.hubConnection.on("ChatMessage", (data: ChatMessageDto) => {
+            //const fullDto = new ChatMessageDto(data);
 
             // TODO: Use moment or something?
-            const messageTime = new Date(fullDto.timestamp).toTimeString().split(" ")[0];
+            const messageTime = new Date(data.timestamp).toTimeString().split(" ")[0];
             let chatElement = "<li>";
 
             chatElement += `[${messageTime}]`;
-            if (fullDto.isSystemMessage ) {
-                chatElement += `&nbsp;<span style='color:#AFEEEE'>${_.escape(fullDto.message)}</span>`;
+            if (data.isSystemMessage ) {
+                chatElement += `&nbsp;<span style='color:#AFEEEE'>${_.escape(data.message)}</span>`;
             } else {
-                const colour = fullDto.sourceColour.replace("%A%", "100");
-                chatElement += `&nbsp;<span style='color:${colour}'><strong>${fullDto.source}</strong></span>:`;
-                chatElement += `&nbsp;${_.escape(fullDto.message)}`;
+                const colour = data.sourceColour.replace("%A%", "100");
+                chatElement += `&nbsp;<span style='color:${colour}'><strong>${data.source}</strong></span>:`;
+                chatElement += `&nbsp;${_.escape(data.message)}`;
             }
             chatElement += "</li>";
 
@@ -154,8 +154,8 @@ export class Game {
                         }                            
                     } else if ($(ev.target).is("#chat-input")) { // enter when inside chat box
                         let message = $("#chat-input").val() as string;
-                        let dto = new ChatMessageDtoShort();
-                        dto.m = message;
+                        let dto = new ChatMessageDto();
+                        dto.message = message;
                         if (message.toString().trim() != "") {
                             this.hubConnection.invoke("ChatMessage", dto);
                             $("#chat-input").val("");
@@ -205,12 +205,12 @@ export class Game {
                     //this.player.setDirection(newVector);
                     //this.sendClientUpdate();
                     // TODO MOVE THIS SOMEWHERE ELSE
-                    let updateDto = new ClientUpdateDtoShort();
-                    updateDto.i = this.player.getPlayerId();
-                    updateDto.xd = newVector.x;
-                    updateDto.yd = newVector.y;
-                    updateDto.xp = this.player.getBike().getPos().x;
-                    updateDto.yp = this.player.getBike().getPos().y;
+                    let updateDto = new ClientUpdateDto();
+                    updateDto.playerId = this.player.getPlayerId();
+                    updateDto.xDir = newVector.x;
+                    updateDto.yDir = newVector.y;
+                    updateDto.xPos = this.player.getBike().getPos().x;
+                    updateDto.yPos = this.player.getBike().getPos().y;
                     this.hubConnection.invoke("Update", updateDto);
                 }
             }
@@ -269,8 +269,8 @@ export class Game {
     }
 
     private requestJoinGame(name: string) {
-        const joinObj = new ClientGameJoinDtoShort()
-        joinObj.n = name;
+        const joinObj = new ClientGameJoinDto();
+        joinObj.name = name;
         this.hubConnection.invoke("RequestJoinGame", joinObj);
     }
 
@@ -293,6 +293,7 @@ export class Game {
     }
 
     private initGame(data: HelloDto) {
+        console.log(data);
         if ( !data.gameSettings.gameTickMs ) {
             console.error("Cannot start game - game tick interval is not defined");
         }

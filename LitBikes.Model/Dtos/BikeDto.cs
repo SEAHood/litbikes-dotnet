@@ -1,7 +1,5 @@
 ﻿using System.Collections.Generic;
-using System.Linq;
 using System.Numerics;
-using LitBikes.Model.Dtos.Short;
 
 namespace LitBikes.Model.Dtos
 {
@@ -12,18 +10,5 @@ namespace LitBikes.Model.Dtos
         public float Spd;
         public List<TrailSegmentDto> Trail;
         public string Colour; // in rgba(0,0,0,%A%) format
-
-        public IDtoShort MapToShortDto()
-        {
-            var shortDto = new BikeDtoShort
-            {
-                D = Dir,
-                C = Colour,
-                P = Pos,
-                S = Spd,
-                T = Trail.Select(t => (TrailSegmentDtoShort) t.MapToShortDto()).ToList()
-            };
-            return shortDto;
-        }
     }
 }

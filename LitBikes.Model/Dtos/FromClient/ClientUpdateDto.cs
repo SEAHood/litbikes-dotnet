@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Numerics;
-using LitBikes.Model.Dtos.FromClient.Short;
 
 namespace LitBikes.Model.Dtos.FromClient
 {
@@ -24,19 +23,6 @@ namespace LitBikes.Model.Dtos.FromClient
             return PlayerId != Guid.Empty &&
                    XDir != null && XDir <= 1 && XDir >= -1 &&
                    YDir != null && YDir <= 1 && YDir >= -1;
-        }
-
-        public IDtoShort MapToShortDto()
-        {
-            var shortDto = new ClientUpdateDtoShort
-            {
-                I = PlayerId,
-                Xd = XDir,
-                Yd = YDir,
-                Xp = XPos,
-                Yp = YPos
-            };
-            return shortDto;
         }
     }
 }

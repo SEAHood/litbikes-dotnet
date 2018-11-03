@@ -61,9 +61,6 @@
       <SubType>Code</SubType>
     </TypeScriptCompile>
     <TypeScriptCompile Include="src\model\trailSegment.ts" />
-    <TypeScriptCompile Include="src\dto\shortDto.ts">
-      <SubType>Code</SubType>
-    </TypeScriptCompile>
     <TypeScriptCompile Include="src\util.ts">
       <SubType>Code</SubType>
     </TypeScriptCompile>
