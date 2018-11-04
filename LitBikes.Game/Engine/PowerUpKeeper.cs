@@ -89,14 +89,17 @@ namespace LitBikes.Game.Engine
 
         public void PlayerCollectedPowerUp(Player player, PowerUp powerUp)
         {
+            Console.WriteLine("Player collected powerup");
             var availablePowerUp = _availablePowerUps.Values.FirstOrDefault(p => p.GetId() == powerUp.GetId());
             if (availablePowerUp == null || !availablePowerUp.Equals(powerUp))
                 throw new Exception("PowerUp does not exist");
 
+            availablePowerUp.SetCollected(true);
             _playerPowerUps.Remove(player.GetId());
             _playerPowerUps.Add(player.GetId(), availablePowerUp);
+            player.SetCurrentPowerUpType(availablePowerUp.GetPowerUpType());
 
-            _availablePowerUps.TryRemove(availablePowerUp.GetId(), out _);
+            Task.Delay(4000).ContinueWith(t => _availablePowerUps.TryRemove(availablePowerUp.GetId(), out _));
         }
 
         public void PlayerRequestsUse(Player player, List<Player> playerList, List<TrailSegment> trails, int gameSize)

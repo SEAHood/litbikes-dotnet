@@ -52,7 +52,7 @@ export class PlayerDtoShort {
             this.dt = fullDto.deathTimestamp;
             this.s = fullDto.spectating;
             this.sc = fullDto.score;
-            this.cpu = fullDto.currentPowerUp;
+            //this.cpu = fullDto.currentPowerUp;
             this.e = fullDto.effect;
         }
     }

@@ -1,5 +1,6 @@
 import { Bike } from "./bike"
 import { PlayerDto } from "../dto/dto";
+import { PowerUpType } from "./powerUp";
 
 export class Player {        
     private playerId: string;
@@ -12,7 +13,7 @@ export class Player {
     private crashedIntoName: string;
     private score: number;
     private isControlledPlayer: boolean;
-    private currentPowerUp: string;
+    private currentPowerUp: PowerUpType;
     private effect: string;
 
     constructor(playerId: string, name: string, bike: Bike, crashed: boolean, 
@@ -67,7 +68,7 @@ export class Player {
     public isSpectating() : boolean {
         return this.spectating;
     }
-    public getCurrentPowerUp(): string {
+    public getCurrentPowerUp(): PowerUpType {
         return this.currentPowerUp;
     }
     public getEffect(): string {
@@ -112,7 +113,7 @@ export class Player {
         this.crashedIntoName = dto.crashedIntoName;
         this.spectating = dto.spectating;
         this.score = dto.score;
-        this.currentPowerUp = dto.currentPowerUp ? dto.currentPowerUp.toLowerCase() : null;
+        this.currentPowerUp = dto.currentPowerUp ? dto.currentPowerUp : null;
         this.effect = dto.effect;
         this.bike.updateFromDto(dto.bike);          
     }

@@ -1,6 +1,6 @@
 import { Bike } from "../model/bike"
 import { Player } from "../model/player"
-import { PowerUp } from "../model/powerUp"
+import { PowerUp, PowerUpType } from "../model/powerUp"
 import { Arena } from "../model/arena"
 import { Vector, NumberUtil, RenderUtil, TextEffect } from "../util"
 import {
@@ -412,6 +412,8 @@ export class Game {
             }
             powerUps.push(existingPowerUp);
         });
+
+
         this.powerUps = powerUps;
         this.impacts = data.debug.impacts.map(x => x.pos);
     }
@@ -446,11 +448,11 @@ export class Game {
         }
     }
 
-    private getPowerUpIcon(powerUp: string) {
+    private getPowerUpIcon(powerUp: PowerUpType) {
         switch (powerUp) {
-            case "rocket":
+            case PowerUpType.Rocket:
                 return this.powerUpIconRocket;
-            case "slow":
+            case PowerUpType.Slow:
                 return this.powerUpIconSlow;
             default:
                 return null;

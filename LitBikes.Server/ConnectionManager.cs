@@ -1,26 +1,26 @@
 ﻿using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 
 namespace LitBikes.Server
 {
     public static class ConnectionManager
     {
-        private static readonly Dictionary<string, Guid> ConnectionsToPlayers = new Dictionary<string, Guid>();
-        private static readonly Dictionary<Guid, string> PlayersToConnections = new Dictionary<Guid, string>();
+        private static readonly ConcurrentDictionary<string, Guid> ConnectionsToPlayers = new ConcurrentDictionary<string, Guid>();
+        private static readonly ConcurrentDictionary<Guid, string> PlayersToConnections = new ConcurrentDictionary<Guid, string>();
 
         public static void OnConnected(string connectionId)
         {
             if (PlayerExists(connectionId, out _)) return;
             var newPlayerId = Guid.NewGuid();
-            ConnectionsToPlayers.Add(connectionId, newPlayerId);
-            PlayersToConnections.Add(newPlayerId, connectionId);
+            ConnectionsToPlayers.TryAdd(connectionId, newPlayerId);
+            PlayersToConnections.TryAdd(newPlayerId, connectionId);
         }
 
         public static void OnDisconnected(string connectionId)
         {
-            ConnectionsToPlayers.TryGetValue(connectionId, out var playerId);
-            ConnectionsToPlayers.Remove(connectionId);
-            PlayersToConnections.Remove(playerId);
+            ConnectionsToPlayers.TryRemove(connectionId, out var playerId);
+            PlayersToConnections.TryRemove(playerId, out _);
         }
 
         public static bool PlayerExists(string connectionId, out Guid playerId)

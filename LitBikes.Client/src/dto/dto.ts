@@ -39,12 +39,12 @@ export class PlayerDto {
     deathTimestamp?: number;
     spectating: boolean;
     score: number;
-    currentPowerUp: string;
+    currentPowerUp: PowerUpType;
     effect: string;
 
     constructor(shortDto?: PlayerDtoShort) {
         if (shortDto) {
-            this.playerId = shortDto.i;
+            /*this.playerId = shortDto.i;
             this.name = shortDto.n;
             this.bike = new BikeDto(shortDto.b);
             this.crashed = shortDto.c;
@@ -55,7 +55,7 @@ export class PlayerDto {
             this.spectating = shortDto.s;
             this.score = shortDto.sc;
             this.currentPowerUp = shortDto.cpu;
-            this.effect = shortDto.e;
+            this.effect = shortDto.e;*/
         }
     }
 }

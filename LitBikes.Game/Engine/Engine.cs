@@ -104,7 +104,7 @@ namespace LitBikes.Game.Engine
                     PlayerCrashed(player, crashedInto);
                 }
 
-                foreach (var powerUp in _powerUpKeeper.GetList())
+                foreach (var powerUp in _powerUpKeeper.GetList().Where(p => !p.IsCollected()))
                 {
                     var pos = bike.GetPos();
                     var dir = bike.GetDir();
