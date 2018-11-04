@@ -102,9 +102,10 @@ namespace LitBikes.Game.Engine
             Task.Delay(4000).ContinueWith(t => _availablePowerUps.TryRemove(availablePowerUp.GetId(), out _));
         }
 
-        public void PlayerRequestsUse(Player player, List<Player> playerList, List<TrailSegment> trails, int gameSize)
+        public ImpactPoint PlayerRequestsUse(Player player, List<Player> playerList, List<TrailSegment> trails, int gameSize)
         {
-            if (!_playerPowerUps.TryGetValue(player.GetId(), out var powerUp)) return;
+            ImpactPoint impactPoint = null;
+            if (!_playerPowerUps.TryGetValue(player.GetId(), out var powerUp)) return null;
             _playerPowerUps.Remove(player.GetId());
             switch (powerUp.GetPowerUpType())
             {
@@ -142,7 +143,7 @@ namespace LitBikes.Game.Engine
 
 
                     var ray = new LineSegment2D(pos.ToVector2(), wallAhead.ToVector2());
-                    var impactPoint = Physics.FindClosestImpactPoint(pos, ray, trails);
+                    impactPoint = Physics.FindClosestImpactPoint(pos, ray, trails);
                     if (impactPoint?.GetTrailSegment() == null)
                     {
                         break;
@@ -155,7 +156,7 @@ namespace LitBikes.Game.Engine
                     if (trailOwner == null)
                     {
                         Console.WriteLine("Trail exists without a player - this is a bug");
-                        return;
+                        return null;
                     }
 
                     trailOwner.BreakTrailSegment(impactPoint, 10);
@@ -181,11 +182,12 @@ namespace LitBikes.Game.Engine
                     }
                     break;
                 default:
-                    return;
+                    return null;
             }
 
             player.SetCurrentPowerUpType(PowerUpType.Nothing);
             _playerPowerUps.Remove(player.GetId());
+            return impactPoint;
         }
 
         public List<PowerUpDto> GetDtoList()

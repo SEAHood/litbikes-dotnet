@@ -62,11 +62,14 @@ export class PowerUp {
 
     public draw(p: p5) {
 
-        var debug = this.collected ? "collected" : "uncollected";
-        debug += this.collecting ? ", collecting" : ", not collecting";
-        p.textSize(15);
-        p.textAlign("center", "middle");
-        p.text(debug, this.getPos().x, Math.max(0, this.getPos().y - 15));
+        var boxSize = 6;
+        var originX = this.pos.x - (boxSize / 2);
+        var originY = this.pos.y - (boxSize / 2);
+        p.push();
+        p.fill("rgb(255,0,255)");
+        p.noStroke();
+        p.rect(originX, originY, boxSize, boxSize);
+        p.pop();
 
         if (!this.collected) {
             p.push();

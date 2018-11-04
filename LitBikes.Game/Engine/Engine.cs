@@ -109,7 +109,7 @@ namespace LitBikes.Game.Engine
                     var pos = bike.GetPos();
                     var dir = bike.GetDir();
                     var aheadX = pos.X + (2 * dir.X);
-                    var aheadY = pos.X + (2 * dir.Y);
+                    var aheadY = pos.Y + (2 * dir.Y);
                     var line = new LineSegment2D(new Vector2(pos.X, pos.Y), new Vector2(aheadX, aheadY));
                     if (powerUp.Collides(line))
                         _powerUpKeeper.PlayerCollectedPowerUp(player, powerUp);
@@ -233,7 +233,9 @@ namespace LitBikes.Game.Engine
 
         public void RequestUsePowerUp(Player player)
         {
-            _powerUpKeeper.PlayerRequestsUse(player, _players.Values.ToList(), GetTrails(), _gameSize);
+            var impactPoint = _powerUpKeeper.PlayerRequestsUse(player, _players.Values.ToList(), GetTrails(), _gameSize);
+            if (impactPoint != null) 
+                _debug.AddImpact(impactPoint);
         }
 
         public Spawn FindSpawn()
